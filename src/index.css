@@ -18,7 +18,7 @@
 /* div glow */
 .div-glow {
   font: 400 50px "Vibur";
-  margin-top: 120px;
+  margin-top: 60px;
   width: 300px;
   height: 300px;
   border-radius: 50%;
@@ -110,9 +110,9 @@
   }
 }
 
-/* Glow button */
+/* Staff button */
 
-#testbutton {
+#staff_button {
   width: 150px;
   height: 50px;
   border-radius: 180px;
@@ -142,7 +142,7 @@
   line-height: 12px;
 }
 
-#testbutton:before {
+#staff_button:before {
   content: '';
   z-index: 1;
   position: absolute;
@@ -157,14 +157,14 @@
   background: linear-gradient(60deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
 }
 
-#testbutton:hover:before {
+#staff_button:hover:before {
   opacity: 1;
   transition: 0.3s opacity ease-in-out;
   filter: blur(25px);
   background: linear-gradient(60deg, #f79533, #f37055, #ef4e7b, #a166ab, #5073b8, #1098ad, #07b39b, #6fba82);
 }
 
-#testbutton:after {
+#staff_button:after {
   content: 'Staff';
   text-align: center;
   line-height: 40px;
