@@ -1,13 +1,17 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Home from '../Home/Home';
 import { Link, Outlet } from 'react-router-dom';
 import { MdOutlineCancel } from "react-icons/md";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import auth from '../../firebase/firebase.init';
+import { AuthContext } from '../Provider/AuthProvider';
 
 const Main = () => {
     const [modal, setModal] = useState(false);
     const provider = new GoogleAuthProvider();
+    const { user, googleSignIn, logOut } = useContext(AuthContext);
+    console.log(user)
+
 
     const handleGoogleLogin = () => {
         const submitted_shop_code = document.getElementById('submitted_shop_code');
@@ -15,7 +19,7 @@ const Main = () => {
         if (submitted_shop_code.value == shop_main_code.innerText) {
             console.log('code match');
             console.log(auth, provider)
-            signInWithPopup(auth, provider)
+            googleSignIn()
                 .then((result) => {
                     console.log(result)
                     setModal(!modal);
@@ -28,6 +32,10 @@ const Main = () => {
             console.log('code does not match')
         }
         submitted_shop_code.value = '';
+    }
+
+    const handleLogOut = () => {
+        logOut();
     }
 
     return (
@@ -45,13 +53,26 @@ const Main = () => {
                     <Link onClick={handleGoogleLogin}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Submit</button></Link>
                 </div>
             </div>
-            <div className='flex items-center relative'>
+            <Link to="/" className='flex items-center relative'>
                 <div className="logo"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></div>
                 <div className='absolute right-10'>
-                    <Link onClick={() => { setModal(!modal) }}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff Login</button></Link>
+                    {
+                        user ?
+                            <div className='flex items-center gap-5'>
+                                <img className='rounded-full h-10 w-10' src={user.photoURL} alt="" />
+                                <Link onClick={handleLogOut}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Logout</button></Link>
+                            </div> :
+                            <Link onClick={() => { setModal(!modal) }}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff Login</button></Link>
+                    }
                 </div>
 
-            </div>
+            </Link>
+            {
+                user ?
+                    <div className='flex items-center justify-center'>
+                        <Link to="/staff"><button className='mt-8 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff</button></Link>
+                    </div> : ''
+            }
             <Outlet></Outlet>
         </div>
     );
