@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import Home from '../Home/Home';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import { MdOutlineCancel } from "react-icons/md";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import auth from '../../firebase/firebase.init';
@@ -11,6 +11,7 @@ const Main = () => {
     const provider = new GoogleAuthProvider();
     const { user, googleSignIn, logOut } = useContext(AuthContext);
     console.log(user)
+    const location = useLocation();
 
 
     const handleGoogleLogin = () => {
@@ -53,22 +54,22 @@ const Main = () => {
                     <Link onClick={handleGoogleLogin}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Submit</button></Link>
                 </div>
             </div>
-            <Link to="/" className='flex items-center relative'>
-                <div className="logo"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></div>
+            <div className='flex items-center relative'>
+                <Link to="/" className="logo"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></Link>
                 <div className='absolute right-10'>
                     {
                         user ?
                             <div className='flex items-center gap-5'>
-                                <img className='rounded-full h-10 w-10' src={user.photoURL} alt="" />
+                                <img className='rounded-full h-10 w-10' src={user?.photoURL} alt="" />
                                 <Link onClick={handleLogOut}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Logout</button></Link>
                             </div> :
-                            <Link onClick={() => { setModal(!modal) }}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff Login</button></Link>
+                            <Link><button onClick={() => { setModal(!modal) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff Login</button></Link>
                     }
                 </div>
 
-            </Link>
+            </div>
             {
-                user ?
+                user && location.pathname == '/' ?
                     <div className='flex items-center justify-center'>
                         <Link to="/staff"><button className='mt-8 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff</button></Link>
                     </div> : ''
