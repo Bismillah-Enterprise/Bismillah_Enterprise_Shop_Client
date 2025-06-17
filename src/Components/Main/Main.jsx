@@ -9,7 +9,7 @@ import { AuthContext } from '../Provider/AuthProvider';
 const Main = () => {
     const [modal, setModal] = useState(false);
     const [staff, setStaff] = useState({});
-    const {_id} = staff;
+    const { _id } = staff;
     const provider = new GoogleAuthProvider();
     const { user, googleSignIn, logOut } = useContext(AuthContext);
     console.log(user)
@@ -81,8 +81,13 @@ const Main = () => {
             </div>
             {
                 user && location.pathname == '/' ?
-                    <div className='flex items-center justify-center'>
+                    <div className='flex items-center justify-center gap-7'>
                         <Link to={`/staff/${_id}`}><button className='mt-8 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff</button></Link>
+                        {
+                            staff?.user_category == 'admin' ?
+                                <Link to={`/admin`}><button className='mt-8 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Admin</button></Link>
+                                : ''
+                        }
                     </div> : ''
             }
             <Outlet></Outlet>

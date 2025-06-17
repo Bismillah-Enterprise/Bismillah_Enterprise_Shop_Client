@@ -8,6 +8,7 @@ import Login from "../Login/Login";
 import Calculation from "../Calculation/Calculation";
 import Signup from "../Signup/Signup";
 import User_IP from "../User_IP/User_IP";
+import Admin from "../Admin/Admin";
 
 const router = createBrowserRouter([
   {
@@ -30,6 +31,11 @@ const router = createBrowserRouter([
         {
             path: "/calculation",
             element: <Calculation></Calculation>
+        },
+        {
+          path: "/admin",
+          element: <Admin></Admin>,
+          loader: () => fetch('http://localhost:5000/staffs')
         }
     ]
   },

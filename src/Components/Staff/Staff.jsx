@@ -6,7 +6,6 @@ import Clock from '../Clock/Clock';
 
 
 const Staff = () => {
-    const [disabled, setDisabled] = useState(false);
     const staff = useLoaderData();
     const { _id, name, hour_rate, today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time } = staff[0];
     const [userIP, setUserIP] = useState('')
@@ -31,35 +30,54 @@ const Staff = () => {
         month: 'long',
     });
 
-    useEffect(() => {
-        const now = new Date();
-        const midnight = new Date();
-        midnight.setHours(24, 0, 0, 0); // 12:00 AM next day
+    // useEffect(() => {
+    //     const now = new Date();
 
-        const timeUntilMidnight = midnight.getTime() - now.getTime();
+    //     // Set today's 8:20 PM
+    //     const targetTime = new Date();
+    //     targetTime.setHours(20, 52, 0, 0); // 8:20 PM
 
-        const midnightAction = () => {
-            console.log('🎉 It is 12:00 AM! Taking action...');
+    //     const timeUntilTarget = targetTime.getTime() - now.getTime();
 
-            // 👉 Do whatever you want here:
-            // For example, refresh user data, reset daily time logs, etc.
-            // You can even call a backend API here if needed
-        };
+    //     // If it's already past 8:20 PM, skip today
+    //     if (timeUntilTarget <= 0) return;
 
-        // Wait until midnight first time
-        const timeoutId = setTimeout(() => {
-            midnightAction();
+    //     const timerId = setTimeout(() => {
+    //         // Call the server to reset data
+    //         fetch(`http://localhost:5000/reset_time/${_id}`, {
+    //             method: 'PUT',
+    //             headers: {
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             body: JSON.stringify({ enter1_time: '', exit1_time: '', enter2_time: '', exit2_time: '' }) // ✅ send an empty body (was incorrect)
+    //         })
+    //             .then(res => res.json())
+    //             .then(data => {
+    //                 console.log('⏰ Time reset successfully:', data);
+    //                 location.reload()
+    //             })
+    //             .catch(err => {
+    //                 console.error('❌ Failed to reset time:', err);
+    //             });
 
-            // Then repeat every 24 hours
-            const intervalId = setInterval(midnightAction, 24 * 60 * 60 * 1000);
+    //         // Optional: setup for the next day (repeat every 24h)
+    //         const intervalId = setInterval(() => {
+    //             fetch(`http://localhost:5000/reset_time/${_id}`, {
+    //                 method: 'PUT',
+    //                 headers: {
+    //                     'Content-Type': 'application/json'
+    //                 },
+    //                 body: JSON.stringify({ enter1_time: '', exit1_time: '', enter2_time: '', exit2_time: '' })
+    //             })
+    //         }, 24 * 60 * 60 * 1000); // every 24 hours
 
-            // Cleanup interval on unmount
-            return () => clearInterval(intervalId);
-        }, timeUntilMidnight);
+    //         // Clean up interval
+    //         return () => clearInterval(intervalId);
+    //     }, timeUntilTarget);
 
-        // Cleanup timeout on unmount
-        return () => clearTimeout(timeoutId);
-    }, []);
+    //     // Cleanup timeout on unmount
+    //     return () => clearTimeout(timerId);
+    // }, [_id]);
 
     useEffect(() => {
         fetch('http://localhost:5000/get_network_ip')
