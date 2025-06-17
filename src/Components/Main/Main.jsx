@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Home from '../Home/Home';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { MdOutlineCancel } from "react-icons/md";
@@ -8,11 +8,22 @@ import { AuthContext } from '../Provider/AuthProvider';
 
 const Main = () => {
     const [modal, setModal] = useState(false);
+    const [staff, setStaff] = useState({});
+    const {_id} = staff;
     const provider = new GoogleAuthProvider();
     const { user, googleSignIn, logOut } = useContext(AuthContext);
     console.log(user)
     const location = useLocation();
 
+    useEffect(() => {
+        fetch('http://localhost:5000/staffs')
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                const findCurrentUser = data.filter(currentUser => currentUser.email == user.email);
+                setStaff(findCurrentUser[0]);
+            })
+    }, [user]);
 
     const handleGoogleLogin = () => {
         const submitted_shop_code = document.getElementById('submitted_shop_code');
@@ -71,7 +82,7 @@ const Main = () => {
             {
                 user && location.pathname == '/' ?
                     <div className='flex items-center justify-center'>
-                        <Link to="/staff"><button className='mt-8 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff</button></Link>
+                        <Link to={`/staff/${_id}`}><button className='mt-8 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff</button></Link>
                     </div> : ''
             }
             <Outlet></Outlet>

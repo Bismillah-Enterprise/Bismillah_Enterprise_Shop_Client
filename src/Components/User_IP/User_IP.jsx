@@ -40,7 +40,7 @@ const User_IP = () => {
                 Swal.fire({
                     position: "center",
                     icon: "success",
-                    title: "Your work has been saved",
+                    title: "Wi-fi IP update successfully",
                     showConfirmButton: false,
                     timer: 1000
                 });
