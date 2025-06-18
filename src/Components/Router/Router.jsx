@@ -9,6 +9,11 @@ import Calculation from "../Calculation/Calculation";
 import Signup from "../Signup/Signup";
 import User_IP from "../User_IP/User_IP";
 import Admin from "../Admin/Admin";
+import UserRequest from "../UserRequest/UserRequest";
+import UserAccountManipulation from "../UserAccountManipulation/UserAccountManipulation";
+import StaffManipulation from "../StaffManipulation/StaffManipulation";
+import NoticePanel from "../NoticePanel/NoticePanel";
+import AdminBanner from "../AdminBanner/AdminBanner";
 
 const router = createBrowserRouter([
   {
@@ -35,7 +40,29 @@ const router = createBrowserRouter([
         {
           path: "/admin",
           element: <Admin></Admin>,
-          loader: () => fetch('http://localhost:5000/staffs')
+          loader: () => fetch('http://localhost:5000/staffs'),
+          children: [
+            {
+              path: "/admin",
+              element: <AdminBanner></AdminBanner>
+            },
+            {
+              path: "/admin/user_request",
+              element: <UserRequest></UserRequest>
+            },
+            {
+              path: "/admin/user_account_manipulation",
+              element: <UserAccountManipulation></UserAccountManipulation>
+            },
+            {
+              path: "/admin/staff_manipulation",
+              element: <StaffManipulation></StaffManipulation>
+            },
+            {
+              path: "/admin/notice_panel",
+              element: <NoticePanel></NoticePanel>
+            }
+          ]
         }
     ]
   },
