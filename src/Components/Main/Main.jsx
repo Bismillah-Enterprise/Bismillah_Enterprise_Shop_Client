@@ -5,6 +5,7 @@ import { MdOutlineCancel } from "react-icons/md";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import auth from '../../firebase/firebase.init';
 import { AuthContext } from '../Provider/AuthProvider';
+import Swal from 'sweetalert2';
 
 const Main = () => {
     const [modal, setModal] = useState(false);
@@ -35,6 +36,23 @@ const Main = () => {
                 .then((result) => {
                     console.log(result)
                     setModal(!modal);
+                    fetch(`http://localhost:5000/user_request`, {
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify({ name: result?.displayName, email: result?.email })
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log(data);
+                            Swal.fire({
+                                position: "center",
+                                icon: "success",
+                                title: "User Request Sent Successfully",
+                                showConfirmButton: false,
+                                timer: 1000
+                            });
+                        })
                 })
                 .catch(error => {
                     console.log('Errror: ', error)

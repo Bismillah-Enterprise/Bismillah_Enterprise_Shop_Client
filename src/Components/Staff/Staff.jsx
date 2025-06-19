@@ -7,7 +7,7 @@ import Clock from '../Clock/Clock';
 
 const Staff = () => {
     const staff = useLoaderData();
-    const { _id, name, hour_rate, today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time } = staff[0];
+    const { _id, name, hour_rate, today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time, message } = staff[0];
     const [userIP, setUserIP] = useState('')
     const [isAllowed, setIsAllowed] = useState(false);
     const now = new Date();
@@ -128,35 +128,41 @@ const Staff = () => {
     return (
         <div>
             <Clock></Clock>
-            <div>
-                <h1 className='text-2xl text-center text-pink-200 mt-5 font-semibold'>{name} - Hour Rate: {hour_rate}</h1>
-            </div>
-            <div className='flex items-center gap-10 justify-center mt-10'>
-                <button disabled={today_enter1_time == '' ? false : true} onClick={() => handleTodayTime('today_enter1_time', _id)} className='disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[100px] w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-lg cursor-pointer hover:shadow-lg'>Enter 1</button>
-                <button disabled={today_exit1_time == '' ? false : true} onClick={() => handleTodayTime('today_exit1_time', _id)} className='disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[100px] w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-lg cursor-pointer hover:shadow-lg'>Exit 1</button>
-                <button disabled={today_enter2_time == '' ? false : true} onClick={() => handleTodayTime('today_enter2_time', _id)} className='disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[100px] w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-lg cursor-pointer hover:shadow-lg'>Enter 2</button>
-                <button disabled={today_exit2_time == '' ? false : true} onClick={() => handleTodayTime('today_exit2_time', _id)} className='disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[100px] w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-lg cursor-pointer hover:shadow-lg'>Exit 2</button>
-            </div>
-            <div className='flex items-center justify-center mt-10'>
-                <table className='text-pink-200 w-[70%]'>
-                    <tr>
-                        <th>Date</th>
-                        <th>Day Name</th>
-                        <th>Enter 1</th>
-                        <th>Exit 1</th>
-                        <th>Enter 2</th>
-                        <th>Exit 2</th>
-                    </tr>
-                    <tr>
-                        <td id='today_date'>{currentDate}</td>
-                        <td id='today_day_name'>{currentDayName}</td>
-                        <td id='enter1_time'>{today_enter1_time}</td>
-                        <td id='exit1_time'>{today_exit1_time}</td>
-                        <td id='enter2_time'>{today_enter2_time}</td>
-                        <td id='exit2_time'>{today_exit2_time}</td>
-                    </tr>
-                </table>
-            </div>
+            {
+                !message ?
+                    <div>
+                        <div>
+                            <h1 className='text-2xl text-center text-pink-200 mt-5 font-semibold'>{name} - Hour Rate: {hour_rate}</h1>
+                        </div>
+                        <div className='flex items-center gap-10 justify-center mt-10'>
+                            <button disabled={today_enter1_time == '' ? false : true} onClick={() => handleTodayTime('today_enter1_time', _id)} className='disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[100px] w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-lg cursor-pointer hover:shadow-lg'>Enter 1</button>
+                            <button disabled={today_exit1_time == '' ? false : true} onClick={() => handleTodayTime('today_exit1_time', _id)} className='disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[100px] w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-lg cursor-pointer hover:shadow-lg'>Exit 1</button>
+                            <button disabled={today_enter2_time == '' ? false : true} onClick={() => handleTodayTime('today_enter2_time', _id)} className='disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[100px] w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-lg cursor-pointer hover:shadow-lg'>Enter 2</button>
+                            <button disabled={today_exit2_time == '' ? false : true} onClick={() => handleTodayTime('today_exit2_time', _id)} className='disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[100px] w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-lg cursor-pointer hover:shadow-lg'>Exit 2</button>
+                        </div>
+                        <div className='flex items-center justify-center mt-10'>
+                            <table className='text-pink-200 w-[70%]'>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Day Name</th>
+                                    <th>Enter 1</th>
+                                    <th>Exit 1</th>
+                                    <th>Enter 2</th>
+                                    <th>Exit 2</th>
+                                </tr>
+                                <tr>
+                                    <td id='today_date'>{currentDate}</td>
+                                    <td id='today_day_name'>{currentDayName}</td>
+                                    <td id='enter1_time'>{today_enter1_time}</td>
+                                    <td id='exit1_time'>{today_exit1_time}</td>
+                                    <td id='enter2_time'>{today_enter2_time}</td>
+                                    <td id='exit2_time'>{today_exit2_time}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    : <div><p className='text-3xl text-pink-200 text-center'>{message}</p></div>
+            }
         </div>
     );
 };
