@@ -201,3 +201,13 @@ th {
 tr:nth-child(even) {
   /* background-color: #dddddd; */
 }
+
+
+
+/* Media query for mobile responsive */
+
+@media only screen and (max-width: 600px) {
+  .logo b {
+    font-size: 30px;
+  }
+}
