@@ -210,4 +210,11 @@ tr:nth-child(even) {
   .logo b {
     font-size: 30px;
   }
+
+  .div-glow {
+    font: 400 30px "Vibur";
+    margin-top: 30px;
+    width: 250px;
+    height: 250px;
+  }
 }

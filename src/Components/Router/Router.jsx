@@ -48,7 +48,8 @@ const router = createBrowserRouter([
             },
             {
               path: "/admin/user_request",
-              element: <UserRequest></UserRequest>
+              element: <UserRequest></UserRequest>,
+              loader: () => fetch('http://localhost:5000/user_request')
             },
             {
               path: "/admin/user_account_manipulation",

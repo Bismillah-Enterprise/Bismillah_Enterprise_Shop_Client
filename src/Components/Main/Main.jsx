@@ -34,13 +34,14 @@ const Main = () => {
             console.log(auth, provider)
             googleSignIn()
                 .then((result) => {
-                    console.log(result)
+                    console.log(result.user.displayName);
                     setModal(!modal);
                     fetch(`http://localhost:5000/user_request`, {
+                        method: 'POST',
                         headers: {
                             'content-type': 'application/json'
                         },
-                        body: JSON.stringify({ name: result?.displayName, email: result?.email })
+                        body: JSON.stringify({ name: result?.user?.displayName, email: result?.user?.email })
                     })
                         .then(res => res.json())
                         .then(data => {
@@ -83,16 +84,17 @@ const Main = () => {
                     <Link onClick={handleGoogleLogin}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Submit</button></Link>
                 </div>
             </div>
-            <div className='flex items-center relative'>
-                <Link to="/" className="logo"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></Link>
-                <div className='absolute right-10'>
+            <div className='flex items-center justify-between md:justify-start relative'>
+                <Link to="/" className="logo hidden md:block"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></Link>
+                <img className='w-[60px] h-[60px] md:hidden' src='../../src/assets/logo.png'></img>
+                <div className='md:absolute md:right-10 md:mt-5 md:mt-0'>
                     {
                         user ?
                             <div className='flex items-center gap-5'>
                                 <img className='rounded-full h-10 w-10' src={user?.photoURL} alt="" />
-                                <Link onClick={handleLogOut}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Logout</button></Link>
+                                <Link onClick={handleLogOut}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg md:font-semibold'>Logout</button></Link>
                             </div> :
-                            <Link><button onClick={() => { setModal(!modal) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Staff Login</button></Link>
+                            <Link><button onClick={() => { setModal(!modal) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg md:font-semibold'>Staff Login</button></Link>
                     }
                 </div>
 
