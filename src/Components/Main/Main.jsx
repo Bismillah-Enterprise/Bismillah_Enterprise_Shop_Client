@@ -11,9 +11,7 @@ const Main = () => {
     const [modal, setModal] = useState(false);
     const [staff, setStaff] = useState({});
     const { _id } = staff;
-    const provider = new GoogleAuthProvider();
     const { user, googleSignIn, logOut } = useContext(AuthContext);
-    console.log(user)
     const location = useLocation();
 
     useEffect(() => {
@@ -22,51 +20,81 @@ const Main = () => {
             .then(data => {
                 console.log(data)
                 const findCurrentUser = data.filter(currentUser => currentUser.email == user.email);
-                setStaff(findCurrentUser[0]);
+                if (findCurrentUser && findCurrentUser.length > 0) {
+                    setStaff(findCurrentUser[0]);
+                }
             })
     }, [user]);
+    if (!staff) {
+        return <div className="text-center mt-10 text-pink-400">⏳ Loading profile...</div>;
+    }
 
     const handleGoogleLogin = () => {
         const submitted_shop_code = document.getElementById('submitted_shop_code');
         const shop_main_code = document.getElementById('shop_main_code');
-        if (submitted_shop_code.value == shop_main_code.innerText) {
-            console.log('code match');
-            console.log(auth, provider)
+
+        if (submitted_shop_code.value === shop_main_code.innerText) {
             googleSignIn()
                 .then((result) => {
-                    console.log(result.user.displayName);
+                    const email = result?.user?.email;
+                    const name = result?.user?.displayName;
                     setModal(!modal);
-                    fetch(`http://localhost:5000/user_request`, {
-                        method: 'POST',
-                        headers: {
-                            'content-type': 'application/json'
-                        },
-                        body: JSON.stringify({ name: result?.user?.displayName, email: result?.user?.email })
-                    })
+
+                    // 1️⃣ First check if the user is in the staff list
+                    fetch(`http://localhost:5000/staff/${name}`)
                         .then(res => res.json())
-                        .then(data => {
-                            console.log(data);
-                            Swal.fire({
-                                position: "center",
-                                icon: "success",
-                                title: "User Request Sent Successfully",
-                                showConfirmButton: false,
-                                timer: 1000
-                            });
-                        })
+                        .then(staffData => {
+                            if (staffData.length > 0) {
+                                // ✅ User is a staff — proceed to profile or dashboard
+                                console.log("✅ Logged in as staff:", staffData[0]);
+                                // redirect to profile/dashboard if needed
+                            } else {
+                                // 2️⃣ Check if user request already exists
+                                fetch(`http://localhost:5000/user_request/${email}`)
+                                    .then(res => res.json())
+                                    .then(userRequest => {
+                                        if (userRequest) {
+                                            console.log("ℹ️ User request already exists:", userRequest);
+                                        } else {
+                                            // 3️⃣ Insert new request
+                                            fetch(`http://localhost:5000/user_request`, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'content-type': 'application/json'
+                                                },
+                                                body: JSON.stringify({ name, email, message: 'You are Waiting for Admin Approval' })
+                                            })
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    console.log("📩 New request submitted:", data);
+                                                    Swal.fire({
+                                                        position: "center",
+                                                        icon: "success",
+                                                        title: "User Request Sent Successfully",
+                                                        showConfirmButton: false,
+                                                        timer: 1000
+                                                    });
+                                                });
+                                        }
+                                    });
+                            }
+                        });
                 })
                 .catch(error => {
-                    console.log('Errror: ', error)
-                })
+                    console.log('❌ Google login failed:', error);
+                });
+        } else {
+            console.log('❌ Shop code does not match');
         }
-        else {
-            console.log('code does not match')
-        }
+
         submitted_shop_code.value = '';
-    }
+    };
 
     const handleLogOut = () => {
-        logOut();
+        logOut()
+            .then(() => {
+                location.reload();
+            })
     }
 
     return (
@@ -81,13 +109,13 @@ const Main = () => {
                     <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 mb-2 w-full'>
                         <input id='submitted_shop_code' type="password" className='outline-none' />
                     </div>
-                    <Link onClick={handleGoogleLogin}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Submit</button></Link>
+                    <Link onClick={handleGoogleLogin}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 md:mb-0'>Submit</button></Link>
                 </div>
             </div>
             <div className='flex items-center justify-between md:justify-start relative'>
                 <Link to="/" className="logo hidden md:block"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></Link>
                 <img className='w-[60px] h-[60px] md:hidden' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
-                <div className='md:absolute md:right-10 md:mt-5 md:mt-0'>
+                <div className='md:absolute md:right-10 mt-5 md:mt-0'>
                     {
                         user ?
                             <div className='flex items-center gap-5'>
