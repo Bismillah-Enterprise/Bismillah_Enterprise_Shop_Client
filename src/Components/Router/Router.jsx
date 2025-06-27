@@ -16,6 +16,8 @@ import NoticePanel from "../NoticePanel/NoticePanel";
 import AdminBanner from "../AdminBanner/AdminBanner";
 import NotAuthorized from "../NotAuthorized/NotAuthorized";
 import AdminRoute from "./AdminRoute";
+import StaffRoute from "./StaffRoute";
+import ShopCode from "../ShopCode/ShopCode";
 
 const router = createBrowserRouter([
   {
@@ -28,13 +30,10 @@ const router = createBrowserRouter([
       },
       {
         path: "/staff/:id",
-        element: <Staff></Staff>,
+        element: <StaffRoute><Staff></Staff></StaffRoute>,
         loader: ({ params }) => fetch(`http://localhost:5000/staff/${params.id}`)
       },
-      {
-        path: "/user_ip",
-        element: <User_IP></User_IP>
-      },
+
       {
         path: "/calculation",
         element: <Calculation></Calculation>
@@ -47,6 +46,14 @@ const router = createBrowserRouter([
           {
             path: "/admin",
             element: <AdminRoute><AdminBanner></AdminBanner></AdminRoute>
+          },
+          {
+            path: "/admin/user_ip",
+            element: <AdminRoute><User_IP></User_IP></AdminRoute>
+          },
+          {
+            path: "/admin/shop_code",
+            element: <AdminRoute><ShopCode></ShopCode></AdminRoute>
           },
           {
             path: "/admin/user_request",

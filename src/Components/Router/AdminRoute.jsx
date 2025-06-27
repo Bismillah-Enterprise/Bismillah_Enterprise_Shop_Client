@@ -6,43 +6,38 @@ const AdminRoute = ({ children }) => {
     const { user, loading } = useContext(AuthContext);
     const [isAdmin, setIsAdmin] = useState(null);
     const [checking, setChecking] = useState(true);
-    console.log(user)
 
     useEffect(() => {
-        if (user?.email) {
-            fetch(`http://localhost:5000/staff`, {
-                method: 'GET',
-                headers: {
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify({email: user?.email})
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.length > 0 && data[0].user_category === 'admin') {
-                        setIsAdmin(true);
-                    } else {
-                        setIsAdmin(false);
-                    }
-                    setChecking(false);
-                })
-                .catch(() => {
-                    setIsAdmin(false);
-                    setChecking(false);
-                });
-        } else {
-            setChecking(false);
-        }
-    }, [user]);
+        if (!user) return;
 
+        // ✅ Only run this if user is available
+        fetch(`http://localhost:5000/staff/uid_query/${user.uid}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.user_category === 'admin') {
+                    setIsAdmin(true);
+                } else {
+                    setIsAdmin(false);
+                }
+                setChecking(false);
+            })
+            .catch(() => {
+                setIsAdmin(false);
+                setChecking(false);
+            });
+    }, [user]); // ✅ depend on `user`, not `isAdmin`
+
+    // ⏳ Still checking or auth not ready
     if (loading || checking) {
         return <div className="text-center text-pink-500 mt-10">⏳ Checking Admin Access...</div>;
     }
 
+    // 🚫 Not logged in or not admin
     if (!user || !isAdmin) {
         return <Navigate to="/not_authorized" replace />;
     }
 
+    // ✅ Authorized admin
     return children;
 };
 

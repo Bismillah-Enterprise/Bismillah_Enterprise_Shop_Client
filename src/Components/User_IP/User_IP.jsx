@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2'
+import useGetWifiIp from '../Hooks/useGetWifiIp';
 
 const User_IP = () => {
     const [allowed, setAllowed] = useState(false);
-    const [wifiIp, setWifiIp] = useState(null);
+    const [wifiIp] = useGetWifiIp();
+    console.log(wifiIp)
     const [isSetIp, setIsSetIp] = useState(false);
-
-    useEffect(() => {
-        fetch('http://localhost:5000/get_network_ip')
-            .then(res => res.json())
-            .then(data => {
-                setWifiIp(data.ip);
-            })
-    }, [])
 
     const handleShowWifiIp = () => {
         const ipText = document.getElementById('wifi_ip_text');
@@ -44,6 +38,9 @@ const User_IP = () => {
                     showConfirmButton: false,
                     timer: 1000
                 });
+                const ipText = document.getElementById('wifi_ip_text');
+                ipText.innerText = 'Click the button below to view your WiFi IP'
+                setIsSetIp(!isSetIp);
             })
     }
 
@@ -54,9 +51,11 @@ const User_IP = () => {
             <div className=''>
                 <div className='w-[500px] mb-5 flex items-center gap-5'>
                     <p id='wifi_ip_text' className='text-2xl'>Click the button below to view your WiFi IP</p>
-                    <button onClick={handleSetWifiIP} className={`${!isSetIp ? 'hidden' : 'block'} border-2 border-yellow-400 px-4 py-2 rounded-2xl cursor-pointer`}>Set The IP For Shop</button>
                 </div>
-                <button onClick={handleShowWifiIp} className='border-2 border-yellow-400 px-4 py-2 rounded-2xl cursor-pointer'>Show IP Address</button>
+                <div className='flex items-center gap-8'>
+                    <button onClick={handleShowWifiIp} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Show IP Address</button>
+                    <button onClick={handleSetWifiIP} disabled={!isSetIp ? true : false} className={`disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed disabled:border-2 disabled:border-gray-400 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold`}>Set The IP For Shop</button>
+                </div>
             </div>
         </div>
     );

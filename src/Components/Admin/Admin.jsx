@@ -19,9 +19,16 @@ const Admin = () => {
                 <Link to={"/admin/staff_manipulation"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
                     Staff Manipulation
                 </Link>
+                <Link to={"/admin/user_ip"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
+                    Set Shop Wi-Fi IP
+                </Link>
+                <Link to={"/admin/shop_code"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
+                    Set Shop Code
+                </Link>
                 <Link to={"/admin/notice_panel"} className='rounded-b-2xl w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
                     Notice Panel
                 </Link>
+                
             </div>
             <div className='min-h-[60vh] w-[68%] rounded-2xl shadow-lg shadow-pink-300 flex items-center justify-center'>
                 <Outlet></Outlet>

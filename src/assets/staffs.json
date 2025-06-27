@@ -1,0 +1,37 @@
+[
+	{
+		"name": "Robiul Hasan",
+		"email": "bismillah786e@gmail.com",
+		"hour_rate": 18,
+		"total_income": 0,
+		"total_working_hour": "0-0",
+		"current_working_month": "June",
+		"current_month_details": [
+			{
+				"date": "01-06-25",
+				"enter1": "0-0",
+				"exit1": "0-0",
+				"enter2": "0-0",
+				"exit2": "0-0",
+				"total_hour": "0-0",
+				"total_income": 0,
+				"cash_received": 0
+			}
+		],
+		"income_history": [
+			{
+				"month_name": "May",
+				"total_income": 0,
+				"paid_ammount": 0,
+				"paid_date": 0,
+				"payment_status": "Payed"
+			}
+		],
+		"user_category": "admin",
+		"today_enter1_time": "09:54 PM",
+		"today_enter2_time": "09:55 PM",
+		"today_exit1_time": "09:55 PM",
+		"today_exit2_time": "09:55 PM",
+		"display_name": "Abdul Kader Proprietor"
+	}
+]
