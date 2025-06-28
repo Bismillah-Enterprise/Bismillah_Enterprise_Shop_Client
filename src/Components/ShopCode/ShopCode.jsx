@@ -38,9 +38,10 @@ const ShopCode = () => {
 					title: "Shop Code Changed successfully",
 					showConfirmButton: false,
 					timer: 1000
-				});
+				}).then(() => {
+					window.location.reload();
+				})
 				setIsSetShopCode(!isSetIp);
-				location.reload();
 			});
 
 	}

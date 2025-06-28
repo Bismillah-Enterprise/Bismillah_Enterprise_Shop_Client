@@ -30,7 +30,7 @@ const Admin = () => {
                 </Link>
                 
             </div>
-            <div className='min-h-[60vh] w-[68%] rounded-2xl shadow-lg shadow-pink-300 flex items-center justify-center'>
+            <div className='min-h-[60vh] w-[68%] rounded-2xl shadow-lg shadow-pink-300 flex items-start justify-center p-5'>
                 <Outlet></Outlet>
             </div>
 
