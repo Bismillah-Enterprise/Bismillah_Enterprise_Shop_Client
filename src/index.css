@@ -187,7 +187,7 @@
 
 table {
   font-family: arial, sans-serif;
-  border-collapse: collapse;
+  /* border-collapse: collapse; */
 }
 
 td,
@@ -201,6 +201,18 @@ tr:nth-child(even) {
   /* background-color: #dddddd; */
 }
 
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Opera */
+}
 
 
 /* Media query for mobile responsive */

@@ -11,6 +11,7 @@ const auth = getAuth(app);
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+	const [isMenu, setIsMenu] = useState(false);
     const googleProvider = new GoogleAuthProvider;
 
 
@@ -30,7 +31,7 @@ const AuthProvider = ({ children }) => {
         const unsubscribe = onAuthStateChanged(auth, currentUser => {
             setUser(currentUser);
             console.log('current user', currentUser);
-            setLoading(false);
+            // setLoading(false);
         });
         return () => {
             return unsubscribe();
@@ -43,6 +44,8 @@ const AuthProvider = ({ children }) => {
 		setLoading,
         googleSignIn,
         logOut,
+		isMenu,
+		setIsMenu
     }
 
     return (

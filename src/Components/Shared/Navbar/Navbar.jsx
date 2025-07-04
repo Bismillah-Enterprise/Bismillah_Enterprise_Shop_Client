@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../../Providers/AuthProvider';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { MdOutlineCancel } from 'react-icons/md';
 import Loading from '../Loading/Loading';
 import Swal from 'sweetalert2';
@@ -10,6 +10,7 @@ const Navbar = () => {
 	const [modal, setModal] = useState(false);
 	const [isCodeMatched, setIsCodeMatched] = useState(true);
 	const inputRef = useRef(null);
+	const navigate = useNavigate();
 	const handleOpenModal = () => {
 		setModal(!modal)
 	}
@@ -24,6 +25,7 @@ const Navbar = () => {
 	const handleLogOut = () => {
 		logOut()
 			.then(() => {
+				navigate('/')
 				setLoading(false);
 			})
 		location.reload();
@@ -32,9 +34,9 @@ const Navbar = () => {
 		setLoading(true)
 		const typedShopCode = inputRef.current?.value;
 		fetch(`https://shop-manager-server.onrender.com/shop_code/${import.meta.env.VITE_shop_code_object_id}`)
-			.then(res => res.json())
-			.then(theShopCode => {
-				if (typedShopCode === theShopCode[0]?.shop_code) {
+		.then(res => res.json())
+		.then(theShopCode => {
+			if (typedShopCode === theShopCode[0]?.shop_code) {
 					setModal(!modal);
 					googleSignIn()
 						.then(userData => {
@@ -56,7 +58,7 @@ const Navbar = () => {
 														})
 															.then(res => res.json())
 															.then(newUserRequest => {
-																if(newUserRequest?.acknowledged) {
+																if (newUserRequest?.acknowledged) {
 																	Swal.fire({
 																		position: "center",
 																		icon: "success",
@@ -106,40 +108,35 @@ const Navbar = () => {
 	}
 	return (
 		<div>
-
 			{/* ------------ Modal ---------------- */}
-			< div id='shop_code_modal' className={`${!modal ? 'hidden' : 'block'} h-[300px] w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`
+			< div id='shop_code_modal' className={`${!modal ? 'hidden' : 'block'} h-[300px] w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50`
 			}>
-				{
-					!loading ?
-						<div>
-							<div className='flex justify-end -top-[10px] -right-[10px] relative'>
-								<MdOutlineCancel onClick={() => { !setModal(!modal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
-							</div>
-							<div className='text-pink-200 flex flex-col gap-5 p-8 items-center h-full w-full'>
-								<h1 className='text-2xl font-semibold'>Enter The Shop Code</h1>
-								{/* <p id='shop_main_code' className='hidden'>12345</p> */}
-								<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
-									<input type="password" ref={inputRef} className='outline-none' />
-								</div>
-								<p id='doesNotMatched' className={`text-red-500 ${isCodeMatched ? 'hidden' : ''}`}>Shop code does not matched</p>
-								<button onClick={handleLogin} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 md:mb-0'>Submit</button>
-							</div>
+				<div>
+					<div className='flex justify-end -top-[10px] -right-[10px] relative'>
+						<MdOutlineCancel onClick={() => { !setModal(!modal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+					</div>
+					<div className='text-pink-200 flex flex-col gap-5 p-8 items-center h-full w-full'>
+						<h1 className='text-2xl font-semibold'>Enter The Shop Code</h1>
+						{/* <p id='shop_main_code' className='hidden'>12345</p> */}
+						<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+							<input type="password" ref={inputRef} className='outline-none' />
 						</div>
-						: <div className='h-full rounded-2xl overflow-hidden'><Loading></Loading></div>
+						<p id='doesNotMatched' className={`text-red-500 ${isCodeMatched ? 'hidden' : ''}`}>Shop code does not matched</p>
+						<button onClick={handleLogin} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold mb-5 md:mb-0'>Submit</button>
+					</div>
+				</div>
 
-				}
 			</div >
 			{/* --------------- End Modal ------------------------- */}
-			< div className='flex items-center justify-between md:justify-start relative py-5' >
+			< div className='flex items-center justify-between md:justify-start relative py-5 px-5' >
 				<Link to="/" className="logo hidden md:block"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></Link>
 				<img className='w-[60px] h-[60px] md:hidden' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
-				<div className='md:absolute md:right-10 mt-5 md:mt-0'>
+				<div className='md:absolute md:right-10'>
 					{
 						user ?
 							<div className='flex items-center gap-5'>
 								<img className='rounded-full h-10 w-10' src={user?.photoURL} alt="" />
-								<Link onClick={handleLogOut}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg md:font-semibold'>Logout</button></Link>
+								<Link onClick={handleLogOut}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg font-semibold'>Logout</button></Link>
 							</div> :
 							<Link><button onClick={handleOpenModal} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg md:font-semibold'>Staff Login</button></Link>
 					}
