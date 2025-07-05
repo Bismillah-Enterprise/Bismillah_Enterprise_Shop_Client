@@ -10,7 +10,7 @@ const AdminMain = () => {
 			<div className='max-h-fit md:w-[400px] shadow-lg shadow-pink-200 rounded-2xl overflow-scroll scrollbar-hide'>
 				<AdminNavbar></AdminNavbar>
 			</div>
-			<div onClick={() => {setIsMenu(!isMenu)}} className='shadow-lg shadow-pink-200 p-5 rounded-2xl flex-1 h-full'>
+			<div onClick={() => {setIsMenu(false)}} className='shadow-lg shadow-pink-200 p-5 rounded-2xl flex-1 h-full'>
 				<Outlet></Outlet>
 			</div>
 		</div>

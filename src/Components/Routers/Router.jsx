@@ -14,6 +14,7 @@ import StaffManipulation from '../Admin/StaffManipulation/StaffManipulation';
 import UserManipulation from '../Admin/UserManipulation/UserManipulation';
 import UserRequest from '../Admin/UserRequest/UserRequest';
 import SetShopLocation from '../Admin/SetShopLocation/SetShopLocation';
+import LocationDetails from '../Admin/LocationDetails/LocationDetails';
 
 const router = createBrowserRouter([
 	{
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
 					{
 						path: '/admin/user_request',
 						element: <UserRequest></UserRequest>
+					},
+					{
+						path: '/admin/location_details',
+						element: <LocationDetails></LocationDetails>
 					}
 				]
 			}

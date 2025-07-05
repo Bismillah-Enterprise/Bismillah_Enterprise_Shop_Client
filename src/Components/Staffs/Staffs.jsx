@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, useLoaderData } from 'react-router-dom';
+import { Link, useLoaderData, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Providers/AuthProvider';
 import Loading from '../Shared/Loading/Loading';
 import useCurrentUser from '../Hooks/useCurrentUser';
@@ -20,94 +20,59 @@ function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
 }
 
 const Staffs = () => {
-	const { user, loading } = useContext(AuthContext);
+	const { user } = useContext(AuthContext);
 	const [, , isAdmin, userHookLoading] = useCurrentUser();
 	const staff = useLoaderData();
-	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time } = staff;
+	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time, uid } = staff;
 	const [isAllowed, setIsAllowed] = useState(false);
-	const [isLocationChecked, setIsLocationChecked] = useState(false);
+	const [accuracy, setAccuracy] = useState('');
+	const [lat, setLat] = useState('')
+	const [lan, setLan] = useState('')
+	const [distance, setDistance] = useState('')
+	const [currentLocation, setCurrentLocation] = useState({});
+	const [locationLoading, setLocationLoading] = useState(false);
+	const navigate = useNavigate();
 
 	useEffect(() => {
-		// if (loading || userHookLoading) return;
-
-		const fetchAndCompareLocation = async () => {
-			if (isAdmin) {
-				setIsAllowed(true);
-				setIsLocationChecked(true);
-				console.log("✅ Admin: skipping location check");
-				return;
-			}
-
-			try {
-				console.log("🌐 Fetching shop location...");
-				const res = await fetch('https://shop-manager-server.onrender.com/shop_location');
-				const shopLocation = await res.json();
-
-				if (!shopLocation || !shopLocation.latitude || !shopLocation.longitude) {
-					alert("⚠️ Shop location is not set yet. Contact Admin.");
-					setIsAllowed(false);
-					setIsLocationChecked(true);
-					return;
-				}
-
-				console.log("📍 Shop location:", shopLocation);
-
-				if (!navigator.geolocation) {
-					alert('Geolocation not supported.');
-					setIsAllowed(false);
-					setIsLocationChecked(true);
-					return;
-				}
-
+		setLocationLoading(true);
+		fetch('https://shop-manager-server.onrender.com/shop_location')
+			.then(res => res.json())
+			.then(currentLocationData => {
+				setCurrentLocation(currentLocationData);
+				console.log(currentLocationData)
 				navigator.geolocation.getCurrentPosition(
-					(pos) => {
-						const { latitude, longitude, accuracy } = pos.coords;
-
-						console.log("📌 User Location:", latitude, longitude, "Accuracy:", accuracy);
-
-						if (accuracy > 200) {
-							alert('⚠️ Location accuracy too low. Try using a mobile phone.');
-							setIsAllowed(false);
-							setIsLocationChecked(true);
-							return;
-						}
+					(position) => {
+						const { latitude, longitude, accuracy } = position.coords;
 
 						const distance = getDistanceFromLatLonInMeters(
 							latitude,
 							longitude,
-							shopLocation.latitude,
-							shopLocation.longitude
+							currentLocationData.latitude,
+							currentLocationData.longitude
 						);
 
-						console.log("📏 Distance to shop:", distance, "meters");
-
-						if (distance <= 100) {
+						if(distance > 50 && accuracy > 100) {
+							setIsAllowed(false)
+							setLocationLoading(false);
+							console.log('no')
+						}
+						else {
 							setIsAllowed(true);
-							console.log("✅ Inside shop area");
-						} else {
-							alert(`You are ${Math.round(distance)}m away from the shop. Access denied.`);
-							setIsAllowed(false);
+							setLocationLoading(false)
+							console.log('yes')
 						}
 
-						setIsLocationChecked(true);
-					},
-					(err) => {
-						console.error("❌ Geolocation error:", err);
-						alert("⚠️ Location access denied.");
-						setIsAllowed(false);
-						setIsLocationChecked(true);
-					}
-				);
-			} catch (err) {
-				console.error("❌ Shop location fetch failed:", err);
-				alert("⚠️ Could not fetch shop location. Try again.");
-				setIsAllowed(false);
-				setIsLocationChecked(true);
-			}
-		};
+						setLat(latitude);
+						setLan(longitude);
+						setAccuracy(accuracy.toFixed(2));
+						setDistance(distance.toFixed(2));
+						setLocationLoading(false);
 
-		fetchAndCompareLocation();
-	}, [isAdmin, loading, userHookLoading]);
+					}
+				)
+			})
+			setLocationLoading(false)
+	}, [user]);
 
 
 	// Time
@@ -141,17 +106,12 @@ const Staffs = () => {
 					showConfirmButton: false,
 					timer: 1000,
 				});
-				location.reload();
+				navigate(`/staff/uid_query/${uid}`)
 			});
 	};
-
-	console.log('isAllowed:', isAllowed);
-	console.log('enter1:', today_enter1_time);
-	console.log('exit1:', today_exit1_time);
-	console.log('enter2:', today_enter2_time);
-	console.log('exit2:', today_exit2_time);
-
-	if (userHookLoading || loading || !isLocationChecked) {
+	console.log(userHookLoading);
+	console.log(locationLoading);
+	if (userHookLoading || locationLoading) {
 		return (
 			<div className="h-full rounded-2xl overflow-hidden">
 				<Loading />
@@ -178,6 +138,11 @@ const Staffs = () => {
 						)}
 					</div>
 				)}
+				<h1 className='text-pink-200 text-md md:text-xl text-center mb-2 font-semibold'>Your Location From Shop</h1>
+				<div className='flex items-center justify-center gap-5 text-pink-200 text-md md:text-xl'>
+					<h1>Accuracy: {accuracy} meters</h1>
+					<h1>Distance: {distance} meters</h1>
+				</div>
 				<div>
 					<h1 className="text-lg md:text-2xl text-center text-pink-200 mt-5 font-semibold">
 						{name} - Hour Rate: {hour_rate}

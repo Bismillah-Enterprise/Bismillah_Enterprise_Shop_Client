@@ -130,7 +130,7 @@ const Navbar = () => {
 			{/* --------------- End Modal ------------------------- */}
 			< div className='flex items-center justify-between md:justify-start relative py-5 px-5' >
 				<Link to="/" className="logo hidden md:block"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></Link>
-				<img className='w-[60px] h-[60px] md:hidden' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
+				<Link to={'/'}><img className='w-[60px] h-[60px] md:hidden' src='https://i.ibb.co/01Zf9m1/logo.png'></img></Link>
 				<div className='md:absolute md:right-10'>
 					{
 						user ?

@@ -6,9 +6,10 @@ const useCurrentUser = () => {
 	const [current_User, setCurrent_User] = useState({});
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [isStaff, setIsStaff] = useState(false);
-	const [userHookLoading, setUserHookLoading] = useState(true); // Local userHookLoading for the hook
+	const [userHookLoading, setUserHookLoading] = useState(false); // Local userHookLoading for the hook
 
 	useEffect(() => {
+		setUserHookLoading(true);
 		if (!user?.uid) {
 			setUserHookLoading(false);
 			return;
