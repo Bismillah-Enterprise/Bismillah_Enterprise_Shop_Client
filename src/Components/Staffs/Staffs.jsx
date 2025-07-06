@@ -4,6 +4,7 @@ import { AuthContext } from '../Providers/AuthProvider';
 import Loading from '../Shared/Loading/Loading';
 import useCurrentUser from '../Hooks/useCurrentUser';
 import Swal from 'sweetalert2'; // assuming you're using this
+import { PuffLoader } from 'react-spinners';
 
 // Utility to calculate distance in meters
 function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
@@ -51,7 +52,7 @@ const Staffs = () => {
 							currentLocationData.longitude
 						);
 
-						if(distance > 50 && accuracy > 100) {
+						if (distance > 50 && accuracy > 100) {
 							setIsAllowed(false)
 							setLocationLoading(false);
 							console.log('no')
@@ -71,7 +72,7 @@ const Staffs = () => {
 					}
 				)
 			})
-			setLocationLoading(false)
+		setLocationLoading(false)
 	}, [user]);
 
 
@@ -139,10 +140,13 @@ const Staffs = () => {
 					</div>
 				)}
 				<h1 className='text-pink-200 text-md md:text-xl text-center mb-2 font-semibold'>Your Location From Shop</h1>
-				<div className='flex items-center justify-center gap-5 text-pink-200 text-md md:text-xl'>
-					<h1>Accuracy: {accuracy} meters</h1>
-					<h1>Distance: {distance} meters</h1>
-				</div>
+				{
+					!accuracy && !distance ? <div className='flex justify-center'><PuffLoader color='#fccee8' size={40} /></div> :
+						<div className='flex items-center justify-center gap-5 text-pink-200 text-md md:text-xl'>
+							<h1>Accuracy: {accuracy} meters</h1>
+							<h1>Distance: {distance} meters</h1>
+						</div>
+				}
 				<div>
 					<h1 className="text-lg md:text-2xl text-center text-pink-200 mt-5 font-semibold">
 						{name} - Hour Rate: {hour_rate}
