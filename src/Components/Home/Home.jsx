@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../Providers/AuthProvider';
 import Loading from '../Shared/Loading/Loading';
 import useCurrentUser from '../Hooks/useCurrentUser';
@@ -7,9 +7,8 @@ import useCurrentUser from '../Hooks/useCurrentUser';
 const Home = () => {
 	const { user, loading, setLoading } = useContext(AuthContext);
 	const [current_User, isAdmin, isStaff, userHookLoading] = useCurrentUser();
-	console.log('current user: ',current_User);
-	console.log('Admin: ',isAdmin);
-	console.log('Staff: ',isStaff);
+	const location = useLocation();
+	console.log(location);
 
 	if (userHookLoading && loading) {
 		return (<div className='h-full rounded-2xl overflow-hidden'><Loading></Loading></div>);
@@ -20,7 +19,7 @@ const Home = () => {
 				{
 					user ? <div className="flex items-center justify-center gap-5 mb-10">
 
-						<Link to={!isStaff? `/not_authorized` : `/staff/uid_query/${current_User?.uid}`} state={{ from: "/" }}>
+						<Link to={!isStaff? `/not_authorized` : `/staff/uid_query/${current_User?.uid}`} state={{ pathname: location.pathname }}>
 							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold">
 								Staff
 							</button>

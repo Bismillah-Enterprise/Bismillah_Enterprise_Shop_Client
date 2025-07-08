@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../../Providers/AuthProvider';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { MdOutlineCancel } from 'react-icons/md';
 import Loading from '../Loading/Loading';
 import Swal from 'sweetalert2';
@@ -11,6 +11,7 @@ const Navbar = () => {
 	const [isCodeMatched, setIsCodeMatched] = useState(true);
 	const inputRef = useRef(null);
 	const navigate = useNavigate();
+	const location = useLocation();
 	const handleOpenModal = () => {
 		setModal(!modal)
 	}
@@ -23,20 +24,24 @@ const Navbar = () => {
 		}
 	}, [modal]);
 	const handleLogOut = () => {
-		logOut()
-			.then(() => {
+		logOut().then(() => {
+			setLoading(false);
+			if (location.pathname.includes('staffs')) {
 				navigate('/')
-				setLoading(false);
-			})
-		location.reload();
+			}
+			else {
+				navigate('/')
+			}
+		})
 	}
 	const handleLogin = () => {
 		setLoading(true)
 		const typedShopCode = inputRef.current?.value;
 		fetch(`https://shop-manager-server.onrender.com/shop_code/${import.meta.env.VITE_shop_code_object_id}`)
-		.then(res => res.json())
-		.then(theShopCode => {
-			if (typedShopCode === theShopCode[0]?.shop_code) {
+			.then(res => res.json())
+			.then(theShopCode => {
+				if (typedShopCode === theShopCode[0]?.shop_code) {
+					inputRef.current.value = '';
 					setModal(!modal);
 					googleSignIn()
 						.then(userData => {
@@ -101,6 +106,7 @@ const Navbar = () => {
 						})
 				}
 				else {
+					inputRef.current.value = '';
 					setIsCodeMatched(false);
 					setLoading(false);
 				}

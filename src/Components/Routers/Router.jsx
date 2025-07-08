@@ -15,6 +15,8 @@ import UserManipulation from '../Admin/UserManipulation/UserManipulation';
 import UserRequest from '../Admin/UserRequest/UserRequest';
 import SetShopLocation from '../Admin/SetShopLocation/SetShopLocation';
 import LocationDetails from '../Admin/LocationDetails/LocationDetails';
+import StaffsMonthlyRecords from '../StaffsMonthlyRecords/StaffsMonthlyRecords';
+import AdditionalRequest from '../Admin/AdditionalRequest/AdditionalRequest';
 
 const router = createBrowserRouter([
 	{
@@ -28,6 +30,11 @@ const router = createBrowserRouter([
 			{
 				path: '/staff/uid_query/:uid',
 				element: <Staffs></Staffs>,
+				loader: ({params}) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+			},
+			{
+				path: '/monthly_records/:uid',
+				element: <StaffsMonthlyRecords></StaffsMonthlyRecords>,
 				loader: ({params}) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
 			},
 			{
@@ -56,15 +63,23 @@ const router = createBrowserRouter([
 					},
 					{
 						path: '/admin/staff_manipulation',
-						element: <StaffManipulation></StaffManipulation>
+						element: <StaffManipulation></StaffManipulation>,
+						loader: () => fetch(`https://shop-manager-server.onrender.com/staffs`)
+					},
+					{
+						path: '/admin/additional_request',
+						element: <AdditionalRequest></AdditionalRequest>,
+						loader: () => fetch(`https://shop-manager-server.onrender.com/additional_movement_request`)
 					},
 					{
 						path: '/admin/user_manipulation',
-						element: <UserManipulation></UserManipulation>
+						element: <UserManipulation></UserManipulation>,
+						loader: () => fetch(`https://shop-manager-server.onrender.com/staffs`)
 					},
 					{
 						path: '/admin/user_request',
-						element: <UserRequest></UserRequest>
+						element: <UserRequest></UserRequest>,
+						loader: () => fetch(`https://shop-manager-server.onrender.com/user_request`)
 					},
 					{
 						path: '/admin/location_details',

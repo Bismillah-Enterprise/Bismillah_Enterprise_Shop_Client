@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import useCurrentUser from '../../Hooks/useCurrentUser';
 import { RiMenuUnfoldFill } from 'react-icons/ri';
 import { AuthContext } from '../../Providers/AuthProvider';
@@ -7,6 +7,7 @@ import { AuthContext } from '../../Providers/AuthProvider';
 const AdminNavbar = () => {
 	const [current_User] = useCurrentUser();
 	const { isMenu, setIsMenu } = useContext(AuthContext);
+	const location = useLocation();
 	const handleIsMenuClose = () => {
 		if (isMenu) {
 
@@ -24,7 +25,10 @@ const AdminNavbar = () => {
 				<Link to={"/admin/user_request"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
 					User Request
 				</Link>
-				<Link to={"/admin/user_account_manipulation"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
+				<Link to={"/admin/additional_request"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
+					Additional Movement Request
+				</Link>
+				<Link to={"/admin/user_manipulation"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
 					User Account Manipulation
 				</Link>
 				<Link to={"/admin/staff_manipulation"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
@@ -36,7 +40,7 @@ const AdminNavbar = () => {
 				<Link to={"/admin/shop_location"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
 					Set Shop Location
 				</Link>
-				<Link to={"/admin/shop_code"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
+				<Link to={"/admin/set_shop_code"} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
 					Set Shop Code
 				</Link>
 				<Link to={"/admin/notice_panel"} className='rounded-b-2xl w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
@@ -45,7 +49,7 @@ const AdminNavbar = () => {
 			</div>
 			{/* <div className={`block md:hidden absolute`}>
 				< */}
-			<div className={`absolute ${isMenu ? 'left-5 gap-2' : '-left-[250px] gap-14'} top-24 duration-300 flex `}>
+			<div className={`absolute ${isMenu ? 'left-5 gap-2' : '-left-[250px] gap-14'} top-24 duration-300 flex z-50 `}>
 				<div onClick={() => { setIsMenu(false) }} className={`w-fit min-h-fit rounded-2xl ${isMenu ? 'shadow-lg' : 'shadow-none'}  flex shadow-pink-300 flex-col items-center bg-linear-to-r from-[#485563] to-[#29322c]`}>
 					<Link to={"/"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Home
@@ -56,7 +60,10 @@ const AdminNavbar = () => {
 					<Link to={"/admin/user_request"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						User Request
 					</Link>
-					<Link to={"/admin/user_account_manipulation"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+					<Link to={"/admin/additional_request"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+						Additional Movement Request
+					</Link>
+					<Link to={"/admin/user_manipulation"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						User Account Manipulation
 					</Link>
 					<Link to={"/admin/staff_manipulation"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
@@ -68,14 +75,14 @@ const AdminNavbar = () => {
 					<Link to={"/admin/shop_location"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Set Shop Location
 					</Link>
-					<Link to={"/admin/shop_code"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+					<Link to={"/admin/set_shop_code"} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Set Shop Code
 					</Link>
 					<Link to={"/admin/notice_panel"} className={`rounded-b-2xl px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Notice Panel
 					</Link>
 				</div>
-				<RiMenuUnfoldFill onClick={() => { setIsMenu(!isMenu) }} className={``} />
+				<RiMenuUnfoldFill onClick={() => { setIsMenu(!isMenu) }} className={`md:hidden`} />
 			</div>
 			{/* 
 			</div> */}

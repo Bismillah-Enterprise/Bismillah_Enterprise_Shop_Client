@@ -1,15 +1,21 @@
 import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../../Providers/AuthProvider';
 import Loading from '../../Shared/Loading/Loading';
 import Swal from 'sweetalert2';
 import { PropagateLoader } from 'react-spinners';
+import { MdOutlineCancel } from 'react-icons/md';
 
 const SetShopLocation = () => {
 	const [location, setLocation] = useState({ latitude: '', longitude: '' });
 	const { loading, setLoading } = useContext(AuthContext);
-	const [locationLoading, setLocationLoading] = useState(false)
-
+	const [locationLoading, setLocationLoading] = useState(false);
+	const [saveLocationLoading, setSaveLocationLoading] = useState(false);
+	const [modal, setModal] = useState(false);
+	const inputRef = useRef(null);
+	const handleOpenModal = () => {
+		setModal(!modal)
+	}
 	// Fetch current shop location
 	useEffect(() => {
 		fetch('https://shop-manager-server.onrender.com/shop_location')
@@ -38,7 +44,7 @@ const SetShopLocation = () => {
 		navigator.geolocation.getCurrentPosition(
 			(pos) => {
 				const { latitude, longitude } = pos.coords;
-				setLocation({ latitude, longitude });
+				setLocation({ latitude, longitude, shop_range: 0 });
 				setLocationLoading(false);
 			},
 			(err) => {
@@ -55,13 +61,21 @@ const SetShopLocation = () => {
 	};
 
 	const handleSaveLocation = () => {
+		setSaveLocationLoading(true);
+		const shop_range = parseInt(inputRef.current.value);
 		fetch('https://shop-manager-server.onrender.com/shop_location', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(location),
+			body: JSON.stringify({
+				latitude: location?.latitude,
+				longitude: location?.longitude,
+				shop_range
+			}),
 		})
 			.then((res) => res.json())
 			.then(() => {
+				setSaveLocationLoading(false);
+				setModal(!modal);
 				Swal.fire({
 					position: "center",
 					icon: "success",
@@ -71,6 +85,7 @@ const SetShopLocation = () => {
 				});
 			})
 			.catch(() => {
+				setSaveLocationLoading(false);
 				Swal.fire({
 					position: "center",
 					icon: "success",
@@ -84,10 +99,32 @@ const SetShopLocation = () => {
 	if (loading) return <div className='h-full rounded-2xl overflow-hidden'><Loading></Loading></div>;
 
 	return (
-		<div className="p-4 h-full">
+		// How many meters of your shop area do you want to save?
+		<div className="p-4 h-full relative">
 			<h2 className="text-lg md:text-2xl text-pink-200 font-semibold text-center">Set Shop Location</h2>
-			<div className='h-full flex items-center justify-center'>
-				<div className="text-pink-200 shadow-lg shadow-pink-200 p-10 flex flex-col items-center justify-center mt-10 w-[350px] md:w-[500px] rounded-2xl">
+			{/* modal */}
+			< div className={`${!modal ? 'hidden' : 'block'} h-[250px] w-full md:w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50`
+			}>
+				{
+					saveLocationLoading ? <div className='h-full w-full flex items-center justify-center rounded-2xl overflow-hidden'><Loading></Loading></div> :
+						<div>
+							<div className='flex justify-end -top-[10px] -right-[10px] relative'>
+								<MdOutlineCancel onClick={() => { !setModal(!modal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+							</div>
+							<div className='text-pink-200 flex flex-col gap-5 p-5 items-center h-full w-full'>
+								<h1 className='text-xl font-semibold text-center'>How many meters of your shop area do you want to save?</h1>
+								<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+									<input type="text" ref={inputRef} className='outline-none' />
+								</div>
+								<button onClick={handleSaveLocation} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold mb-5 md:mb-0'>Submit</button>
+							</div>
+						</div>
+				}
+
+			</div >
+			{/* end modal */}
+			<div className='h-fit flex md:justify-center'>
+				<div className="text-pink-200 shadow-lg shadow-pink-200 md:p-10 flex flex-col items-center md:justify-center mt-10 w-full md:w-[500px] rounded-2xl">
 					<div className='flex flex-col items-center justify-center gap-5 text-pink-200 text-md md:text-lg font-semibold mt-5'>
 						{
 							locationLoading ? <div className='w-fit'><PropagateLoader color='#fccee8' size={10} /></div> :
@@ -120,7 +157,7 @@ const SetShopLocation = () => {
 								</div>
 						}
 					</div>
-					<div className='mt-7 flex flex-col md:flex-row items-center justify-center gap-5'>
+					<div className='my-7 flex flex-col md:flex-row items-center justify-center gap-5'>
 
 						<button
 							onClick={handleSetCurrentLocation}
@@ -129,7 +166,7 @@ const SetShopLocation = () => {
 							Use Current Location
 						</button>
 						<button
-							onClick={handleSaveLocation}
+							onClick={handleOpenModal}
 							className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg md:font-semibold"
 						>
 							Save

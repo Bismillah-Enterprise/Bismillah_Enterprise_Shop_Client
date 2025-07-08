@@ -6,10 +6,11 @@ const useCurrentUser = () => {
 	const [current_User, setCurrent_User] = useState({});
 	const [isAdmin, setIsAdmin] = useState(false);
 	const [isStaff, setIsStaff] = useState(false);
-	const [userHookLoading, setUserHookLoading] = useState(false); // Local userHookLoading for the hook
+	const [userHookLoading, setUserHookLoading] = useState(false);
 
 	useEffect(() => {
 		setUserHookLoading(true);
+
 		if (!user?.uid) {
 			setUserHookLoading(false);
 			return;
@@ -19,30 +20,30 @@ const useCurrentUser = () => {
 			.then(res => res.json())
 			.then(currentUserData => {
 				if (currentUserData?.message === 'UID not found') {
-					fetch(`https://shop-manager-server.onrender.com/user_request_uid/${user.uid}`)
-						.then(res => res.json())
-						.then(userRequestedData => {
-							if (userRequestedData?.message === 'UID not found') {
-								setIsStaff(false);
-								setIsAdmin(false);
-								setUserHookLoading(false);
-							} else {
-								setIsStaff(false);
-								setIsAdmin(false);
-								setUserHookLoading(false);
-							}
-						});
+					setIsStaff(false);
+					setIsAdmin(false);
+					setCurrent_User({});
 				} else {
 					setCurrent_User(currentUserData);
+
 					if (currentUserData.user_category === 'admin') {
 						setIsAdmin(true);
 						setIsStaff(true);
 					} else if (currentUserData.user_category === 'staff') {
-						setIsAdmin(false);
 						setIsStaff(true);
+						setIsAdmin(false);
+					} else {
+						setIsAdmin(false);
+						setIsStaff(false);
 					}
-					setUserHookLoading(false);
 				}
+				setUserHookLoading(false);
+			})
+			.catch(() => {
+				setIsAdmin(false);
+				setIsStaff(false);
+				setCurrent_User({});
+				setUserHookLoading(false);
 			});
 	}, [user]);
 
