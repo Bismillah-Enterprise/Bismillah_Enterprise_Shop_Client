@@ -73,6 +73,7 @@ const Staffs = () => {
 	const staff = useLoaderData();
 	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
 	const [isAllowed, setIsAllowed] = useState(false);
+	const [adminAccessToStaff, setAdminAccessToStaff] = useState(false);
 	const [accuracy, setAccuracy] = useState('');
 	const [lat, setLat] = useState('')
 	const [lan, setLan] = useState('')
@@ -225,14 +226,40 @@ const Staffs = () => {
 							currentLocationData.latitude,
 							currentLocationData.longitude
 						);
-						if (accuracy <= 100 && distance <= currentLocationData?.shop_range) {
-							setIsAllowed(true)
+
+						const isOwnStaffPage = location.pathname === `/staff/uid_query/${user?.uid}`;
+						console.log(isOwnStaffPage);
+
+						// CASE 1: Admin viewing own staff page → check accuracy + distance
+						if (isAdmin && isOwnStaffPage) {
+							if (accuracy <= 100 && distance <= currentLocationData?.shop_range) {
+								setIsAllowed(true);
+								console.log('Step 1: Admin viewing own page with valid location');
+							} else {
+								setIsAllowed(false);
+								console.log('Step 1 failed: Admin viewing own page but invalid location');
+							}
 							setLocationLoading(false);
 						}
-						else {
-							setIsAllowed(false);
-							setLocationLoading(false)
+
+						// CASE 2: Admin viewing someone else’s staff page → allow directly
+						console.log(isAdmin, !isOwnStaffPage);
+						console.log(user_category)
+						if (isAdmin && !isOwnStaffPage) {
+							setIsAllowed(true);
+							console.log('Step 2: Admin viewing other staff page, allowed without location check');
+							setLocationLoading(false);
 						}
+
+						// CASE 3: Non-admin (e.g. staff) → must pass location check
+						if (accuracy <= 100 && distance <= currentLocationData?.shop_range) {
+							setIsAllowed(true);
+							console.log('Step 3: Staff in valid location');
+						} else {
+							setIsAllowed(false);
+							console.log('Step 4: Staff in invalid location');
+						}
+						setLocationLoading(false);
 
 						setLat(latitude);
 						setLan(longitude);
@@ -461,7 +488,7 @@ const Staffs = () => {
 
 				if (additional_movement_hour || additional_movement_minute) {
 					console.log(totalMinutes)
-					totalMinutes = totalMinutes - (additional_movement_hour*60) - additional_movement_minute;
+					totalMinutes = totalMinutes - (additional_movement_hour * 60) - additional_movement_minute;
 					console.log(totalMinutes)
 				}
 
