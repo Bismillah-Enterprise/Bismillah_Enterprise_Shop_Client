@@ -79,19 +79,19 @@ const AdditionalRequest = () => {
 		})
 	}
 	return (
-		<div className='w-full h-full md:p-5 flex flex-col gap-5 text-pink-200'>
-			<h1 className='font-semibold text-2xl'>All Users</h1>
+		<div className='w-full h-full lg:p-5 flex flex-col gap-5 text-pink-200'>
+			<h1 className='font-semibold text-2xl text-pink-300'>Additonal Movement Requests</h1>
 			{
 				additionalRequestData.map(requestData =>
 					<div key={requestData._id}>
 						<div className='grid grid-cols-2 items-center justify-between border-b-2 border-pink-200 py-4'>
-							<div className='flex flex-col md:flex-row items-center gap-2 md:gap-5 col-span-1'>
+							<div className='flex items-center gap-2 lg:gap-5 col-span-1'>
 								<h1 className='font-semibold text-xl'>{requestData.name}</h1>
 							</div>
-							<div className='flex justify-end md:flex-row gap-4 col-span-1'>
-								<div className='flex items-center gap-7'>
-									<button onClick={() => { handleApproveRequest(requestData.uid) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  md:text-lg font-semibold'>Approve</button>
-									<button onClick={() => { handleRejectRequest(requestData.uid) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  md:text-lg font-semibold'>Reject</button>
+							<div className='flex justify-end lg:flex-row gap-4 col-span-1'>
+								<div className='flex flex-col sm:flex-row items-end  justify-end gap-4'>
+									<button onClick={() => { handleApproveRequest(requestData.uid) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-[100px]'>Approve</button>
+									<button onClick={() => { handleRejectRequest(requestData.uid) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-[100px]'>Reject</button>
 								</div>
 							</div>
 						</div>

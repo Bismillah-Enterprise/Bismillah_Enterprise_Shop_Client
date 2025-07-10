@@ -54,19 +54,22 @@ const LocationDetails = () => {
 			})
 	}
 
-	if(locationLoading) {
+	if (locationLoading) {
 		return <Loading></Loading>
 	}
 	return (
-		<div className='flex flex-col items-center justify-center'>
+		<div className='w-full h-full lg:p-5 flex flex-col text-pink-200 scrollbar-hide'>
+			<h1 className='font-semibold text-2xl mb-10 text-pink-300'>Location Details</h1>
 			<div className='text-pink-200 text-xl font-semibold flex flex-col gap-5 mb-7'>
-				<h1>Lan: {lan }</h1>
-				<h1>Lat: { lat}</h1>
-				<h1>Accuracy: { accuracy} meters</h1>
-				<h1>Distance: { distance} meters</h1>
-				<h1>Current Location: lan: { currentLocation.longitude}, lat: {currentLocation.latitude}</h1>
+				<h1>Lan: {lan}</h1>
+				<h1>Lat: {lat}</h1>
+				<h1>Accuracy: {accuracy} meters</h1>
+				<h1>Distance: {distance} meters</h1>
+				<h1>Current Location: lan: {currentLocation.longitude}, lat: {currentLocation.latitude}</h1>
 			</div>
-			<button onClick={handleLocation} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold'>Show Location details</button>
+			<div className='flex items-center justify-center'>
+				<button onClick={handleLocation} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold'>Show Location details</button>
+			</div>
 		</div>
 	);
 };

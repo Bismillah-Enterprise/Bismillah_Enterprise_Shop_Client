@@ -47,24 +47,24 @@ const SetShopCode = () => {
 
 	return (
 		<div>
-			<h2 className="text-lg md:text-2xl text-pink-200 font-semibold text-center">Set Shop Code</h2>
-			<div className='h-fit min-h-[320px] flex md:justify-center duration-300'>
-				<div className="text-pink-200 shadow-lg shadow-pink-200 md:p-10 flex flex-col items-center md:justify-center mt-10 w-full md:w-fit rounded-2xl">
+			<h2 className="text-2xl text-pink-300 font-semibold text-center">Set Shop Code</h2>
+			<div className='h-fit min-h-[320px] flex lg:justify-center duration-300'>
+				<div className="text-pink-200 shadow-lg shadow-pink-200 lg:p-10 flex flex-col items-center justify-center mt-10 w-fit rounded-2xl p-5">
 					{
 						isChange ?
 							<div className='text-pink-200 flex flex-col gap-5 p-8 items-center h-full w-full'>
-								<h1 className='text-lg md:text-2xl font-semibold'>Enter Your New Shop Code</h1>
+								<h1 className='text-lg lg:text-2xl font-semibold'>Enter Your New Shop Code</h1>
 								<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
 									<input id='new_shop_code' type="text" className='outline-none w-full' />
 								</div>
 								<p id='doesNotMatched' className='text-red-500 hidden'>Shop code does not matched</p>
-								<button onClick={handleChangeShopCode} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 md:mb-0'>Change</button>
+								<button onClick={handleChangeShopCode} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 lg:mb-0'>Change</button>
 							</div> :
-							<div className='w-[500px] mb-5 flex items-center justify-center gap-5'>
-								<p id='current_shop_code' className='text-2xl'>Click the button below to view your Shop Code</p>
+							<div className='lg:w-[500px] mb-5 flex items-center justify-center gap-5'>
+								<p id='current_shop_code' className='font-semibold text-lg text-center md:text-2xl'>Click the button below to view your Shop Code</p>
 							</div>
 					}
-					<div className='flex items-center gap-8 flex-wrap'>
+					<div className='flex flex-col md:flex-row items-center gap-8'>
 						<button onClick={handleShowShopCode} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold'>Show Current Shop Code</button>
 						<button onClick={() => { setIsChange(!isChange) }} disabled={!isSetShopCode ? true : false} className={`disabled:text-gray-400 disabled:shadow-none disabled:cursor-not-allowed disabled:border-2 disabled:border-gray-400 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold`}>Change The Code</button>
 					</div>

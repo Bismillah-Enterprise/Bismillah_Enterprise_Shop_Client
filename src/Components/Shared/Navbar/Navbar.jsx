@@ -128,23 +128,23 @@ const Navbar = () => {
 							<input type="password" ref={inputRef} className='outline-none' />
 						</div>
 						<p id='doesNotMatched' className={`text-red-500 ${isCodeMatched ? 'hidden' : ''}`}>Shop code does not matched</p>
-						<button onClick={handleLogin} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold mb-5 md:mb-0'>Submit</button>
+						<button onClick={handleLogin} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
 					</div>
 				</div>
 
 			</div >
 			{/* --------------- End Modal ------------------------- */}
-			< div className='flex items-center justify-between md:justify-start relative py-5 px-5' >
-				<Link to="/" className="logo hidden md:block"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></Link>
-				<Link to={'/'}><img className='w-[60px] h-[60px] md:hidden' src='https://i.ibb.co/01Zf9m1/logo.png'></img></Link>
-				<div className='md:absolute md:right-10'>
+			< div className='flex items-center justify-between lg:justify-start relative py-5 px-5' >
+				<Link to="/" className="logo hidden lg:block"><b>BIS<span>M</span>ILLAH ENTER<span>P</span>RISE</b></Link>
+				<Link to={'/'}><img className='w-[60px] h-[60px] lg:hidden' src='https://i.ibb.co/01Zf9m1/logo.png'></img></Link>
+				<div className='lg:absolute lg:right-10'>
 					{
 						user ?
 							<div className='flex items-center gap-5'>
 								<img className='rounded-full h-10 w-10' src={user?.photoURL} alt="" />
-								<Link onClick={handleLogOut}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg font-semibold'>Logout</button></Link>
+								<Link onClick={handleLogOut}><button className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg font-semibold'>Logout</button></Link>
 							</div> :
-							<Link><button onClick={handleOpenModal} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg md:font-semibold'>Staff Login</button></Link>
+							<Link><button onClick={handleOpenModal} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold'>Staff Login</button></Link>
 					}
 				</div>
 

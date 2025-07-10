@@ -101,9 +101,9 @@ const SetShopLocation = () => {
 	return (
 		// How many meters of your shop area do you want to save?
 		<div className="p-4 h-full relative">
-			<h2 className="text-lg md:text-2xl text-pink-200 font-semibold text-center">Set Shop Location</h2>
+			<h2 className="text-lg lg:text-2xl font-semibold text-center text-pink-300">Set Shop Location</h2>
 			{/* modal */}
-			< div className={`${!modal ? 'hidden' : 'block'} h-[250px] w-full md:w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50`
+			< div className={`${!modal ? 'hidden' : 'block'} h-[250px] w-full lg:w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50`
 			}>
 				{
 					saveLocationLoading ? <div className='h-full w-full flex items-center justify-center rounded-2xl overflow-hidden'><Loading></Loading></div> :
@@ -116,16 +116,16 @@ const SetShopLocation = () => {
 								<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
 									<input type="text" ref={inputRef} className='outline-none' />
 								</div>
-								<button onClick={handleSaveLocation} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold mb-5 md:mb-0'>Submit</button>
+								<button onClick={handleSaveLocation} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
 							</div>
 						</div>
 				}
 
 			</div >
 			{/* end modal */}
-			<div className='h-fit flex md:justify-center'>
-				<div className="text-pink-200 shadow-lg shadow-pink-200 md:p-10 flex flex-col items-center md:justify-center mt-10 w-full md:w-[500px] rounded-2xl">
-					<div className='flex flex-col items-center justify-center gap-5 text-pink-200 text-md md:text-lg font-semibold mt-5'>
+			<div className='h-fit flex lg:justify-center'>
+				<div className="text-pink-200 shadow-lg shadow-pink-200 lg:p-10 flex flex-col items-center lg:justify-center mt-10 w-full lg:w-[500px] rounded-2xl">
+					<div className='flex flex-col items-center justify-center gap-5 text-pink-200 text-md lg:text-lg font-semibold mt-5'>
 						{
 							locationLoading ? <div className='w-fit'><PropagateLoader color='#fccee8' size={10} /></div> :
 								<div className='flex items-center gap-3'>
@@ -157,17 +157,17 @@ const SetShopLocation = () => {
 								</div>
 						}
 					</div>
-					<div className='my-7 flex flex-col md:flex-row items-center justify-center gap-5'>
+					<div className='my-7 flex flex-col lg:flex-row items-center justify-center gap-5'>
 
 						<button
 							onClick={handleSetCurrentLocation}
-							className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg md:font-semibold"
+							className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold"
 						>
 							Use Current Location
 						</button>
 						<button
 							onClick={handleOpenModal}
-							className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 md:px-5 py-1 rounded-md text-md md:text-lg md:font-semibold"
+							className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold"
 						>
 							Save
 						</button>

@@ -562,7 +562,7 @@ const Staffs = () => {
 				<div className="flex items-center justify-center gap-5 mb-10">
 					{user ?
 						<Link to={'/'} state={{ from: location }}>
-							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold">
+							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 								Home
 							</button>
 						</Link> : ''
@@ -571,22 +571,22 @@ const Staffs = () => {
 						user_category === 'admin' ?
 							<div className='flex items-center gap-5'>
 								<Link to={'/admin'} state={{ from: '/' }}>
-									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold">
+									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 										Admin
 									</button>
 								</Link>
 								<Link to={from} state={{ from: location.pathname }}>
-									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold">
+									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 										Back
 									</button>
 								</Link>
 							</div> : ''
 					}
 				</div>
-				<h1 className='text-pink-200 text-md md:text-xl text-center mb-2 font-semibold'>Your Location From Shop</h1>
+				<h1 className='text-pink-200 text-md lg:text-xl text-center mb-2 font-semibold'>Your Location From Shop</h1>
 				{
 					!accuracy && !distance ? <div className='flex justify-center'><PuffLoader color='#fccee8' size={40} /></div> :
-						<div className='flex items-center justify-center gap-5 text-pink-200 text-md md:text-xl'>
+						<div className='flex items-center justify-center gap-5 text-pink-200 text-md lg:text-xl'>
 							<h1>Accuracy: {accuracy} meters</h1>
 							<h1>Distance: {distance} meters</h1>
 						</div>
@@ -595,7 +595,7 @@ const Staffs = () => {
 					<Clock></Clock>
 				</div>
 				<div>
-					<h1 className="text-lg md:text-2xl text-center text-pink-200 mt-5 font-semibold">
+					<h1 className="text-lg lg:text-2xl text-center text-pink-200 mt-5 font-semibold">
 						{name} - Hour Rate: {hour_rate}
 					</h1>
 				</div>
@@ -603,58 +603,58 @@ const Staffs = () => {
 				{
 					!accuracy && !distance ? <div className='flex justify-center mt-10'><PuffLoader color='#fccee8' size={40} /></div> :
 						<div>
-							<div className="flex items-center gap-5 md:gap-10 justify-center mt-10 flex-wrap">
+							<div className="flex items-center gap-5 lg:gap-10 justify-center mt-10 flex-wrap">
 								<button
 									disabled={!!today_enter1_time || !isAllowed || additional_movement_status}
 									onClick={() => handleTodayTime('today_enter1_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] md:h-[100px] w-[70px] md:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md md:text-lg cursor-pointer hover:shadow-lg"
+									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 1
 								</button>
 								<button
 									disabled={!!today_exit1_time || !isAllowed || additional_movement_status || today_enter1_time === ''}
 									onClick={() => handleTodayTime('today_exit1_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] md:h-[100px] w-[70px] md:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md md:text-lg cursor-pointer hover:shadow-lg"
+									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Exit 1
 								</button>
 								<button
 									disabled={!!today_enter2_time || !isAllowed || additional_movement_status || today_exit1_time === ''}
 									onClick={() => handleTodayTime('today_enter2_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] md:h-[100px] w-[70px] md:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md md:text-lg cursor-pointer hover:shadow-lg"
+									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 2
 								</button>
 								<button
 									disabled={!!today_exit2_time || !isAllowed || additional_movement_status || today_enter2_time === ''}
 									onClick={() => handleTodayTime('today_exit2_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] md:h-[100px] w-[70px] md:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md md:text-lg cursor-pointer hover:shadow-lg"
+									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Exit 2
 								</button>
 							</div>
 							<div className='mt-10'>
 								<div className={`${additional_movement_status ? 'hidden' : 'flex'} items-center justify-center`}>
-									<button onClick={() => { handleAdditionalMovementRequest(name, uid) }} disabled={today_enter1_time === ''} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold">Request For Additional Movement</button>
+									<button onClick={() => { handleAdditionalMovementRequest(name, uid) }} disabled={today_enter1_time === ''} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">Request For Additional Movement</button>
 								</div>
-								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center gap-5 md:gap-10 justify-center flex-wrap`}>
+								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center gap-5 lg:gap-10 justify-center flex-wrap`}>
 
 									<button
 										disabled={!!additional_exit_time || !isAllowed}
 										onClick={() => handleAdditionalTime('additional_exit_time', _id)}
-										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] md:h-[100px] w-[70px] md:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md md:text-lg cursor-pointer hover:shadow-lg"
+										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>
 										Exit
 									</button>
 									<button
 										disabled={!!additional_enter_time || !isAllowed || additional_exit_time === ''}
 										onClick={() => handleAdditionalTime('additional_enter_time', _id)}
-										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] md:h-[100px] w-[70px] md:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md md:text-lg cursor-pointer hover:shadow-lg"
+										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>
 										Enter
 									</button>
 								</div>
-								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center sm:justify-center mt-8 md:mt-10 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs md:text-lg`}>
+								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center sm:justify-center mt-8 lg:mt-10 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg`}>
 									<table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
 										<tbody>
 											<tr>
@@ -676,7 +676,7 @@ const Staffs = () => {
 						</div>
 
 				}
-				<div className="flex items-center sm:justify-center mt-8 md:mt-10 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs md:text-lg">
+				<div className="flex items-center justify-center mt-8 lg:mt-10 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
 					<table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
 						<tbody>
 							<tr>
@@ -699,10 +699,10 @@ const Staffs = () => {
 					</table>
 				</div>
 				<div className='flex flex-col gap-10 items-center justify-center mt-5'>
-					<button onClick={handleSubmitWorkTime} disabled={!workSubmitButton} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold">
+					<button onClick={handleSubmitWorkTime} disabled={!workSubmitButton} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Submit Your Work Time
 					</button>
-					<Link to={`/monthly_records/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md md:text-lg font-semibold">
+					<Link to={`/monthly_records/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						See Your Montly Records
 					</Link>
 				</div>

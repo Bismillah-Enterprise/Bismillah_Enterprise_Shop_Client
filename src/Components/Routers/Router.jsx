@@ -17,6 +17,8 @@ import SetShopLocation from '../Admin/SetShopLocation/SetShopLocation';
 import LocationDetails from '../Admin/LocationDetails/LocationDetails';
 import StaffsMonthlyRecords from '../StaffsMonthlyRecords/StaffsMonthlyRecords';
 import AdditionalRequest from '../Admin/AdditionalRequest/AdditionalRequest';
+import StaffTransections from '../Admin/StaffTransections/StaffTransections';
+import StaffDetails from '../Admin/StaffDetails/StaffDetails';
 
 const router = createBrowserRouter([
 	{
@@ -30,12 +32,12 @@ const router = createBrowserRouter([
 			{
 				path: '/staff/uid_query/:uid',
 				element: <Staffs></Staffs>,
-				loader: ({params}) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
 			},
 			{
 				path: '/monthly_records/:uid',
 				element: <StaffsMonthlyRecords></StaffsMonthlyRecords>,
-				loader: ({params}) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
 			},
 			{
 				path: '/not_authorized',
@@ -70,6 +72,18 @@ const router = createBrowserRouter([
 						path: '/admin/additional_request',
 						element: <AdditionalRequest></AdditionalRequest>,
 						loader: () => fetch(`https://shop-manager-server.onrender.com/additional_movement_request`)
+					},
+					{
+						path: '/admin/staff_transections',
+						element: <StaffTransections></StaffTransections>,
+						loader: () => fetch('https://shop-manager-server.onrender.com/staffs'),
+						
+						
+					},
+					{
+						path: '/admin/staff_details/:uid',
+						element: <StaffDetails></StaffDetails>,
+						loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
 					},
 					{
 						path: '/admin/user_manipulation',
