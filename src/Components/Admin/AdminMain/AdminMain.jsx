@@ -10,7 +10,7 @@ const AdminMain = () => {
 			<div className='max-h-fit lg:w-[300px] xl:[400px] shadow-lg shadow-pink-200 rounded-2xl overflow-scroll scrollbar-hide'>
 				<AdminNavbar></AdminNavbar>
 			</div>
-			<div onClick={() => {setIsMenu(false)}} className='shadow-lg shadow-pink-200 p-5 rounded-2xl flex-1 min-h-[340px] h-full mt-4 lg:mt-0 scrollbar-hide mb-20'>
+			<div onClick={() => {setIsMenu(false)}} className='shadow-lg shadow-pink-200 p-5 rounded-2xl flex-1 min-h-[340px] h-fit mt-4 lg:mt-0 scrollbar-hide mb-20 px-5'>
 				<Outlet></Outlet>
 			</div>
 		</div>

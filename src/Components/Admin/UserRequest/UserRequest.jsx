@@ -35,6 +35,7 @@ const UserRequest = () => {
 			status: true,
 			current_working_month: "",
 			total_income: 0,
+			last_month_due: 0,
 			withdrawal_amount: 0,
 			available_balance: 0,
 			transections: [],

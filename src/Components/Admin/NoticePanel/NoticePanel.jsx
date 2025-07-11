@@ -1,9 +1,10 @@
 import React from 'react';
+import AdminRoute from '../../AdminRoute/AdminRoute';
 
 const NoticePanel = () => {
 	return (
 		<div>
-			This is Admin Notice panel
+			<AdminRoute></AdminRoute>
 		</div>
 	);
 };

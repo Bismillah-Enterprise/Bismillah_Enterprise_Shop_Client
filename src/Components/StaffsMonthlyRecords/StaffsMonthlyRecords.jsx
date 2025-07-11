@@ -4,8 +4,6 @@ import { Link, useLoaderData, useLocation } from 'react-router-dom';
 const StaffsMonthlyRecords = () => {
 	const staff = useLoaderData();
 	const { _id, name, hour_rate, uid, user_category, current_month_details, total_working_hour, total_working_minute, total_income, withdrawal_amount, available_balance } = staff;
-	// const {today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time} = current_month_details
-	const [totalTimeCalculation, setTotalTimeCalculation] = useState('');
 	const location = useLocation();
 	const from = location?.state?.pathname;
 
@@ -30,11 +28,6 @@ const StaffsMonthlyRecords = () => {
 				<Link to={`/`} state={{ from: "/" }}>
 					<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Home
-					</button>
-				</Link>
-				<Link to={`/staff/uid_query/${uid}`} state={{ from: "/" }}>
-					<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-						Staff
 					</button>
 				</Link>
 				<Link to={from}>
@@ -109,11 +102,15 @@ const StaffsMonthlyRecords = () => {
 					</tbody>
 				</table>
 			</div>
-			<div className='flex items-center justify-center mt-5 mb-10'>
-				<button onClick={handlePrint} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-					Print
-				</button>
-			</div>
+			{
+				user_category === 'admin' ?
+					<div className='flex items-center justify-center mt-5 mb-10'>
+						<button onClick={handlePrint} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+							Print
+						</button>
+					</div>
+					: ''
+			}
 
 
 			<div ref={printRef} className='nunito hidden'>

@@ -19,6 +19,11 @@ import StaffsMonthlyRecords from '../StaffsMonthlyRecords/StaffsMonthlyRecords';
 import AdditionalRequest from '../Admin/AdditionalRequest/AdditionalRequest';
 import StaffTransections from '../Admin/StaffTransections/StaffTransections';
 import StaffDetails from '../Admin/StaffDetails/StaffDetails';
+import TransectionsHistory from '../TransectionsHistory/TransectionsHistory';
+import AdminRoute from '../AdminRoute/AdminRoute';
+import StaffRoute from '../StaffRoute/StaffRoute';
+import IncomeHistory from '../IncomeHistory/IncomeHistory';
+import ShopTransections from '../Admin/ShopTransections/ShopTransections';
 
 const router = createBrowserRouter([
 	{
@@ -31,12 +36,22 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/staff/uid_query/:uid',
-				element: <Staffs></Staffs>,
+				element: <StaffRoute><Staffs></Staffs></StaffRoute>,
 				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
 			},
 			{
 				path: '/monthly_records/:uid',
-				element: <StaffsMonthlyRecords></StaffsMonthlyRecords>,
+				element: <StaffRoute><StaffsMonthlyRecords></StaffsMonthlyRecords></StaffRoute>,
+				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+			},
+			{
+				path: '/transections_history/:uid',
+				element: <StaffRoute><TransectionsHistory></TransectionsHistory></StaffRoute>,
+				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+			},
+			{
+				path: '/income_history/:uid',
+				element: <StaffRoute><IncomeHistory></IncomeHistory></StaffRoute>,
 				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
 			},
 			{
@@ -45,7 +60,7 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/admin',
-				element: <AdminMain></AdminMain>,
+				element: <AdminRoute><AdminMain></AdminMain></AdminRoute>,
 				children: [
 					{
 						path: '/admin',
@@ -54,6 +69,10 @@ const router = createBrowserRouter([
 					{
 						path: '/admin/notice_panel',
 						element: <NoticePanel></NoticePanel>
+					},
+					{
+						path: '/admin/shop_transections',
+						element: <ShopTransections></ShopTransections>
 					},
 					{
 						path: '/admin/set_shop_code',
@@ -77,8 +96,8 @@ const router = createBrowserRouter([
 						path: '/admin/staff_transections',
 						element: <StaffTransections></StaffTransections>,
 						loader: () => fetch('https://shop-manager-server.onrender.com/staffs'),
-						
-						
+
+
 					},
 					{
 						path: '/admin/staff_details/:uid',

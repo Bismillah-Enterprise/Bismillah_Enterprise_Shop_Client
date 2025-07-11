@@ -34,46 +34,12 @@ function parseTimeToDate(timeString) {
 	return now;
 }
 
-function calculateTotalWorkTime({
-	today_enter1_time,
-	today_exit1_time,
-	today_enter2_time,
-	today_exit2_time
-}) {
-	let totalMilliseconds = 0;
-
-	const enter1 = parseTimeToDate(today_enter1_time);
-	const exit1 = parseTimeToDate(today_exit1_time);
-	console.log(enter1, enter2)
-	if (enter1 && exit1) {
-		totalMilliseconds += exit1 - enter1
-		console.log(totalMilliseconds);
-	};
-
-	const enter2 = parseTimeToDate(today_enter2_time);
-	const exit2 = parseTimeToDate(today_exit2_time);
-	console.log(enter2, exit2)
-	if (enter2 && exit2) {
-		totalMilliseconds += exit2 - enter2
-		console.log(totalMilliseconds)
-	};
-
-	if (totalMilliseconds <= 0) return '0 hr 0 min';
-
-	const totalMinutes = Math.floor(totalMilliseconds / 60000);
-	const hours = Math.floor(totalMinutes / 60);
-	const minutes = totalMinutes % 60;
-
-	return `${hours} hr ${minutes} min`;
-}
-
 const Staffs = () => {
 	const { user } = useContext(AuthContext);
 	const [, , isAdmin, userHookLoading] = useCurrentUser();
 	const staff = useLoaderData();
 	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
 	const [isAllowed, setIsAllowed] = useState(false);
-	const [adminAccessToStaff, setAdminAccessToStaff] = useState(false);
 	const [accuracy, setAccuracy] = useState('');
 	const [lat, setLat] = useState('')
 	const [lan, setLan] = useState('')
@@ -557,32 +523,45 @@ const Staffs = () => {
 		);
 	}
 	return (
-		<div className="px-5">
+		<div className="">
 			<div>
-				<div className="flex items-center justify-center gap-5 mb-10">
+				<div className="flex items-center justify-center gap-5 mb-5">
 					{user ?
-						<Link to={'/'} state={{ from: location }}>
-							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-								Home
-							</button>
-						</Link> : ''
-					}
-					{
-						user_category === 'admin' ?
-							<div className='flex items-center gap-5'>
-								<Link to={'/admin'} state={{ from: '/' }}>
-									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-										Admin
-									</button>
-								</Link>
-								<Link to={from} state={{ from: location.pathname }}>
-									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-										Back
-									</button>
-								</Link>
-							</div> : ''
+						<div className='flex items-center justify-center gap-5 flex-wrap mt-5'>
+							<Link to={'/'} state={{ from: location }}>
+								<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+									Home
+								</button>
+							</Link>
+							<Link to={`/monthly_records/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+								See Your Montly Records
+							</Link>
+							<Link to={`/transections_history/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+								Transections History
+							</Link>
+							<Link to={`/income_history/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+								Income History
+							</Link>
+						</div>
+						: ''
 					}
 				</div>
+				{
+					location?.state?.pathname.includes('admin') || user_category === 'admin' ?
+						<div className='flex items-center justify-center gap-5 mb-10'>
+							<Link to={'/admin'} state={{ from: '/' }}>
+								<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+									Admin
+								</button>
+							</Link>
+							<Link to={from} state={{ from: location.pathname }}>
+								<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+									Back
+								</button>
+							</Link>
+						</div> : ''
+				}
+
 				<h1 className='text-pink-200 text-md lg:text-xl text-center mb-2 font-semibold'>Your Location From Shop</h1>
 				{
 					!accuracy && !distance ? <div className='flex justify-center'><PuffLoader color='#fccee8' size={40} /></div> :
@@ -601,7 +580,7 @@ const Staffs = () => {
 				</div>
 
 				{
-					!accuracy && !distance ? <div className='flex justify-center mt-10'><PuffLoader color='#fccee8' size={40} /></div> :
+					!accuracy && !distance && !staff ? <div className='flex justify-center mt-10'><PuffLoader color='#fccee8' size={40} /></div> :
 						<div>
 							<div className="flex items-center gap-5 lg:gap-10 justify-center mt-10 flex-wrap">
 								<button
@@ -698,13 +677,10 @@ const Staffs = () => {
 						</tbody>
 					</table>
 				</div>
-				<div className='flex flex-col gap-10 items-center justify-center mt-5'>
+				<div className='flex flex-col gap-10 items-center justify-center mt-5 mb-10'>
 					<button onClick={handleSubmitWorkTime} disabled={!workSubmitButton} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Submit Your Work Time
 					</button>
-					<Link to={`/monthly_records/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-						See Your Montly Records
-					</Link>
 				</div>
 			</div>
 		</div>

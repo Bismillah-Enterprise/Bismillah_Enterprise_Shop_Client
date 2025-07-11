@@ -3,7 +3,7 @@ import { MdOutlineCancel } from 'react-icons/md';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const StaffDetails = () => {
+const ShopTransections = () => {
 	const staffDetails = useLoaderData();
 	const { _id, name, total_income, last_month_due, withdrawal_amount, current_working_month, available_balance, total_working_hour, total_working_minute, transections, uid } = staffDetails;
 	const [modal, setModal] = useState(false);
@@ -180,4 +180,4 @@ const StaffDetails = () => {
 	);
 };
 
-export default StaffDetails;
+export default ShopTransections;

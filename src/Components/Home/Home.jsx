@@ -27,7 +27,7 @@ const Home = () => {
 
 						{
 							isAdmin ?
-								<Link to="/admin" state={{ from: "/" }}>
+								<Link to="/admin" state={{ pathname: "/" }}>
 									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 										Admin
 									</button>
