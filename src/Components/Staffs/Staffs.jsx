@@ -112,7 +112,7 @@ const Staffs = () => {
 		const previousEarn = parseFloat(staff.total_income || 0);
 		const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2));
 
-		fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${uid}`)
+		fetch(`http://localhost:5000/staff/uid_query/${uid}`)
 			.then(res => res.json())
 			.then(data => {
 				if (data.today_date !== todayOnlyDateIntFormat) {
@@ -132,7 +132,7 @@ const Staffs = () => {
 					};
 
 					// Save to database
-					fetch(`https://shop-manager-server.onrender.com/submit_work_time/${_id}`, {
+					fetch(`http://localhost:5000/submit_work_time/${_id}`, {
 						method: 'PUT',
 						headers: {
 							'content-type': 'application/json'
@@ -177,7 +177,7 @@ const Staffs = () => {
 
 	useEffect(() => {
 		setLocationLoading(true);
-		fetch('https://shop-manager-server.onrender.com/shop_location')
+		fetch('http://localhost:5000/shop_location')
 			.then(res => res.json())
 			.then(currentLocationData => {
 				setCurrentLocation(currentLocationData);
@@ -254,7 +254,7 @@ const Staffs = () => {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				const updatedTime = { name, clickedTime: Time, today_date: today_only_date_number };
-				fetch(`https://shop-manager-server.onrender.com/staffs_daily_time/${id}`, {
+				fetch(`http://localhost:5000/staffs_daily_time/${id}`, {
 					method: 'PUT',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(updatedTime),
@@ -300,7 +300,7 @@ const Staffs = () => {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				const requestData = { name, uid };
-				fetch(`https://shop-manager-server.onrender.com/additional_movement_request`, {
+				fetch(`http://localhost:5000/additional_movement_request`, {
 					method: 'POST',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(requestData),
@@ -332,7 +332,7 @@ const Staffs = () => {
 		}).then(async (result) => {
 			if (result.isConfirmed) {
 				const updatedTime = { name, clickedTime: Time };
-				await fetch(`https://shop-manager-server.onrender.com/additional_movements/${id}`, {
+				await fetch(`http://localhost:5000/additional_movements/${id}`, {
 					method: 'PUT',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(updatedTime),
@@ -374,7 +374,7 @@ const Staffs = () => {
 								additional_movement_minute: updatedAdditionalTotalMinutesRemainder,
 							};
 							console.log(AdditionalMovementSummary);
-							await fetch(`https://shop-manager-server.onrender.com/additional_movement_submit/${_id}`, {
+							await fetch(`http://localhost:5000/additional_movement_submit/${_id}`, {
 								method: 'PUT',
 								headers: {
 									'content-type': 'application/json'
@@ -384,7 +384,7 @@ const Staffs = () => {
 								.then(res => res.json())
 								.then(async (sentDataToStuffProfile) => {
 									if (sentDataToStuffProfile.acknowledged) {
-										await fetch(`https://shop-manager-server.onrender.com/additional_request_approve/${uid}`, {
+										await fetch(`http://localhost:5000/additional_request_approve/${uid}`, {
 											method: 'PUT',
 											headers: {
 												'content-type': 'application/json'
@@ -491,7 +491,7 @@ const Staffs = () => {
 				};
 
 				// Save to database
-				fetch(`https://shop-manager-server.onrender.com/submit_work_time/${_id}`, {
+				fetch(`http://localhost:5000/submit_work_time/${_id}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'

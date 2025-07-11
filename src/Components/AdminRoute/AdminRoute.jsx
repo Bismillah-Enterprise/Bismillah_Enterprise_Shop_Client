@@ -12,7 +12,7 @@ const AdminRoute = ({children}) => {
 
 	useEffect(() => {
 		setAdminLoading(true);
-		fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${user?.uid}`).then(res => res.json()).then(gotData => {
+		fetch(`http://localhost:5000/staff/uid_query/${user?.uid}`).then(res => res.json()).then(gotData => {
 			setSiteUser(gotData);
 			setAdminLoading(false);
 		})

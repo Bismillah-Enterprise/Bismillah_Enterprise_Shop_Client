@@ -37,22 +37,22 @@ const router = createBrowserRouter([
 			{
 				path: '/staff/uid_query/:uid',
 				element: <StaffRoute><Staffs></Staffs></StaffRoute>,
-				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+				loader: ({ params }) => fetch(`http://localhost:5000/staff/uid_query/${params.uid}`)
 			},
 			{
 				path: '/monthly_records/:uid',
 				element: <StaffRoute><StaffsMonthlyRecords></StaffsMonthlyRecords></StaffRoute>,
-				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+				loader: ({ params }) => fetch(`http://localhost:5000/staff/uid_query/${params.uid}`)
 			},
 			{
 				path: '/transections_history/:uid',
 				element: <StaffRoute><TransectionsHistory></TransectionsHistory></StaffRoute>,
-				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+				loader: ({ params }) => fetch(`http://localhost:5000/staff/uid_query/${params.uid}`)
 			},
 			{
 				path: '/income_history/:uid',
 				element: <StaffRoute><IncomeHistory></IncomeHistory></StaffRoute>,
-				loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+				loader: ({ params }) => fetch(`http://localhost:5000/staff/uid_query/${params.uid}`)
 			},
 			{
 				path: '/not_authorized',
@@ -72,7 +72,8 @@ const router = createBrowserRouter([
 					},
 					{
 						path: '/admin/shop_transections',
-						element: <ShopTransections></ShopTransections>
+						element: <ShopTransections></ShopTransections>,
+						loader: () => fetch(`http://localhost:5000/shop_transections`)
 					},
 					{
 						path: '/admin/set_shop_code',
@@ -85,34 +86,34 @@ const router = createBrowserRouter([
 					{
 						path: '/admin/staff_manipulation',
 						element: <StaffManipulation></StaffManipulation>,
-						loader: () => fetch(`https://shop-manager-server.onrender.com/staffs`)
+						loader: () => fetch(`http://localhost:5000/staffs`)
 					},
 					{
 						path: '/admin/additional_request',
 						element: <AdditionalRequest></AdditionalRequest>,
-						loader: () => fetch(`https://shop-manager-server.onrender.com/additional_movement_request`)
+						loader: () => fetch(`http://localhost:5000/additional_movement_request`)
 					},
 					{
 						path: '/admin/staff_transections',
 						element: <StaffTransections></StaffTransections>,
-						loader: () => fetch('https://shop-manager-server.onrender.com/staffs'),
+						loader: () => fetch('http://localhost:5000/staffs'),
 
 
 					},
 					{
 						path: '/admin/staff_details/:uid',
 						element: <StaffDetails></StaffDetails>,
-						loader: ({ params }) => fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${params.uid}`)
+						loader: ({ params }) => fetch(`http://localhost:5000/staff/uid_query/${params.uid}`)
 					},
 					{
 						path: '/admin/user_manipulation',
 						element: <UserManipulation></UserManipulation>,
-						loader: () => fetch(`https://shop-manager-server.onrender.com/staffs`)
+						loader: () => fetch(`http://localhost:5000/staffs`)
 					},
 					{
 						path: '/admin/user_request',
 						element: <UserRequest></UserRequest>,
-						loader: () => fetch(`https://shop-manager-server.onrender.com/user_request`)
+						loader: () => fetch(`http://localhost:5000/user_request`)
 					},
 					{
 						path: '/admin/location_details',

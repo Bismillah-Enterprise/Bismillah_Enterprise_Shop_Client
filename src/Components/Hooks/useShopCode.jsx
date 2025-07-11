@@ -5,7 +5,7 @@ const useShopCode = () => {
 	const { user } = useContext(AuthContext)
 	const [shopCode, setShopCode] = useState();
 	useEffect(() => {
-		fetch(`https://shop-manager-server.onrender.com/shop_code/${import.meta.env.VITE_shop_code_object_id}`)
+		fetch(`http://localhost:5000/shop_code/${import.meta.env.VITE_shop_code_object_id}`)
 			.then(res => res.json())
 			.then(data => {
 				console.log(data);

@@ -19,7 +19,7 @@ const StaffManipulation = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`https://shop-manager-server.onrender.com/set_user_category/${uid}`, {
+				fetch(`http://localhost:5000/set_user_category/${uid}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -52,7 +52,7 @@ const StaffManipulation = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`https://shop-manager-server.onrender.com/set_user_status/${uid}`, {
+				fetch(`http://localhost:5000/set_user_status/${uid}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'

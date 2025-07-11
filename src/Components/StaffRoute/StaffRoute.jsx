@@ -15,7 +15,7 @@ const StaffRoute = ({children}) => {
 	useEffect(() => {
 		setLoading(true);
 		setStaffLoading(true);
-		fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${user?.uid}`).then(res => res.json()).then(gotData => {
+		fetch(`http://localhost:5000/staff/uid_query/${user?.uid}`).then(res => res.json()).then(gotData => {
 			if(gotData) {
 				setSiteUser(gotData);
 				setStaffLoading(false);
@@ -23,7 +23,7 @@ const StaffRoute = ({children}) => {
 
 			}
 			else{
-				navigate('/')
+				navigate('/');
 			}
 		})
 	}, [user])

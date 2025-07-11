@@ -16,7 +16,7 @@ const useCurrentUser = () => {
 			return;
 		}
 
-		fetch(`https://shop-manager-server.onrender.com/staff/uid_query/${user.uid}`)
+		fetch(`http://localhost:5000/staff/uid_query/${user.uid}`)
 			.then(res => res.json())
 			.then(currentUserData => {
 				if (currentUserData?.message === 'UID not found') {

@@ -27,7 +27,7 @@ const LocationDetails = () => {
 	const handleLocation = () => {
 		console.log('first')
 		setLocationLoading(true);
-		fetch('https://shop-manager-server.onrender.com/shop_location')
+		fetch('http://localhost:5000/shop_location')
 			.then(res => res.json())
 			.then(currentLocationData => {
 				setCurrentLocation(currentLocationData);
