@@ -13,3 +13,4 @@ If you are developing a production application, we recommend using TypeScript wi
 # bismillah_enterprise_client
 # shop_manager_client
 # shop_manager_client
+# Bismillah_Enterprise_Shop_Client
