@@ -43,7 +43,7 @@ const StaffDetails = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/transection_details/${id}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/transection_details/${id}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -90,7 +90,7 @@ const StaffDetails = () => {
 			if (result.isConfirmed) {
 				const currentWorkingMonth = currentDate.split(' ')[0];
 				const closing_month_details = { current_working_month: currentWorkingMonth, month_name: current_working_month, total_income, paid_amount: withdrawal_amount, paid_date: currentDate, last_month_due: available_balance, total_working_hour, total_working_minute };
-				fetch(`http://localhost:5000/closing_month/${_id}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/closing_month/${_id}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'

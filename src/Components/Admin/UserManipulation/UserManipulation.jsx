@@ -18,7 +18,7 @@ const UserManipulation = () => {
 			confirmButtonText: "Yes, reject it!"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/staff/${id}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/staff/${id}`, {
 					method: 'DELETE'
 				}).then(res => res.json())
 				Swal.fire({

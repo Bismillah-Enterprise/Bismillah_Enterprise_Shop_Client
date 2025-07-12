@@ -17,7 +17,7 @@ const AdditionalRequest = () => {
 			confirmButtonText: "Yes, Submit"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/additional_request_approve/${uid}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/additional_request_approve/${uid}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -26,7 +26,7 @@ const AdditionalRequest = () => {
 				})
 					.then(res => res.json())
 					.then(() => {
-						fetch(`http://localhost:5000/additional_movement_request/${uid}`, {
+						fetch(`https://bismillah-enterprise-server.onrender.com/additional_movement_request/${uid}`, {
 							method: 'DELETE'
 						}).then(() => {
 							navigate(location.pathname)
@@ -53,7 +53,7 @@ const AdditionalRequest = () => {
 			confirmButtonText: "Yes, Submit"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/additional_request_approve/${uid}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/additional_request_approve/${uid}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -62,7 +62,7 @@ const AdditionalRequest = () => {
 				})
 					.then(res => res.json())
 					.then(() => {
-						fetch(`http://localhost:5000/additional_request_approve/${uid}`, {
+						fetch(`https://bismillah-enterprise-server.onrender.com/additional_request_approve/${uid}`, {
 							method: 'DELETE'
 						}).then(() => {
 							navigate(location.pathname)

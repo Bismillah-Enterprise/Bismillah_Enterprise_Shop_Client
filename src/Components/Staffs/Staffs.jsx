@@ -38,7 +38,7 @@ const Staffs = () => {
 	const { user } = useContext(AuthContext);
 	const [, , isAdmin, userHookLoading] = useCurrentUser();
 	const staff = useLoaderData();
-	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
+	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, bonus, fine, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
 	const [isAllowed, setIsAllowed] = useState(false);
 	const [accuracy, setAccuracy] = useState('');
 	const [lat, setLat] = useState('')
@@ -60,6 +60,7 @@ const Staffs = () => {
 		minute: '2-digit',
 		hour12: true,
 	});
+
 	const currentDayName = now.toLocaleDateString('en-BD', { weekday: 'long' });
 	const currentDate = now.toLocaleDateString('en-BD', {
 		day: 'numeric',
@@ -112,7 +113,7 @@ const Staffs = () => {
 		const previousEarn = parseFloat(staff.total_income || 0);
 		const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2));
 
-		fetch(`http://localhost:5000/staff/uid_query/${uid}`)
+		fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${uid}`)
 			.then(res => res.json())
 			.then(data => {
 				if (data.today_date !== todayOnlyDateIntFormat) {
@@ -132,7 +133,7 @@ const Staffs = () => {
 					};
 
 					// Save to database
-					fetch(`http://localhost:5000/submit_work_time/${_id}`, {
+					fetch(`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`, {
 						method: 'PUT',
 						headers: {
 							'content-type': 'application/json'
@@ -150,16 +151,6 @@ const Staffs = () => {
 				}
 			})
 	}, [user])
-	useEffect(() => {
-		if (userHookLoading || !user) return;
-
-		if (isAdmin) {
-			setIsAllowed(true);  // Admin bypasses location check
-			return;
-		}
-
-		// Then do the location fetch here...
-	}, [user, isAdmin, userHookLoading]);
 
 	useEffect(() => {
 		if (
@@ -176,8 +167,16 @@ const Staffs = () => {
 	}, [user, staff])
 
 	useEffect(() => {
+		setIsAllowed(false);
 		setLocationLoading(true);
-		fetch('http://localhost:5000/shop_location')
+		if (!user) return;
+
+		if (user_category === 'admin' && user?.uid !== uid) {
+			setIsAllowed(true);  // Admin bypasses location check
+			setLocationLoading(false);
+			return;
+		}
+		fetch('https://bismillah-enterprise-server.onrender.com/shop_location')
 			.then(res => res.json())
 			.then(currentLocationData => {
 				setCurrentLocation(currentLocationData);
@@ -197,7 +196,7 @@ const Staffs = () => {
 						console.log(isOwnStaffPage);
 
 						// CASE 1: Admin viewing own staff page → check accuracy + distance
-						if (isAdmin && isOwnStaffPage) {
+						if (user_category === 'admin' && isOwnStaffPage) {
 							if (accuracy <= 100 && distance <= currentLocationData?.shop_range) {
 								setIsAllowed(true);
 								console.log('Step 1: Admin viewing own page with valid location');
@@ -209,9 +208,9 @@ const Staffs = () => {
 						}
 
 						// CASE 2: Admin viewing someone else’s staff page → allow directly
-						console.log(isAdmin, !isOwnStaffPage);
+						console.log(user_category === 'admin', !isOwnStaffPage);
 						console.log(user_category)
-						if (isAdmin && !isOwnStaffPage) {
+						if (user_category === 'admin' && !isOwnStaffPage) {
 							setIsAllowed(true);
 							console.log('Step 2: Admin viewing other staff page, allowed without location check');
 							setLocationLoading(false);
@@ -254,7 +253,7 @@ const Staffs = () => {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				const updatedTime = { name, clickedTime: Time, today_date: today_only_date_number };
-				fetch(`http://localhost:5000/staffs_daily_time/${id}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/staffs_daily_time/${id}`, {
 					method: 'PUT',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(updatedTime),
@@ -271,6 +270,52 @@ const Staffs = () => {
 						});
 						if (name === 'today_enter1_time') {
 							setWorkSubmitButton(false);
+							fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
+								.then(response => response.json())
+								.then(bonusData => {
+									const parseTime = (timeStr) => {
+										if (!timeStr) return null;
+										const [time, modifier] = timeStr.split(' ');
+										let [hours, minutes] = time.split(':').map(Number);
+										if (modifier === 'PM' && hours !== 12) hours += 12;
+										if (modifier === 'AM' && hours === 12) hours = 0;
+										return hours * 60 + minutes;
+									};
+									if (!bonusData[0].first_entry.time && !bonusData[0].second_entry.time && parseTime(Time) < 511) {
+										fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
+											method: 'PUT',
+											headers: { 'content-type': 'application/json' },
+											body: JSON.stringify({ entry_type: 'first entry', time: Time, uid }),
+										}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
+											if (firstEntryData.acknowledged) {
+												Swal.fire({
+													position: 'center',
+													icon: 'success',
+													title: 'You Will Get Bonus Today',
+													showConfirmButton: false,
+													timer: 1000,
+												});
+											}
+										})
+									}
+									if (bonusData[0].first_entry.time && parseTime(Time) - parseTime(bonusData[0].first_entry.time) < 6 && !bonusData[0].second_entry.time) {
+										fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
+											method: 'PUT',
+											headers: { 'content-type': 'application/json' },
+											body: JSON.stringify({ entry_type: 'second entry', time: Time, uid }),
+										}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
+											if (firstEntryData.acknowledged) {
+												Swal.fire({
+													position: 'center',
+													icon: 'success',
+													title: 'You Will Get Bonus Today',
+													showConfirmButton: false,
+													timer: 1000,
+												});
+											}
+										})
+									}
+								})
 						}
 						else if (name === 'today_exit1_time') {
 							setWorkSubmitButton(true);
@@ -300,7 +345,7 @@ const Staffs = () => {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				const requestData = { name, uid };
-				fetch(`http://localhost:5000/additional_movement_request`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/additional_movement_request`, {
 					method: 'POST',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(requestData),
@@ -332,7 +377,7 @@ const Staffs = () => {
 		}).then(async (result) => {
 			if (result.isConfirmed) {
 				const updatedTime = { name, clickedTime: Time };
-				await fetch(`http://localhost:5000/additional_movements/${id}`, {
+				await fetch(`https://bismillah-enterprise-server.onrender.com/additional_movements/${id}`, {
 					method: 'PUT',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(updatedTime),
@@ -374,7 +419,7 @@ const Staffs = () => {
 								additional_movement_minute: updatedAdditionalTotalMinutesRemainder,
 							};
 							console.log(AdditionalMovementSummary);
-							await fetch(`http://localhost:5000/additional_movement_submit/${_id}`, {
+							await fetch(`https://bismillah-enterprise-server.onrender.com/additional_movement_submit/${_id}`, {
 								method: 'PUT',
 								headers: {
 									'content-type': 'application/json'
@@ -384,7 +429,7 @@ const Staffs = () => {
 								.then(res => res.json())
 								.then(async (sentDataToStuffProfile) => {
 									if (sentDataToStuffProfile.acknowledged) {
-										await fetch(`http://localhost:5000/additional_request_approve/${uid}`, {
+										await fetch(`https://bismillah-enterprise-server.onrender.com/additional_request_approve/${uid}`, {
 											method: 'PUT',
 											headers: {
 												'content-type': 'application/json'
@@ -417,7 +462,7 @@ const Staffs = () => {
 	}
 
 
-	const handleSubmitWorkTime = () => {
+	const handleSubmitWorkTime = (uid) => {
 		Swal.fire({
 			title: "Are you sure?",
 			text: "You won't be able to revert this!",
@@ -426,7 +471,7 @@ const Staffs = () => {
 			confirmButtonColor: "#3085d6",
 			cancelButtonColor: "#d33",
 			confirmButtonText: "Yes, Submit"
-		}).then((result) => {
+		}).then(async (result) => {
 			if (result.isConfirmed) {
 				// Helper to parse time
 				const parseTime = (timeStr) => {
@@ -439,6 +484,7 @@ const Staffs = () => {
 				};
 
 				let totalMinutes = 0;
+
 
 				const enter1 = parseTime(today_enter1_time);
 				const exit1 = parseTime(today_exit1_time);
@@ -462,7 +508,32 @@ const Staffs = () => {
 				const today_minutes = totalMinutes % 60;
 
 				const todayDecimal = totalMinutes / 60;
-				const today_earned = parseFloat((todayDecimal * hour_rate).toFixed(2));
+				let today_earned = parseFloat((todayDecimal * hour_rate).toFixed(2));
+				let today_bonus = 0;
+				let total_bonus = bonus;
+				await fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
+					.then(bonusres => bonusres.json())
+					.then(bonusdata => {
+						console.log(bonusdata)
+						if (bonusdata[0].first_entry.uid === uid && !bonusdata[0].second_entry.time) {
+							today_earned = today_earned + 50;
+							today_bonus = 50;
+							total_bonus = bonus + 50;
+						}
+						if (bonusdata[0].first_entry.uid === uid && bonusdata[0].second_entry.time) {
+							today_earned = today_earned + 30;
+							today_bonus = 30;
+							total_bonus = bonus + 30;
+						}
+						if (bonusdata[0].first_entry.time && bonusdata[0].second_entry.uid === uid) {
+							today_earned = today_earned + 20;
+							today_bonus = 20;
+							total_bonus = bonus + 20;
+						}
+						if (!bonusdata[0].first_entry.time && !bonusdata[0].second_entry.time) {
+							today_earned = today_earned;
+						}
+					})
 
 				// Add today’s work to previous total from staff data
 				const previousTotalMinutes = (total_working_hour || 0) * 60 + (total_working_minute || 0);
@@ -471,7 +542,7 @@ const Staffs = () => {
 				const updatedTotalMinutesRemainder = updatedTotalMinutes % 60;
 
 				const previousEarn = parseFloat(total_income || 0);
-				const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2));
+				const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2) + today_bonus);
 
 				const TodaySummary = {
 					currentDate,
@@ -487,11 +558,13 @@ const Staffs = () => {
 					additional_movement_minute,
 					total_working_hour: updatedTotalHours,
 					total_working_minute: updatedTotalMinutesRemainder,
+					today_bonus,
+					total_bonus,
 					total_income: updatedEarn
 				};
 
 				// Save to database
-				fetch(`http://localhost:5000/submit_work_time/${_id}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -500,7 +573,7 @@ const Staffs = () => {
 				})
 					.then(res => res.json())
 					.then(sentDataToStuffProfile => {
-						if (sentDataToStuffProfile.acknowledged) {
+						if (sentDataToStuffProfile.message === 'Work time submitted successfully') {
 							navigate(`/staff/uid_query/${uid}`)
 							Swal.fire({
 								position: 'center',
@@ -515,7 +588,7 @@ const Staffs = () => {
 		});
 	};
 
-	if (userHookLoading || locationLoading || dateCheckLoading) {
+	if (locationLoading || dateCheckLoading) {
 		return (
 			<div className="h-full rounded-2xl overflow-hidden">
 				<Loading />
@@ -564,7 +637,7 @@ const Staffs = () => {
 
 				<h1 className='text-pink-200 text-md lg:text-xl text-center mb-2 font-semibold'>Your Location From Shop</h1>
 				{
-					!accuracy && !distance ? <div className='flex justify-center'><PuffLoader color='#fccee8' size={40} /></div> :
+					!isAllowed && locationLoading ? <div className='flex justify-center'><PuffLoader color='#fccee8' size={40} /></div> :
 						<div className='flex items-center justify-center gap-5 text-pink-200 text-md lg:text-xl'>
 							<h1>Accuracy: {accuracy} meters</h1>
 							<h1>Distance: {distance} meters</h1>
@@ -614,7 +687,7 @@ const Staffs = () => {
 							</div>
 							<div className='mt-10'>
 								<div className={`${additional_movement_status ? 'hidden' : 'flex'} items-center justify-center`}>
-									<button onClick={() => { handleAdditionalMovementRequest(name, uid) }} disabled={today_enter1_time === ''} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">Request For Additional Movement</button>
+									<button onClick={() => { handleAdditionalMovementRequest(name, uid) }} disabled={!accuracy || !distance || locationLoading || today_enter1_time === ''} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">Request For Additional Movement</button>
 								</div>
 								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center gap-5 lg:gap-10 justify-center flex-wrap`}>
 
@@ -678,7 +751,7 @@ const Staffs = () => {
 					</table>
 				</div>
 				<div className='flex flex-col gap-10 items-center justify-center mt-5 mb-10'>
-					<button onClick={handleSubmitWorkTime} disabled={!workSubmitButton} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+					<button onClick={() => { handleSubmitWorkTime(uid) }} disabled={!workSubmitButton} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Submit Your Work Time
 					</button>
 				</div>

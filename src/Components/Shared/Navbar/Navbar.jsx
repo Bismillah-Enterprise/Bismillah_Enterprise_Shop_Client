@@ -37,7 +37,7 @@ const Navbar = () => {
 	const handleLogin = () => {
 		setLoading(true)
 		const typedShopCode = inputRef.current?.value;
-		fetch(`http://localhost:5000/shop_code/${import.meta.env.VITE_shop_code_object_id}`)
+		fetch(`https://bismillah-enterprise-server.onrender.com/shop_code`)
 			.then(res => res.json())
 			.then(theShopCode => {
 				if (typedShopCode === theShopCode[0]?.shop_code) {
@@ -46,15 +46,15 @@ const Navbar = () => {
 					googleSignIn()
 						.then(userData => {
 							if (userData?.user?.uid) {
-								fetch(`http://localhost:5000/staff/uid_query/${userData?.user?.uid}`)
+								fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${userData?.user?.uid}`)
 									.then(res => res.json())
 									.then(queryData => {
 										if (queryData?.message === 'UID not found') {
-											fetch(`http://localhost:5000/user_request_uid/${userData?.user?.uid}`)
+											fetch(`https://bismillah-enterprise-server.onrender.com/user_request_uid/${userData?.user?.uid}`)
 												.then(res => res.json())
 												.then(userRequestData => {
 													if (userRequestData?.message === 'UID not found') {
-														fetch(`http://localhost:5000/user_request`, {
+														fetch(`https://bismillah-enterprise-server.onrender.com/user_request`, {
 															method: 'POST',
 															headers: {
 																'content-type': 'application/json'

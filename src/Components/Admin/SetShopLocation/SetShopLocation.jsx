@@ -18,7 +18,7 @@ const SetShopLocation = () => {
 	}
 	// Fetch current shop location
 	useEffect(() => {
-		fetch('http://localhost:5000/shop_location')
+		fetch('https://bismillah-enterprise-server.onrender.com/shop_location')
 			.then((res) => res.json())
 			.then((data) => {
 				setLocation(data);
@@ -63,7 +63,7 @@ const SetShopLocation = () => {
 	const handleSaveLocation = () => {
 		setSaveLocationLoading(true);
 		const shop_range = parseInt(inputRef.current.value);
-		fetch('http://localhost:5000/shop_location', {
+		fetch('https://bismillah-enterprise-server.onrender.com/shop_location', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

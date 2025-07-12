@@ -3,7 +3,7 @@ import { Link, useLoaderData, useLocation } from 'react-router-dom';
 
 const StaffsMonthlyRecords = () => {
 	const staff = useLoaderData();
-	const { _id, name, hour_rate, uid, user_category, current_month_details, total_working_hour, total_working_minute, total_income, withdrawal_amount, available_balance } = staff;
+	const { _id, name, hour_rate, uid, user_category, current_month_details, total_working_hour, bonus, fine, total_working_minute, total_income, withdrawal_amount, available_balance } = staff;
 	const location = useLocation();
 	const from = location?.state?.pathname;
 
@@ -50,6 +50,8 @@ const StaffsMonthlyRecords = () => {
 				</h1>
 				<div className='flex flex-wrap items-center justify-center gap-7 mt-10 sm:min-w-[70%]'>
 					<h1 className='text-pink-200 text-lg text-center font-semibold'>Total Earned: {total_income}</h1>
+					<h1 className='text-pink-200 text-lg text-center font-semibold'>Bonus: {bonus}</h1>
+					<h1 className='text-pink-200 text-lg text-center font-semibold'>Fine: {fine}</h1>
 					<h1 className='text-pink-200 text-lg text-center font-semibold'>Withdrawal Amount: {withdrawal_amount}</h1>
 					<h1 className='text-pink-200 text-lg text-center font-semibold'>Receiveable Amount: {available_balance}</h1>
 				</div>

@@ -45,7 +45,7 @@ const ShopTransections = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/shop_transections`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -95,7 +95,7 @@ const ShopTransections = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/shop_transections`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -143,7 +143,7 @@ const ShopTransections = () => {
 			if (result.isConfirmed) {
 				const currentWorkingMonth = currentDate.split(' ')[0];
 				const closing_month_details = { current_working_month: currentWorkingMonth, month_name: current_working_month, total_income, paid_amount: withdrawal_amount, paid_date: currentDate, last_month_due: available_balance, total_working_hour, total_working_minute };
-				fetch(`http://localhost:5000/closing_month/${_id}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/closing_month/${_id}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -247,6 +247,14 @@ const ShopTransections = () => {
 				<button onClick={() => handleClosingMonth()} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					Close The Month
 				</button>
+			</div>
+			<div className='mt-10 flex flex-col lg:flex-row items-center justify-center gap-5'>
+				<Link to={`/admin/revenue_transections_details`} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					See Current Month All Revenue Transections
+				</Link>
+				<Link to={`/admin/expense_transections_details`} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					See Current Month All Expense Transections
+				</Link>
 			</div>
 
 		</div>

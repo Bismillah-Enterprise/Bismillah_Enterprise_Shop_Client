@@ -27,7 +27,7 @@ const LocationDetails = () => {
 	const handleLocation = () => {
 		console.log('first')
 		setLocationLoading(true);
-		fetch('http://localhost:5000/shop_location')
+		fetch('https://bismillah-enterprise-server.onrender.com/shop_location')
 			.then(res => res.json())
 			.then(currentLocationData => {
 				setCurrentLocation(currentLocationData);

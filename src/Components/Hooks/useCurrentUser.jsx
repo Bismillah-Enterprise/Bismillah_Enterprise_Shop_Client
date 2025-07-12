@@ -16,7 +16,7 @@ const useCurrentUser = () => {
 			return;
 		}
 
-		fetch(`http://localhost:5000/staff/uid_query/${user.uid}`)
+		fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${user.uid}`)
 			.then(res => res.json())
 			.then(currentUserData => {
 				if (currentUserData?.message === 'UID not found') {

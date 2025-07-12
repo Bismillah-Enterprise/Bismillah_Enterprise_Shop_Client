@@ -15,7 +15,7 @@ const StaffRoute = ({children}) => {
 	useEffect(() => {
 		setLoading(true);
 		setStaffLoading(true);
-		fetch(`http://localhost:5000/staff/uid_query/${user?.uid}`).then(res => res.json()).then(gotData => {
+		fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${user?.uid}`).then(res => res.json()).then(gotData => {
 			if(gotData) {
 				setSiteUser(gotData);
 				setStaffLoading(false);
