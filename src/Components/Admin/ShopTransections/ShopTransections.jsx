@@ -133,7 +133,7 @@ const ShopTransections = () => {
 	const handleClosingMonth = () => {
 		Swal.fire({
 			title: "Are you sure?",
-			text: `You Are Sure?`,
+			text: `You Should Print It Before Closing`,
 			icon: "warning",
 			showCancelButton: true,
 			confirmButtonColor: "#3085d6",
@@ -141,10 +141,9 @@ const ShopTransections = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				const currentWorkingMonth = currentDate.split(' ')[0];
-				const closing_month_details = { current_working_month: currentWorkingMonth, month_name: current_working_month, total_income, paid_amount: withdrawal_amount, paid_date: currentDate, last_month_due: available_balance, total_working_hour, total_working_minute };
-				fetch(`https://bismillah-enterprise-server.onrender.com/closing_month/${_id}`, {
-					method: 'PUT',
+				const closing_month_details = { month_name, hand_on_cash, total_expense_amount, total_revenue_amount };
+				fetch(`http://localhost:5000/shop_transections_closing_month`, {
+					method: 'POST',
 					headers: {
 						'content-type': 'application/json'
 					},
@@ -152,7 +151,7 @@ const ShopTransections = () => {
 				})
 					.then(res => res.json())
 					.then(data => {
-						if (data.acknowledged) {
+						if (data.message === 'Shop transections saved successfully') {
 							navigate(location.pathname)
 							Swal.fire({
 								position: 'center',
@@ -244,16 +243,22 @@ const ShopTransections = () => {
 				<button onClick={() => setExpenseModal(!expenseModal)} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					Make a Expense Transections
 				</button>
+
+			</div>
+			<div className='mt-10 flex flex-col lg:flex-row items-center justify-center gap-5'>
+				<Link to={`/admin/revenue_transections_details`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					See Current Month All Revenue Transections
+				</Link>
+				<Link to={`/admin/expense_transections_details`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					See Current Month All Expense Transections
+				</Link>
+			</div>
+			<div className='mt-10 flex flex-col lg:flex-row items-center justify-center gap-5'>
 				<button onClick={() => handleClosingMonth()} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					Close The Month
 				</button>
-			</div>
-			<div className='mt-10 flex flex-col lg:flex-row items-center justify-center gap-5'>
-				<Link to={`/admin/revenue_transections_details`} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
-					See Current Month All Revenue Transections
-				</Link>
-				<Link to={`/admin/expense_transections_details`} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
-					See Current Month All Expense Transections
+				<Link to={`/admin/shop_transections_summary`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					See Shop Monthly Transections Summary
 				</Link>
 			</div>
 

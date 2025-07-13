@@ -26,6 +26,9 @@ import IncomeHistory from '../IncomeHistory/IncomeHistory';
 import ShopTransections from '../Admin/ShopTransections/ShopTransections';
 import RevenueTransectionsDetials from '../Admin/RevenueTransectionsDetails/RevenueTransectionsDetials';
 import ExpenseTransectionsDetails from '../Admin/ExpenseTransectionsDetails/ExpenseTransectionsDetails';
+import ShopTransectionsSummary from '../Admin/ShopTransectionsSummary/ShopTransectionsSummary';
+import SelfTransections from '../Admin/SelfTransections/SelfTransections';
+import ClientCorner from '../Admin/ClientCorner/ClientCorner';
 
 const router = createBrowserRouter([
 	{
@@ -70,66 +73,79 @@ const router = createBrowserRouter([
 					},
 					{
 						path: '/admin/notice_panel',
-						element: <NoticePanel></NoticePanel>
+						element: <AdminRoute><NoticePanel></NoticePanel></AdminRoute>
 					},
 					{
 						path: '/admin/shop_transections',
-						element: <ShopTransections></ShopTransections>,
+						element: <AdminRoute><ShopTransections></ShopTransections></AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`)
 					},
 					{
 						path: '/admin/revenue_transections_details',
-						element: <RevenueTransectionsDetials></RevenueTransectionsDetials>,
+						element: <AdminRoute><RevenueTransectionsDetials></RevenueTransectionsDetials></AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`)
 					},
 					{
 						path: '/admin/expense_transections_details',
-						element: <ExpenseTransectionsDetails></ExpenseTransectionsDetails>,
+						element: <AdminRoute><ExpenseTransectionsDetails></ExpenseTransectionsDetails></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`)
 					},
 					{
+						path: '/admin/shop_transections_summary',
+						element: <AdminRoute><ShopTransectionsSummary></ShopTransectionsSummary></ AdminRoute>,
+						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections_summary`)
+					},
+					{
 						path: '/admin/set_shop_code',
-						element: <SetShopCode></SetShopCode>
+						element: <AdminRoute><SetShopCode></SetShopCode></ AdminRoute>
 					},
 					{
 						path: '/admin/shop_location',
-						element: <SetShopLocation></SetShopLocation>
+						element: <AdminRoute><SetShopLocation></SetShopLocation></ AdminRoute>
 					},
 					{
 						path: '/admin/staff_manipulation',
-						element: <StaffManipulation></StaffManipulation>,
+						element: <AdminRoute><StaffManipulation></StaffManipulation></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/staffs`)
 					},
 					{
 						path: '/admin/additional_request',
-						element: <AdditionalRequest></AdditionalRequest>,
+						element: <AdminRoute><AdditionalRequest></AdditionalRequest></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/additional_movement_request`)
 					},
 					{
 						path: '/admin/staff_transections',
-						element: <StaffTransections></StaffTransections>,
+						element: <AdminRoute><StaffTransections></StaffTransections></ AdminRoute>,
 						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/staffs'),
-
-
+					},
+					{
+						path: '/admin/self_transections',
+						element: <AdminRoute><SelfTransections></SelfTransections></ AdminRoute>,
+						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/self_transections'),
+					},
+					{
+						path: '/admin/client_corner',
+						element: <AdminRoute><ClientCorner></ClientCorner></ AdminRoute>,
+						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/client_corner'),
 					},
 					{
 						path: '/admin/staff_details/:uid',
-						element: <StaffDetails></StaffDetails>,
+						element: <AdminRoute><StaffDetails></StaffDetails></ AdminRoute>,
 						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${params.uid}`)
 					},
 					{
 						path: '/admin/user_manipulation',
-						element: <UserManipulation></UserManipulation>,
+						element: <AdminRoute><UserManipulation></UserManipulation></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/staffs`)
 					},
 					{
 						path: '/admin/user_request',
-						element: <UserRequest></UserRequest>,
+						element: <AdminRoute><UserRequest></UserRequest></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/user_request`)
 					},
 					{
 						path: '/admin/location_details',
-						element: <LocationDetails></LocationDetails>
+						element: <AdminRoute><LocationDetails></LocationDetails></ AdminRoute>
 					}
 				]
 			}

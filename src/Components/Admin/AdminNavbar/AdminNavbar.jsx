@@ -25,6 +25,12 @@ const AdminNavbar = () => {
 				<Link to={`/admin/shop_transections`} state={{ pathname: location.pathname }} className='w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
 					Shop Transections
 				</Link>
+				<Link to={`/admin/client_corner`} state={{ pathname: location.pathname }} className='w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
+					Client Corner
+				</Link>
+				<Link to={`/admin/self_transections`} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+					Abdul Kader Transections
+				</Link>
 				<Link to={"/admin/user_request"} state={{ pathname: location.pathname }} className='w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer'>
 					User Request
 				</Link>
@@ -64,7 +70,13 @@ const AdminNavbar = () => {
 						Staff Page
 					</Link>
 					<Link to={`/admin/shop_transections`} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
-						Staff Transections
+						Shop Transections
+					</Link>
+					<Link to={`/admin/client_corner`} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+						Client Corner
+					</Link>
+					<Link to={`/admin/self_transections`} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+						Abdul Kader Transections
 					</Link>
 					<Link to={"/admin/user_request"} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						User Request

@@ -16,7 +16,7 @@ const StaffsMonthlyRecords = () => {
 		document.body.innerHTML = printContents;
 		window.print();
 		document.body.innerHTML = originalContents;
-		window.location.reload(); // Optional: reload page to restore JS state
+		// window.location.reload(); // Optional: reload page to restore JS state
 	};
 
 

@@ -14,7 +14,7 @@ const AdminRoute = ({ children }) => {
 	const [isAdmin, isAdminLoading] = useAdmin();
 
 	if (isAdminLoading) {
-		return <Loading></Loading>
+		return <div className='h-full'><Loading></Loading></div>
 	}
 	if (user && isAdmin) {
 		return children;
