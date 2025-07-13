@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLoaderData, useLocation } from 'react-router-dom';
 
-const ClientDetails = () => {
+const ClientTransections = () => {
     const client = useLoaderData();
     const location = useLocation();
     const from = location?.state?.pathname;
@@ -9,7 +9,7 @@ const ClientDetails = () => {
         <div>
             <div className='grid grid-cols-3 items-center mt-5'>
                 <div className='flex items-center justify-start'>
-                    <Link to='/admin/client_corner'>
+                    <Link to={from}>
                         <button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                             Back
                         </button>
@@ -22,12 +22,9 @@ const ClientDetails = () => {
                 </div>
             </div>
             <div className='flex items-center justify-center mt-5 mb-2 gap-5'>
-                <Link to={`/admin/new_voucher/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                    Create A New Voucher
-                </Link>
-                <Link to={`/admin/client_transections/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                    See Client Transections
-                </Link>
+                <h1 className="text-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                    Client's All Transections
+                </h1>
             </div>
             <div>
                 <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
@@ -36,24 +33,20 @@ const ClientDetails = () => {
                             <tr>
                                 <th>SL No</th>
                                 <th>Date</th>
-                                <th>Voucher No</th>
+                                <th>Reference Voucher No</th>
                                 <th>Paid Amount</th>
                                 <th>Due Amount</th>
                                 <th>Status</th>
-                                <th>View Details</th>
                             </tr>
                             {
-                                client.vouchers?.map((voucher, index) =>
+                                client.transections?.map((transection, index) =>
                                     <tr>
                                         <td>{index + 1}</td>
-                                        <td>{voucher.date}</td>
-                                        <td>{voucher.voucher_no}</td>
-                                        <td>{voucher.paid_amount}</td>
-                                        <td>{voucher.due_amount}</td>
-                                        <td className={`${voucher.payment_status === 'Paid' ? 'text-green-500' : 'text-red-500'}`}>{voucher.payment_status}</td>
-                                        <td>
-                                            <Link to={`/admin/voucher/${client._id}/${voucher.voucher_no}`} state={{ pathname: location?.pathname }} className='text-pink-300 hover:text-pink-400 underline'>View Details</Link>
-                                        </td>
+                                        <td>{transection.date}</td>
+                                        <td>{transection.reference_voucher}</td>
+                                        <td>{transection.paid_amount}</td>
+                                        <td>{transection.due_amount}</td>
+                                        <td className={`${transection.payment_status === 'Paid' ? 'text-green-500' : 'text-red-500'}`}>{transection.payment_status}</td>
                                     </tr>
                                 )
                             }
@@ -65,4 +58,4 @@ const ClientDetails = () => {
     );
 };
 
-export default ClientDetails;
+export default ClientTransections;

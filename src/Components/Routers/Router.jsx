@@ -33,6 +33,7 @@ import ClientDetails from '../Admin/ClientDetails/ClientDetails';
 import Voucher from '../Admin/Voucher/Voucher';
 import CreateNewClient from '../Admin/CreateNewClient/CreateNewClient';
 import NewVoucher from '../Admin/NewVoucher/NewVoucher';
+import ClientTransections from '../Admin/ClientTransections/ClientTransections';
 
 const router = createBrowserRouter([
 	{
@@ -141,6 +142,11 @@ const router = createBrowserRouter([
 					{
 						path: '/admin/client_details/:id',
 						element: <AdminRoute><ClientDetails></ClientDetails></ AdminRoute>,
+						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
+					},
+					{
+						path: '/admin/client_transections/:id',
+						element: <AdminRoute><ClientTransections></ClientTransections></ AdminRoute>,
 						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
 					},
 					{

@@ -1,5 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { MdOutlineCancel } from 'react-icons/md';
+import { NumberFormatBase, NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const Voucher = () => {
     const { voucher_no } = useParams();
@@ -11,8 +14,22 @@ const Voucher = () => {
     const location = useLocation();
     const from = location?.state?.pathname;
     const navigate = useNavigate();
+    const [modal, setModal] = useState(false);
+    const [statusError, setStatusError] = useState(false);
+    const now = new Date();
+    const Time = now.toLocaleTimeString('en-BD', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+    });
+    const currentDate = now.toLocaleDateString('en-BD', {
+        day: 'numeric',
+        year: 'numeric',
+        month: 'long',
+    });
 
-
+    const transection_amount_ref = useRef();
+    const payment_status_ref = useRef();
     const voucherPrintRef = useRef();
 
     const handlePrint = () => {
@@ -24,9 +41,103 @@ const Voucher = () => {
         document.body.innerHTML = originalContents;
         navigate(location.pathname)
     };
-    console.log(matchedVoucher)
+    const handleTakePayment = (id) => {
+        const transectionAmount = parseFloat(transection_amount_ref.current.value).toFixed(2);
+        if (payment_status_ref.current.value === '') {
+            setStatusError(true);
+            return;
+        }
+        let newDue = parseFloat(matchedVoucher.due_amount) - transectionAmount;
+        if (payment_status_ref.current.value === 'Paid') {
+            newDue = 0
+        }
+        const paymentDetails = {
+            date: `${currentDate}, ${Time}`,
+            reference_voucher: voucher_no,
+            paid_amount: parseFloat(transectionAmount),
+            due: parseFloat(newDue).toFixed(2),
+            payment_status: payment_status_ref.current.value,
+            voucher_no: `${voucher_no}`
+        }
+        console.log(paymentDetails);
+        Swal.fire({
+            title: "Are you sure?",
+            text: `You Are Taking a Payment From ${client.name}`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, I am Sure"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`http://localhost:5000/take_payment/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(paymentDetails)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            transection_amount_ref.current.value = '';
+                            payment_status_ref.current.value = '';
+                            setModal(!modal);
+                            navigate(location.pathname)
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'Payment Taking Successfully',
+                                showConfirmButton: false,
+                                timer: 1000,
+                            })
+                        }
+                    })
+            }
+
+        })
+    }
     return (
-        <div>
+        <div className='relative'>
+            {/* modal */}
+            <div id='staff_details_modal' className={`${!modal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
+                <div className='flex justify-end -top-[10px] -right-[10px] relative'>
+                    <MdOutlineCancel onClick={() => { !setModal(!modal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+                </div>
+                <div className='mb-4'>
+                    <h1 className='text-lg font-semibold text-pink-300 text-center mb-2'>Payment Details</h1>
+                    <hr className='text-pink-300 w-full' />
+                </div>
+                <div className='text-pink-200 flex flex-col gap-5 px-8 pt-0 pb-7 items-center h-full w-full'>
+                    <div className='mt-2 w-full'>
+                        <h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
+                        <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
+                            <NumericFormat
+                                getInputRef={transection_amount_ref}
+                                className="outline-none w-full h-full"
+                                placeholder="Enter Amount"
+                                allowNegative={false}
+                                decimalScale={2}
+                                fixedDecimalScale={false}
+                                thousandSeparator={false}
+                            />
+                        </div>
+                    </div>
+                    <div className='mt-2 w-full'>
+                        <div className='flex items-center gap-5'>
+                            <h1 className='lg:text-lg font-semibold'>Transection Type: </h1>
+                            <select ref={payment_status_ref} className='px-3 outline-none border p-1 rounded-md' name="user_category_in_shop" id="user_category">
+                                <option defaultChecked className='text-xs text-black bg-gray' value=""></option>
+                                <option className='text-xs text-black bg-gray' value="Due">Due</option>
+                                <option className='text-xs text-black bg-gray' value="Paid">Paid</option>
+                            </select>
+                        </div>
+                        <p className={`text-red-500 font-thin ${statusError ? 'block' : 'hidden'}`}>Please select the status</p>
+                    </div>
+                    <button onClick={() => handleTakePayment(client._id)} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
+                </div>
+            </div>
+            {/* end modal */}
             <div>
                 <div className='flex items-center justify-start'>
                     <Link to={from}>
@@ -95,6 +206,7 @@ const Voucher = () => {
                 {
                     matchedVoucher ? (
                         <div className='flex items-center justify-between gap-8 text-pink-200 mt-5 text-lg min-w-[380px] sm:min-w-[70%] font-semibold'>
+                            <h1>Payment Status: <span className={`${matchedVoucher.payment_status === 'Due' ? 'text-red-500' : 'text-green-500'}`}>{matchedVoucher.payment_status}</span></h1>
                             <h1>Total Paid: <span className='text-pink-300'>{matchedVoucher.paid_amount}</span></h1>
                             <h1>Due: <span className='text-pink-300'>{matchedVoucher.due_amount}</span></h1>
                         </div>
@@ -102,13 +214,15 @@ const Voucher = () => {
                         : ''
                 }
             </div>
-            <div className='flex items-center justify-center gap-5 mt-5 mb-10'>
-                <button onClick={handlePrint} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                    Close Voucher
-                </button>
-                <button onClick={handlePrint} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                    Print
-                </button>
+            <div className='flex flex-col items-center justify-center gap-5 mt-8 mb-10'>
+                <div className='flex items-center justify-center gap-5'>
+                    <button onClick={() => { setModal(true) }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        Take A Payment
+                    </button>
+                    <button onClick={handlePrint} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        Print
+                    </button>
+                </div>
             </div>
             <div ref={voucherPrintRef} className='nunito w-[550px] hidden'>
                 <div className='flex items-center justify-center mt-3 gap-4'>

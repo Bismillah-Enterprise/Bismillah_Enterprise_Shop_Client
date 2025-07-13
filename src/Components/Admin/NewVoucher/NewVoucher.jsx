@@ -7,7 +7,6 @@ const NewVoucher = () => {
     const client = useLoaderData();
     const location = useLocation();
     const from = location?.state?.pathname;
-    const now = new Date();
     const [voucherSl, setVoucherSl] = useState();
     useEffect(() => {
         fetch('http://localhost:5000/voucher_sl')
@@ -16,6 +15,7 @@ const NewVoucher = () => {
                 setVoucherSl(data.sl_no)
             })
     }, [])
+    const now = new Date();
     const Time = now.toLocaleTimeString('en-BD', {
         hour: '2-digit',
         minute: '2-digit',
