@@ -5,7 +5,7 @@ const IncomeHistory = () => {
 	const staff = useLoaderData();
 	const { name, income_history } = staff;
 	const location = useLocation();
-	const from = location.state?.pathname;
+	const from = location?.state?.pathname;
 	return (
 		<div className='pb-10'>
 			<div className='flex items-center justify-center mt-8 mb-8'>
@@ -30,7 +30,7 @@ const IncomeHistory = () => {
 							<th>Paid Date</th>
 						</tr>
 						{
-							income_history.map(income =>
+							income_history?.map(income =>
 								<tr className='text-pink-200'>
 									<td>{income.month_name}</td>
 									<td>{income.total_income}</td>

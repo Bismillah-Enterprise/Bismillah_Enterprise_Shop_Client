@@ -78,7 +78,7 @@ const StaffManipulation = () => {
 		<div className='w-full h-full lg:p-5 flex flex-col text-pink-200 scrollbar-hide'>
 			<h1 className='font-semibold text-2xl text-pink-300 mb-5'>Staff Manipulation</h1>
 			{
-				allStaffs.map(staff =>
+				allStaffs?.map(staff =>
 					<div key={staff._id}>
 						<div className='flex items-center justify-between gap-5 lg:grid grid-cols-2 lg:grid-cols-3 border-b-2 border-pink-200 py-4'>
 							<div className='col-span-1 flex-1'>

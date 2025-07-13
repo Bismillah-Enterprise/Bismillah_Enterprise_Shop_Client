@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
+import { NumberFormatBase } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
@@ -9,7 +10,7 @@ const StaffDetails = () => {
 	const [modal, setModal] = useState(false);
 	const navigate = useNavigate();
 	const location = useLocation();
-	const from = location.state?.pathname;
+	const from = location?.state?.pathname;
 	const now = new Date();
 	const Time = now.toLocaleTimeString('en-BD', {
 		hour: '2-digit',
@@ -129,7 +130,14 @@ const StaffDetails = () => {
 						<div className='mt-2'>
 							<h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
 							<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-								<input ref={transection_amount_ref} type="text" className='outline-none w-full' />
+								<NumberFormatBase
+									getInputRef={transection_amount_ref}
+									className='outline-none w-full h-full'
+									placeholder='Enter amount'
+									thousandSeparator={true}
+									allowNegative={false}
+									isNumericString={true}
+								/>
 							</div>
 						</div>
 						<div className='mt-2 flex items-center gap-5'>

@@ -76,7 +76,7 @@ const StaffsMonthlyRecords = () => {
 							<th>Total Earn</th>
 						</tr>
 						{
-							current_month_details.map(day =>
+							current_month_details?.map(day =>
 								<tr>
 									<td id="today_date">{day.current_date}</td>
 									<td id="today_day_name">{day.current_day_name}</td>
@@ -133,7 +133,7 @@ const StaffsMonthlyRecords = () => {
 					<h1 className='text-lg text-center font-semibold'>Receiveable Amount: {available_balance}</h1>
 				</div>
 				<div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-					<table className="nunito min-w-[380px] sm:min-w-[70%]">
+					<table className="nunito min-w-[380px] sm:min-w-full">
 						<tbody>
 							<tr>
 								<th>Date</th>
@@ -147,7 +147,7 @@ const StaffsMonthlyRecords = () => {
 								<th>Total Earn</th>
 							</tr>
 							{
-								current_month_details.map(day =>
+								current_month_details?.map(day =>
 									<tr>
 										<td id="today_date">{day.current_date}</td>
 										<td id="today_day_name">{day.current_day_name}</td>

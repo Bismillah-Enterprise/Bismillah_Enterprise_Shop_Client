@@ -5,7 +5,7 @@ const TransectionsHistory = () => {
 	const staffData = useLoaderData();
 	const { name, transections } = staffData;
 	const location = useLocation();
-	const from = location.state?.pathname;
+	const from = location?.state?.pathname;
 	return (
 		<div className='pb-10'>
 			<div className='flex items-center justify-center mt-8 mb-8'>
@@ -30,7 +30,7 @@ const TransectionsHistory = () => {
 							<th>Ammount</th>
 						</tr>
 						{
-							transections.map(transection =>
+							transections?.map(transection =>
 								<tr className='text-pink-200'>
 									<td>{transection.transection_date}</td>
 									<td className='max-w-[100px] text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{transection.comment}</td>

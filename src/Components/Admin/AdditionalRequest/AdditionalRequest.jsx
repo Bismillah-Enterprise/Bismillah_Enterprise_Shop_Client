@@ -82,7 +82,7 @@ const AdditionalRequest = () => {
 		<div className='w-full h-full lg:p-5 flex flex-col gap-5 text-pink-200'>
 			<h1 className='font-semibold text-2xl text-pink-300'>Additonal Movement Requests</h1>
 			{
-				additionalRequestData.map(requestData =>
+				additionalRequestData?.map(requestData =>
 					<div key={requestData._id}>
 						<div className='grid grid-cols-2 items-center justify-between border-b-2 border-pink-200 py-4'>
 							<div className='flex items-center gap-2 lg:gap-5 col-span-1'>

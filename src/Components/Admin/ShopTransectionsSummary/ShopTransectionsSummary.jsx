@@ -4,7 +4,7 @@ import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom'
 const ShopTransectionsSummary = () => {
     const allSummary = useLoaderData();
     const location = useLocation();
-    const from = location.state.pathname
+    const from = location?.state?.pathname
     const navigate = useNavigate();
 
 
@@ -43,7 +43,7 @@ const ShopTransectionsSummary = () => {
                             <th>Hand on Cash</th>
                         </tr>
                         {
-                            allSummary.map(summary =>
+                            allSummary?.map(summary =>
                                 <tr className='text-pink-200'>
                                     <td>{summary.month_name}</td>
                                     <td className='max-w-[100px] text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{summary.total_revenue_amount}</td>
@@ -73,7 +73,7 @@ const ShopTransectionsSummary = () => {
                     </h1>
                 </div>
                 <div className="flex items-center justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="nunito min-w-[380px] sm:min-w-[70%]">
+                    <table className="nunito min-w-[380px] sm:min-w-full">
                         <tbody>
                             <tr className='text-black'>
                                 <th>Month Name</th>
@@ -82,7 +82,7 @@ const ShopTransectionsSummary = () => {
                                 <th>Hand on Cash</th>
                             </tr>
                             {
-                                allSummary.map(summary =>
+                                allSummary?.map(summary =>
                                     <tr className='text-black'>
                                         <td>{summary.month_name}</td>
                                         <td className='max-w-[100px] text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{summary.total_revenue_amount}</td>

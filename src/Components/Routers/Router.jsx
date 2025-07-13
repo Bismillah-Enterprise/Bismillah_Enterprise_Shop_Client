@@ -29,6 +29,10 @@ import ExpenseTransectionsDetails from '../Admin/ExpenseTransectionsDetails/Expe
 import ShopTransectionsSummary from '../Admin/ShopTransectionsSummary/ShopTransectionsSummary';
 import SelfTransections from '../Admin/SelfTransections/SelfTransections';
 import ClientCorner from '../Admin/ClientCorner/ClientCorner';
+import ClientDetails from '../Admin/ClientDetails/ClientDetails';
+import Voucher from '../Admin/Voucher/Voucher';
+import CreateNewClient from '../Admin/CreateNewClient/CreateNewClient';
+import NewVoucher from '../Admin/NewVoucher/NewVoucher';
 
 const router = createBrowserRouter([
 	{
@@ -129,6 +133,26 @@ const router = createBrowserRouter([
 						path: '/admin/client_corner',
 						element: <AdminRoute><ClientCorner></ClientCorner></ AdminRoute>,
 						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/client_corner'),
+					},
+					{
+						path: '/admin/new_client',
+						element: <AdminRoute><CreateNewClient></CreateNewClient></ AdminRoute>
+					},
+					{
+						path: '/admin/client_details/:id',
+						element: <AdminRoute><ClientDetails></ClientDetails></ AdminRoute>,
+						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
+					},
+					{
+						path: '/admin/new_voucher/:id',
+						element: <AdminRoute><NewVoucher></NewVoucher></ AdminRoute>,
+						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
+					},
+					{
+						path: '/admin/voucher/:id/:voucher_no',
+						element: <AdminRoute><Voucher></Voucher></ AdminRoute>,
+						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
+
 					},
 					{
 						path: '/admin/staff_details/:uid',

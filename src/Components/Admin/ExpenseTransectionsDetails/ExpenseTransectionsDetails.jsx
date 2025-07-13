@@ -7,7 +7,7 @@ const ExpenseTransectionsDetails = () => {
     const { expense_transections, total_expense_amount, month_name } = shopTransections[0];
     console.log(expense_transections);
     const location = useLocation();
-    const from = location.state?.pathname;
+    const from = location?.state?.pathname;
     const navigate = useNavigate();
 
 
@@ -83,7 +83,7 @@ const ExpenseTransectionsDetails = () => {
                     </h1>
                 </div>
                 <div className="flex items-center justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="nunito min-w-[380px] sm:min-w-[70%]">
+                    <table className="nunito min-w-[380px] sm:min-w-full">
                         <tbody>
                             <tr className='text-black'>
                                 <th>Date</th>
@@ -92,7 +92,7 @@ const ExpenseTransectionsDetails = () => {
                                 <th>Ammount</th>
                             </tr>
                             {
-                                expense_transections.map(transection =>
+                                expense_transections?.map(transection =>
                                     <tr className='text-black'>
                                         <td>{transection.transection_date}</td>
                                         <td>{transection.transection_id}</td>

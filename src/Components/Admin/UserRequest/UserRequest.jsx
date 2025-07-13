@@ -158,7 +158,7 @@ const UserRequest = () => {
 			</div>
 			<h1 className='font-semibold text-2xl text-pink-300'>User Requests</h1>
 			{
-				userRequest.map(user =>
+				userRequest?.map(user =>
 					<div key={user._id}>
 						<div className='grid grid-cols-2 xl:grid-cols-3 gap-5 items-center border-b-2 border-pink-200 py-4'>
 							<div className='flex flex-col lg:flex-row items-start lg:items-center gap-2 lg:gap-5'>

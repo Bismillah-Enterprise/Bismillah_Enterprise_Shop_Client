@@ -36,7 +36,7 @@ const UserManipulation = () => {
 		<div className='w-full h-full lg:p-5 flex flex-col gap-5 text-pink-200'>
 			<h1 className='font-semibold text-2xl text-pink-300'>User Account Manipulation</h1>
 			{
-				allStaffs.map(staff =>
+				allStaffs?.map(staff =>
 					<div key={staff._id}>
 						<div className='grid grid-cols-2 md:grid-cols-3 gap-5 items-center justify-between border-b-2 border-pink-200 py-4'>
 							<div className='col-span-1'>

@@ -8,7 +8,7 @@ const StaffTransections = () => {
 		<div className='w-full h-full lg:p-5 flex flex-col gap-5 text-pink-200'>
 			<h1 className='font-semibold text-2xl text-pink-300'>Staff Transections</h1>
 			{
-				All_Staffs.map(staff =>
+				All_Staffs?.map(staff =>
 					<div key={staff._id}>
 						<div className='grid grid-cols-2 gap-5 items-center justify-between border-b-2 border-pink-200 py-4'>
 							<div className='col-span-1'>
