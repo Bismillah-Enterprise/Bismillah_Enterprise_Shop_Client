@@ -9,7 +9,7 @@ const NewVoucher = () => {
     const from = location?.state?.pathname;
     const [voucherSl, setVoucherSl] = useState();
     useEffect(() => {
-        fetch('http://localhost:5000/voucher_sl')
+        fetch('https://bismillah-enterprise-server.onrender.com/voucher_sl')
             .then(res => res.json())
             .then(data => {
                 setVoucherSl(data.sl_no)
@@ -70,7 +70,7 @@ const NewVoucher = () => {
             confirmButtonText: "Yes, I am Sure"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:5000/new_voucher/${client._id}`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/new_voucher/${client._id}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(voucher)
@@ -78,7 +78,7 @@ const NewVoucher = () => {
                     .then(res => res.json())
                     .then(data => {
                         if (data.acknowledged) {
-                            fetch(`http://localhost:5000/voucher_sl`, {
+                            fetch(`https://bismillah-enterprise-server.onrender.com/voucher_sl`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ new_sl_no: newSlNo })

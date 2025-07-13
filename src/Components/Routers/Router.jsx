@@ -43,7 +43,7 @@ const router = createBrowserRouter([
 			{
 				path: '/',
 				element: <Home></Home>,
-				loader: () => fetch(`http://localhost:5000/notice_panel`)
+				loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/notice_panel`)
 			},
 			{
 				path: '/staff/uid_query/:uid',
@@ -80,7 +80,7 @@ const router = createBrowserRouter([
 					{
 						path: '/admin/notice_panel',
 						element: <AdminRoute><NoticePanel></NoticePanel></AdminRoute>,
-						loader: () => fetch(`http://localhost:5000/notice_panel`)
+						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/notice_panel`)
 					},
 					{
 						path: '/admin/shop_transections',
@@ -142,22 +142,22 @@ const router = createBrowserRouter([
 					{
 						path: '/admin/client_details/:id',
 						element: <AdminRoute><ClientDetails></ClientDetails></ AdminRoute>,
-						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
+						loader: ({params}) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 					},
 					{
 						path: '/admin/client_transections/:id',
 						element: <AdminRoute><ClientTransections></ClientTransections></ AdminRoute>,
-						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
+						loader: ({params}) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 					},
 					{
 						path: '/admin/new_voucher/:id',
 						element: <AdminRoute><NewVoucher></NewVoucher></ AdminRoute>,
-						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
+						loader: ({params}) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 					},
 					{
 						path: '/admin/voucher/:id/:voucher_no',
 						element: <AdminRoute><Voucher></Voucher></ AdminRoute>,
-						loader: ({params}) => fetch(`http://localhost:5000/client_details/${params.id}`),
+						loader: ({params}) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 
 					},
 					{

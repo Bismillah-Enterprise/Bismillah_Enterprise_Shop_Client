@@ -143,7 +143,7 @@ const ShopTransections = () => {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				const closing_month_details = { month_name, hand_on_cash, total_expense_amount, total_revenue_amount };
-				fetch(`http://localhost:5000/shop_transections_closing_month`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections_closing_month`, {
 					method: 'POST',
 					headers: {
 						'content-type': 'application/json'

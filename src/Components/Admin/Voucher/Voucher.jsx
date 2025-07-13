@@ -70,7 +70,7 @@ const Voucher = () => {
             confirmButtonText: "Yes, I am Sure"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:5000/take_payment/${id}`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/take_payment/${id}`, {
                     method: 'PUT',
                     headers: {
                         'content-type': 'application/json'

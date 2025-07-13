@@ -7,7 +7,7 @@ const NoticePanel = () => {
 	const navigate = useNavigate();
 	const handleChangeNotice = () => {
 		const newNotice = newNoticeRef.current.value;
-		fetch(`http://localhost:5000/notice_panel`, {
+		fetch(`https://bismillah-enterprise-server.onrender.com/notice_panel`, {
 			method: 'POST',
 			headers: {
 				'content-type': 'application/json'
