@@ -37,7 +37,8 @@ const router = createBrowserRouter([
 		children: [
 			{
 				path: '/',
-				element: <Home></Home>
+				element: <Home></Home>,
+				loader: () => fetch(`http://localhost:5000/notice_panel`)
 			},
 			{
 				path: '/staff/uid_query/:uid',
@@ -73,7 +74,8 @@ const router = createBrowserRouter([
 					},
 					{
 						path: '/admin/notice_panel',
-						element: <AdminRoute><NoticePanel></NoticePanel></AdminRoute>
+						element: <AdminRoute><NoticePanel></NoticePanel></AdminRoute>,
+						loader: () => fetch(`http://localhost:5000/notice_panel`)
 					},
 					{
 						path: '/admin/shop_transections',
