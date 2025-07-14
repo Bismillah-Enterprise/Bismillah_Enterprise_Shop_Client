@@ -515,17 +515,17 @@ const Staffs = () => {
 					.then(bonusres => bonusres.json())
 					.then(bonusdata => {
 						console.log(bonusdata)
-						if (bonusdata[0].first_entry.uid === uid && !bonusdata[0].second_entry.time) {
+						if (bonusdata[0].first_entry?.uid === uid && !bonusdata[0].second_entry.time) {
 							today_earned = today_earned + 50;
 							today_bonus = 50;
 							total_bonus = bonus + 50;
 						}
-						if (bonusdata[0].first_entry.uid === uid && bonusdata[0].second_entry.time) {
+						if (bonusdata[0].first_entry?.uid === uid && bonusdata[0].second_entry.time) {
 							today_earned = today_earned + 30;
 							today_bonus = 30;
 							total_bonus = bonus + 30;
 						}
-						if (bonusdata[0].first_entry.time && bonusdata[0].second_entry.uid === uid) {
+						if (bonusdata[0].first_entry.time && bonusdata[0].second_entry?.uid === uid) {
 							today_earned = today_earned + 20;
 							today_bonus = 20;
 							total_bonus = bonus + 20;
