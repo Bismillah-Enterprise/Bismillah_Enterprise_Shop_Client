@@ -38,7 +38,7 @@ const Staffs = () => {
 	const { user } = useContext(AuthContext);
 	const [, , isAdmin, userHookLoading] = useCurrentUser();
 	const staff = useLoaderData();
-	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, bonus, fine, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
+	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, bonus, available_balance, fine, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
 	const [isAllowed, setIsAllowed] = useState(false);
 	const [accuracy, setAccuracy] = useState('');
 	const [lat, setLat] = useState('')
@@ -543,6 +543,7 @@ const Staffs = () => {
 
 				const previousEarn = parseFloat(total_income || 0);
 				const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2) + today_bonus);
+				const new_available_balance = parseFloat(available_balance - updatedEarn).toFixed(2)
 
 				const TodaySummary = {
 					currentDate,
@@ -560,7 +561,8 @@ const Staffs = () => {
 					total_working_minute: updatedTotalMinutesRemainder,
 					today_bonus,
 					total_bonus,
-					total_income: updatedEarn
+					total_income: updatedEarn,
+					available_balance: new_available_balance
 				};
 
 				// Save to database
@@ -657,28 +659,28 @@ const Staffs = () => {
 						<div>
 							<div className="flex items-center gap-5 lg:gap-10 justify-center mt-10 flex-wrap">
 								<button
-									disabled={!!today_enter1_time || !isAllowed || additional_movement_status}
+									disabled={!isAllowed || !!today_enter1_time || additional_movement_status}
 									onClick={() => handleTodayTime('today_enter1_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 1
 								</button>
 								<button
-									disabled={!!today_exit1_time || !isAllowed || additional_movement_status || today_enter1_time === ''}
+									disabled={!isAllowed || !!today_exit1_time || additional_movement_status || today_enter1_time === ''}
 									onClick={() => handleTodayTime('today_exit1_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Exit 1
 								</button>
 								<button
-									disabled={!!today_enter2_time || !isAllowed || additional_movement_status || today_exit1_time === ''}
+									disabled={!isAllowed || !!today_enter2_time || additional_movement_status || today_exit1_time === ''}
 									onClick={() => handleTodayTime('today_enter2_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 2
 								</button>
 								<button
-									disabled={!!today_exit2_time || !isAllowed || additional_movement_status || today_enter2_time === ''}
+									disabled={!isAllowed || !!today_exit2_time || additional_movement_status || today_enter2_time === ''}
 									onClick={() => handleTodayTime('today_exit2_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
@@ -692,14 +694,14 @@ const Staffs = () => {
 								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center gap-5 lg:gap-10 justify-center flex-wrap`}>
 
 									<button
-										disabled={!!additional_exit_time || !isAllowed}
+										disabled={!isAllowed || !!additional_exit_time}
 										onClick={() => handleAdditionalTime('additional_exit_time', _id)}
 										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>
 										Exit
 									</button>
 									<button
-										disabled={!!additional_enter_time || !isAllowed || additional_exit_time === ''}
+										disabled={!isAllowed || !!additional_enter_time || additional_exit_time === ''}
 										onClick={() => handleAdditionalTime('additional_enter_time', _id)}
 										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>

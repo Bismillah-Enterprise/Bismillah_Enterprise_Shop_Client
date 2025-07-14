@@ -7,6 +7,18 @@ const UserRequest = () => {
 	const userRequest = useLoaderData();
 	const [modal, setModal] = useState(false);
 	const now = new Date();
+	const Time = now.toLocaleTimeString('en-BD', {
+		hour: '2-digit',
+		minute: '2-digit',
+		hour12: true,
+	});
+
+	const currentDayName = now.toLocaleDateString('en-BD', { weekday: 'long' });
+	const currentDate = now.toLocaleDateString('en-BD', {
+		day: 'numeric',
+		year: 'numeric',
+		month: 'long',
+	});
 	const todayDate = now.toLocaleDateString('en-BD', { day: 'numeric' });
 	const todayDateIntFormat = parseInt(todayDate);
 
@@ -33,7 +45,7 @@ const UserRequest = () => {
 			hour_rate,
 			user_category,
 			status: true,
-			current_working_month: "",
+			current_working_month: currentDate.split(' ')[0],
 			total_income: 0,
 			bonus: 0,
 			fine: 0,

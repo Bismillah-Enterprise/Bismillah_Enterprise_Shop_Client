@@ -33,7 +33,7 @@ const StaffDetails = () => {
 		const comment = comment_ref.current.value;
 		const transection_id = String(parseInt(transection_amount)) + String(transection_type) + String(parseInt(newWithdrawalAmmount)) + String(parseInt(newReceiveableAmount));
 
-		const transectionData = { transection_id, currentDate, transection_amount, transection_type, withdrawal_amount: newWithdrawalAmmount, available_balance: newReceiveableAmount.toFixed(2), comment }
+		const transectionData = { transection_id, currentDate, transection_amount, transection_type, withdrawal_amount: parseFloat(newWithdrawalAmmount).toFixed(2), available_balance: parseFloat(newReceiveableAmount).toFixed(2), comment }
 		Swal.fire({
 			title: "Are you sure?",
 			text: `You Are Giving ${transection_amount} Taka ${transection_type} to ${name}`,
