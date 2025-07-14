@@ -49,7 +49,7 @@ const AdminNavbar = () => {
 				<Link to={"/admin/location_details"} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/location_details')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Location Details
 				</Link>
-				<Link to={"/admin/shop_location"} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/shop_location')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+				<Link to={"/admin/shop_location"} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} ${location.pathname.includes('/admin/shop_location')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Set Shop Location
 				</Link>
 				<Link to={"/admin/set_shop_code"} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/set_shop_code')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
@@ -96,10 +96,10 @@ const AdminNavbar = () => {
 					<Link to={"/admin/location_details"} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Location Details
 					</Link>
-					<Link to={"/admin/shop_location"} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
-						Set Shop Location
+					<Link to={"/admin/shop_location"} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} ${location.pathname.includes('/admin/shop_location')? 'text-pink-400': 'text-pink-200'} px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+						Shop Location
 					</Link>
-					<Link to={"/admin/set_shop_code"} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+					<Link to={"/admin/set_shop_code"} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Set Shop Code
 					</Link>
 					<Link to={"/admin/notice_panel"} state={{ pathname: location.pathname }} className={`rounded-b-2xl px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>

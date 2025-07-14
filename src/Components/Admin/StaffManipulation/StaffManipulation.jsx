@@ -88,19 +88,19 @@ const StaffManipulation = () => {
 							<div className='flex flex-wrap items-center justify-center lg:justify-end gap-4 col-span-1'>
 								{
 									staff.user_category === 'admin' ?
-										<Link onClick={() => { handleUserCategory(staff.uid, 'staff') }} className={`text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[150px] w-full`}>Set As Staff</Link> :
+										<Link onClick={() => { handleUserCategory(staff?.uid, 'staff') }} className={`text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[150px] w-full`}>Set As Staff</Link> :
 
-										<Link onClick={() => { handleUserCategory(staff.uid, 'admin') }} className={`text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[150px] w-full`}>Set As Admin</Link>
+										<Link onClick={() => { handleUserCategory(staff?.uid, 'admin') }} className={`text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[150px] w-full`}>Set As Admin</Link>
 
 								}
 								{
 									staff.status ?
-										<Link onClick={() => { handleUserStatus(staff.uid, false) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[100px] w-full`}>Block</Link> :
+										<Link onClick={() => { handleUserStatus(staff?.uid, false) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[100px] w-full`}>Block</Link> :
 
-										<Link onClick={() => { handleUserStatus(staff.uid, true) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[100px] w-full`}>Unblock</Link>
+										<Link onClick={() => { handleUserStatus(staff?.uid, true) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[100px] w-full`}>Unblock</Link>
 
 								}
-								<Link to={`/staff/uid_query/${staff.uid}`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>View User</Link>
+								<Link to={`/staff/uid_query/${staff?.uid}`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>View User</Link>
 							</div>
 						</div>
 					</div>)
