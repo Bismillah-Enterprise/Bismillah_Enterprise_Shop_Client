@@ -1,28 +1,29 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 
-const RevenueTransectionsDetials = () => {
+
+const SelfExpenseTransectionsDetails = () => {
     const shopTransections = useLoaderData();
     console.log(shopTransections)
-    const { revenue_transections, total_revenue_amount, month_name } = shopTransections[0];
-    console.log(revenue_transections);
+    const { expense_transections, total_expense_amount, month_name } = shopTransections[0];
+    console.log(expense_transections);
     const location = useLocation();
     const from = location?.state?.pathname;
     const navigate = useNavigate();
 
 
-    const revenueTransectionsPrintRef = useRef();
+    const expenseTransectionsPrintRef = useRef();
 
     const handlePrint = () => {
-        const printContents = revenueTransectionsPrintRef.current.innerHTML;
+        const printContents = expenseTransectionsPrintRef.current.innerHTML;
         const originalContents = document.body.innerHTML;
 
         document.body.innerHTML = printContents;
         window.print();
         document.body.innerHTML = originalContents;
         navigate(location.pathname)
-    };
 
+    };
     return (
         <div className='pb-10'>
             <div className='flex items-center justify-center mt-8 mb-8'>
@@ -34,7 +35,7 @@ const RevenueTransectionsDetials = () => {
             </div>
             <div className='flex items-center justify-center nunito'>
                 <h1 className="nunito text-lg lg:text-2xl text-center font-semibold px-5 py-2 border-2 rounded-lg text-pink-300">
-                    Revenue Transections Details of {month_name}
+                    Expense Transections Details of {month_name}
                 </h1>
             </div>
             <div className="flex items-center justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
@@ -47,7 +48,7 @@ const RevenueTransectionsDetials = () => {
                             <th>Ammount</th>
                         </tr>
                         {
-                            revenue_transections?.map(transection =>
+                            expense_transections.map(transection =>
                                 <tr className='text-pink-200'>
                                     <td>{transection.transection_date}</td>
                                     <td>{transection.transection_id}</td>
@@ -59,8 +60,8 @@ const RevenueTransectionsDetials = () => {
                         <tr className='text-pink-300'>
                             <th></th>
                             <th></th>
-                            <th>Total Revenue Amount</th>
-                            <th>{total_revenue_amount}</th>
+                            <th>Total Expense Amount</th>
+                            <th>{total_expense_amount}</th>
                         </tr>
                     </tbody>
                 </table>
@@ -70,7 +71,7 @@ const RevenueTransectionsDetials = () => {
                     Print
                 </button>
             </div>
-            <div ref={revenueTransectionsPrintRef} className='nunito hidden'>
+            <div ref={expenseTransectionsPrintRef} className='nunito hidden'>
                 <div>
                     <div className='text-center text-4xl font-bold'><h1>BISMILLAH ENTERPRISE</h1></div>
                 </div>
@@ -79,7 +80,7 @@ const RevenueTransectionsDetials = () => {
                 </div>
                 <div className='flex items-center justify-center nunito'>
                     <h1 className="nunito text-lg lg:text-2xl text-center font-semibold px-5 py-2 border-2 rounded-lg text-black">
-                        Revenue Transection Details of {month_name}
+                        Expense Transection Details of {month_name}
                     </h1>
                 </div>
                 <div className="flex items-center justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
@@ -92,7 +93,7 @@ const RevenueTransectionsDetials = () => {
                                 <th>Ammount</th>
                             </tr>
                             {
-                                revenue_transections?.map(transection =>
+                                expense_transections?.map(transection =>
                                     <tr className='text-black'>
                                         <td>{transection.transection_date}</td>
                                         <td>{transection.transection_id}</td>
@@ -104,8 +105,8 @@ const RevenueTransectionsDetials = () => {
                             <tr className='text-black'>
                                 <th></th>
                                 <th></th>
-                                <th>Total Revenue Amount</th>
-                                <th>{total_revenue_amount}</th>
+                                <th>Total Expense Amount</th>
+                                <th>{total_expense_amount}</th>
                             </tr>
                         </tbody>
                     </table>
@@ -116,4 +117,4 @@ const RevenueTransectionsDetials = () => {
     );
 };
 
-export default RevenueTransectionsDetials;
+export default SelfExpenseTransectionsDetails;

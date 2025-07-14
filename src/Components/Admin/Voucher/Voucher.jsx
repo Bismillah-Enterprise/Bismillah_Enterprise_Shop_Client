@@ -141,18 +141,18 @@ const Voucher = () => {
             <div>
                 <div className='flex items-center justify-start'>
                     <Link to={from}>
-                        <button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                             Back
                         </button>
                     </Link>
                 </div>
                 <div className='flex items-center justify-center nunito'>
-                    <h1 className="nunito text-2xl text-center font-bold px-5 text-pink-300">
+                    <h1 className="nunito md:text-2xl text-center font-bold px-5 text-pink-300">
                         Voucher - {voucher_no}
                     </h1>
                 </div>
                 <div className='flex items-center justify-center'>
-                    <div className='text-lg font-semibold grid grid-cols-2 text-pink-200 min-w-[380px] sm:min-w-[70%]'>
+                    <div className='text-xs md:text-lg font-semibold grid grid-cols-2 text-pink-200 sm:min-w-[70%]'>
                         <div className=''>
                             <h1>Name: {client.name}</h1>
                             <h1>Address: {client.address}</h1>
@@ -205,7 +205,7 @@ const Voucher = () => {
             <div className='flex items-center justify-center px-5'>
                 {
                     matchedVoucher ? (
-                        <div className='flex items-center justify-between gap-8 text-pink-200 mt-5 text-lg min-w-[380px] sm:min-w-[70%] font-semibold'>
+                        <div className='flex items-center justify-between gap-8 text-pink-200 mt-5 text-xs md:text-lg sm:min-w-[70%] font-semibold'>
                             <h1>Payment Status: <span className={`${matchedVoucher.payment_status === 'Due' ? 'text-red-500' : 'text-green-500'}`}>{matchedVoucher.payment_status}</span></h1>
                             <h1>Total Paid: <span className='text-pink-300'>{matchedVoucher.paid_amount}</span></h1>
                             <h1>Due: <span className='text-pink-300'>{matchedVoucher.due_amount}</span></h1>

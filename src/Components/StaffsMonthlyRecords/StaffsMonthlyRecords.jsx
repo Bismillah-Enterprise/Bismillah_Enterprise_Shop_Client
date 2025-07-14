@@ -31,7 +31,7 @@ const StaffsMonthlyRecords = () => {
 					</button>
 				</Link>
 				<Link to={from}>
-					<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+					<button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Back
 					</button>
 				</Link>
@@ -133,7 +133,7 @@ const StaffsMonthlyRecords = () => {
 					<h1 className='text-lg text-center font-semibold'>Receiveable Amount: {available_balance}</h1>
 				</div>
 				<div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-					<table className="nunito min-w-[380px] sm:min-w-full">
+					<table className="nunito min-w-[380px] sm:min-w-[380px]">
 						<tbody>
 							<tr>
 								<th>Date</th>

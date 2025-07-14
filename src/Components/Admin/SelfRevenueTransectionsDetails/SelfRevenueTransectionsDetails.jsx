@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 
-const RevenueTransectionsDetials = () => {
-    const shopTransections = useLoaderData();
+const SelfRevenueTransectionsDetails = () => {
+   const shopTransections = useLoaderData();
     console.log(shopTransections)
     const { revenue_transections, total_revenue_amount, month_name } = shopTransections[0];
     console.log(revenue_transections);
@@ -116,4 +116,4 @@ const RevenueTransectionsDetials = () => {
     );
 };
 
-export default RevenueTransectionsDetials;
+export default SelfRevenueTransectionsDetails;

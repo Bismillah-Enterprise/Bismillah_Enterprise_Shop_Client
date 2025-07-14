@@ -34,6 +34,8 @@ import Voucher from '../Admin/Voucher/Voucher';
 import CreateNewClient from '../Admin/CreateNewClient/CreateNewClient';
 import NewVoucher from '../Admin/NewVoucher/NewVoucher';
 import ClientTransections from '../Admin/ClientTransections/ClientTransections';
+import SelfRevenueTransectionsDetails from '../Admin/SelfRevenueTransectionsDetails/SelfRevenueTransectionsDetails';
+import SelfTransectionsSummary from '../Admin/SelfTransectionsSummary/SelfTransectionsSummary';
 
 const router = createBrowserRouter([
 	{
@@ -93,14 +95,29 @@ const router = createBrowserRouter([
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`)
 					},
 					{
+						path: '/admin/self_revenue_transections_details',
+						element: <AdminRoute><SelfRevenueTransectionsDetails></SelfRevenueTransectionsDetails></AdminRoute>,
+						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/self_transections`)
+					},
+					{
 						path: '/admin/expense_transections_details',
 						element: <AdminRoute><ExpenseTransectionsDetails></ExpenseTransectionsDetails></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`)
 					},
 					{
+						path: '/admin/self_expense_transections_details',
+						element: <AdminRoute><ExpenseTransectionsDetails></ExpenseTransectionsDetails></ AdminRoute>,
+						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/self_transections`)
+					},
+					{
 						path: '/admin/shop_transections_summary',
 						element: <AdminRoute><ShopTransectionsSummary></ShopTransectionsSummary></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections_summary`)
+					},
+					{
+						path: '/admin/self_transections_summary',
+						element: <AdminRoute><SelfTransectionsSummary></SelfTransectionsSummary></ AdminRoute>,
+						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/self_transections_summary`)
 					},
 					{
 						path: '/admin/set_shop_code',

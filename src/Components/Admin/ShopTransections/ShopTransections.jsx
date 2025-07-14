@@ -166,10 +166,46 @@ const ShopTransections = () => {
 			}
 		})
 	}
+	const handleNewMonth = () => {
+		Swal.fire({
+			title: "Are you sure?",
+			text: `You Are Sure?`,
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Yes, I am Sure"
+		}).then((result) => {
+			if (result.isConfirmed) {
+				const newMonthName = currentDate.split(' ')[0];
+				const newData = { month_name: newMonthName }
+				fetch(`https://bismillah-enterprise-server.onrender.com/start_new_month`, {
+					method: 'PUT',
+					headers: {
+						'content-type': 'application/json'
+					},
+					body: JSON.stringify(newData)
+				})
+					.then(res => res.json())
+					.then(data => {
+						if (data.acknowledged) {
+							navigate(location.pathname)
+							Swal.fire({
+								position: 'center',
+								icon: 'success',
+								title: 'New Month Start Successfully',
+								showConfirmButton: false,
+								timer: 1000,
+							})
+						}
+					})
+			}
+		})
+	}
 	return (
-		<div>
+		<div className='relative'>
 			{/* modal */}
-			<div className={`${!revenueModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
+			<div className={`${!revenueModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
 				<div className='flex justify-end -top-[10px] -right-[10px] relative'>
 					<MdOutlineCancel onClick={() => { !setRevenueModal(!revenueModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
 				</div>
@@ -203,7 +239,7 @@ const ShopTransections = () => {
 					<button onClick={() => handleRevenueTransections('revenue')} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
 				</div>
 			</div>
-			<div className={`${!expenseModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
+			<div className={`${!expenseModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
 				<div className='flex justify-end -top-[10px] -right-[10px] relative'>
 					<MdOutlineCancel onClick={() => { !setExpenseModal(!expenseModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
 				</div>
@@ -239,13 +275,19 @@ const ShopTransections = () => {
 			{/* end modal */}
 			<div className='flex items-center justify-start'>
 				<Link to={from} state={{ from: location.pathname }}>
-					<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+					<button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Back
 					</button>
 				</Link>
 			</div>
+			<h1 className='text-pink-300 text-lg lg:text-2xl text-center font-semibold'>Shop Transections</h1>
 			<hr className='mt-4 text-pink-300' />
 			<hr className='mt-2 text-pink-300' />
+			<div className='mt-10 flex flex-col lg:flex-row items-center justify-center gap-5'>
+				<button disabled={month_name === currentDate.split(' ')[0]} onClick={handleNewMonth} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					Start A New Month
+				</button>
+			</div>
 			<h1 className='text-pink-200 text-2xl text-center font-semibold mt-10'>Month Name: {month_name}</h1>
 			<div className='flex flex-wrap md:grid md:grid-cols-3 items-center justify-center gap-7 mt-10'>
 				<h1 className='text-pink-200 text-lg lg:text-2xl text-center font-semibold'>Total Revenue Amount: {total_revenue_amount}</h1>
@@ -262,19 +304,19 @@ const ShopTransections = () => {
 
 			</div>
 			<div className='mt-10 flex flex-col lg:flex-row items-center justify-center gap-5'>
-				<Link to={`/admin/revenue_transections_details`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
-					See Current Month All Revenue Transections
+				<Link to={`/admin/revenue_transections_details`} state={{ pathname: location.pathname }} className="text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					Current Month All Revenue Transections
 				</Link>
-				<Link to={`/admin/expense_transections_details`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
-					See Current Month All Expense Transections
+				<Link to={`/admin/expense_transections_details`} state={{ pathname: location.pathname }} className="text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					Current Month All Expense Transections
 				</Link>
 			</div>
 			<div className='mt-10 flex flex-col lg:flex-row items-center justify-center gap-5'>
 				<button onClick={() => handleClosingMonth()} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					Close The Month
 				</button>
-				<Link to={`/admin/shop_transections_summary`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
-					See Shop Monthly Transections Summary
+				<Link to={`/admin/shop_transections_summary`} state={{ pathname: location.pathname }} className="text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					Shop Monthly Transections Summary
 				</Link>
 			</div>
 

@@ -160,7 +160,7 @@ const StaffDetails = () => {
 			{/* end modal */}
 			<div className='flex items-center justify-start'>
 				<Link to={from} state={{ from: location.pathname }}>
-					<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+					<button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Back
 					</button>
 				</Link>

@@ -7,10 +7,10 @@ const ClientDetails = () => {
     const from = location?.state?.pathname;
     return (
         <div>
-            <div className='grid grid-cols-3 items-center mt-5'>
+            <div className='md:grid grid-cols-3 items-center mt-5'>
                 <div className='flex items-center justify-start'>
                     <Link to='/admin/client_corner'>
-                        <button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                             Back
                         </button>
                     </Link>
@@ -21,7 +21,7 @@ const ClientDetails = () => {
                     <h1 className='font-semibold md:text-md text-pink-300 text-center'>{client.on_behalf}</h1>
                 </div>
             </div>
-            <div className='flex items-center justify-center mt-5 mb-2 gap-5'>
+            <div className='flex flex-col md:flex-row items-center justify-center mt-5 mb-2 gap-5'>
                 <Link to={`/admin/new_voucher/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                     Create A New Voucher
                 </Link>
@@ -31,7 +31,7 @@ const ClientDetails = () => {
             </div>
             <div>
                 <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
+                    <table className="text-pink-200 w-full md:min-w-[70%]">
                         <tbody>
                             <tr>
                                 <th>SL No</th>

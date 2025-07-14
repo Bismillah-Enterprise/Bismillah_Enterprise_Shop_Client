@@ -11,7 +11,7 @@ const AdminMain = () => {
 			<div className='max-h-fit lg:w-[300px] xl:[400px] shadow-lg shadow-pink-200 rounded-2xl overflow-scroll scrollbar-hide'>
 				<AdminNavbar></AdminNavbar>
 			</div>
-			<div onClick={() => {setIsMenu(false)}} className={`shadow-lg p-5 shadow-pink-200 rounded-2xl flex-1 min-h-full ${location.pathname === '/admin' ? '' :'h-fit' } mt-4 lg:mt-0 scrollbar-hide mb-20`}>
+			<div onClick={() => {setIsMenu(false)}} className={`shadow-lg p-5 shadow-pink-200 rounded-2xl flex-1 w-full min-h-full ${location.pathname === '/admin' ? '' :'h-fit' } mt-4 lg:mt-0 scrollbar-hide mb-20`}>
 				<Outlet></Outlet>
 			</div>
 		</div>

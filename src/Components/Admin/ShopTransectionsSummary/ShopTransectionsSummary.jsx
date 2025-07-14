@@ -23,7 +23,7 @@ const ShopTransectionsSummary = () => {
         <div className='pb-10'>
             <div className='flex items-center justify-center mt-8 mb-8'>
                 <Link to={from}>
-                    <button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                    <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                         Back
                     </button>
                 </Link>
@@ -73,7 +73,7 @@ const ShopTransectionsSummary = () => {
                     </h1>
                 </div>
                 <div className="flex items-center justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="nunito min-w-[380px] sm:min-w-full">
+                    <table className="nunito min-w-[380px] sm:min-w-[380px]">
                         <tbody>
                             <tr className='text-black'>
                                 <th>Month Name</th>

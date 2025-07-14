@@ -10,7 +10,7 @@ const ClientTransections = () => {
             <div className='grid grid-cols-3 items-center mt-5'>
                 <div className='flex items-center justify-start'>
                     <Link to={from}>
-                        <button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                             Back
                         </button>
                     </Link>
