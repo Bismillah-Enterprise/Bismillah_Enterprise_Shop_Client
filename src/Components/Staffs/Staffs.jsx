@@ -38,7 +38,7 @@ const Staffs = () => {
 	const { user } = useContext(AuthContext);
 	const [, , isAdmin, userHookLoading] = useCurrentUser();
 	const staff = useLoaderData();
-	const { _id, name, hour_rate, today_enter1_time, today_exit1_time, bonus, available_balance, fine, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
+	const { _id, name, hour_rate, last_month_due, withdrawal_amount, today_enter1_time, today_exit1_time, bonus, available_balance, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
 	const [isAllowed, setIsAllowed] = useState(false);
 	const [accuracy, setAccuracy] = useState('');
 	const [lat, setLat] = useState('')
@@ -113,6 +113,22 @@ const Staffs = () => {
 		const previousEarn = parseFloat(staff.total_income || 0);
 		const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2));
 
+		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
+			.then(bonusRes => bonusRes.json())
+			.then(bonusData => {
+				console.log(bonusData.date === currentDate);
+				if (bonusData.date !== currentDate) {
+					fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
+						method: 'PUT',
+						headers: { 'content-type': 'application/json' },
+						body: JSON.stringify({ entry_type: 'new day', date: currentDate }),
+					}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
+						if (firstEntryData.acknowledged) {
+							console.log('bonus date changed')
+						}
+					})
+				}
+			})
 		fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${uid}`)
 			.then(res => res.json())
 			.then(data => {
@@ -171,7 +187,7 @@ const Staffs = () => {
 		setLocationLoading(true);
 		if (!user) return;
 
-		if (user_category === 'admin' && user?.uid !== uid) {
+		if (location?.state?.pathname?.includes('admin') && user?.uid !== uid) {
 			setIsAllowed(true);  // Admin bypasses location check
 			setLocationLoading(false);
 			return;
@@ -281,7 +297,7 @@ const Staffs = () => {
 										if (modifier === 'AM' && hours === 12) hours = 0;
 										return hours * 60 + minutes;
 									};
-									if (!bonusData[0].first_entry.time && !bonusData[0].second_entry.time && parseTime(Time) < 511) {
+									if (!bonusData.first_entry.time && !bonusData.second_entry.time && parseTime(Time) < 511) {
 										fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
 											method: 'PUT',
 											headers: { 'content-type': 'application/json' },
@@ -298,7 +314,7 @@ const Staffs = () => {
 											}
 										})
 									}
-									if (bonusData[0].first_entry.time && parseTime(Time) - parseTime(bonusData[0].first_entry.time) < 6 && !bonusData[0].second_entry.time) {
+									if (bonusData.first_entry.time && parseTime(Time) - parseTime(bonusData.first_entry.time) < 11 && !bonusData.second_entry.time) {
 										fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
 											method: 'PUT',
 											headers: { 'content-type': 'application/json' },
@@ -475,11 +491,16 @@ const Staffs = () => {
 			if (result.isConfirmed) {
 				// Helper to parse time
 				const parseTime = (timeStr) => {
-					if (!timeStr) return null;
+					if (!timeStr || timeStr.trim() === '') return null; // more strict check
 					const [time, modifier] = timeStr.split(' ');
+					if (!time || !modifier) return null;
+
 					let [hours, minutes] = time.split(':').map(Number);
 					if (modifier === 'PM' && hours !== 12) hours += 12;
 					if (modifier === 'AM' && hours === 12) hours = 0;
+
+					if (isNaN(hours) || isNaN(minutes)) return null;
+
 					return hours * 60 + minutes;
 				};
 
@@ -515,23 +536,21 @@ const Staffs = () => {
 					.then(bonusres => bonusres.json())
 					.then(bonusdata => {
 						console.log(bonusdata)
-						if (bonusdata[0].first_entry?.uid === uid && !bonusdata[0].second_entry.time) {
-							today_earned = today_earned + 50;
+						if (bonusdata.first_entry?.uid === uid && !bonusdata.second_entry.time) {
 							today_bonus = 50;
 							total_bonus = bonus + 50;
 						}
-						if (bonusdata[0].first_entry?.uid === uid && bonusdata[0].second_entry.time) {
-							today_earned = today_earned + 30;
+						if (bonusdata.first_entry?.uid === uid && bonusdata.second_entry.time) {
 							today_bonus = 30;
 							total_bonus = bonus + 30;
 						}
-						if (bonusdata[0].first_entry.time && bonusdata[0].second_entry?.uid === uid) {
-							today_earned = today_earned + 20;
+						if (bonusdata.first_entry.time && bonusdata.second_entry?.uid === uid) {
 							today_bonus = 20;
 							total_bonus = bonus + 20;
 						}
-						if (!bonusdata[0].first_entry.time && !bonusdata[0].second_entry.time) {
-							today_earned = today_earned;
+						if (!bonusdata.first_entry.time && !bonusdata.second_entry.time) {
+							today_bonus = 0;
+							total_bonus = 0;
 						}
 					})
 
@@ -541,10 +560,9 @@ const Staffs = () => {
 				const updatedTotalHours = Math.floor(updatedTotalMinutes / 60);
 				const updatedTotalMinutesRemainder = updatedTotalMinutes % 60;
 
-				const previousEarn = parseFloat(total_income || 0);
-				const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2) + today_bonus);
-				const new_available_balance = parseFloat(available_balance - updatedEarn).toFixed(2)
-
+				const previousEarn = total_income || 0;
+				const updatedEarn = previousEarn + today_earned + today_bonus;
+				const new_available_balance = parseFloat((last_month_due + updatedEarn - withdrawal_amount).toFixed(2));
 				const TodaySummary = {
 					currentDate,
 					currentDayName,
@@ -555,6 +573,7 @@ const Staffs = () => {
 					total_hour: today_hours,
 					total_minute: today_minutes,
 					total_earn: today_earned,
+					available_balance: new_available_balance,
 					additional_movement_hour,
 					additional_movement_minute,
 					total_working_hour: updatedTotalHours,
@@ -562,8 +581,8 @@ const Staffs = () => {
 					today_bonus,
 					total_bonus,
 					total_income: updatedEarn,
-					available_balance: new_available_balance
 				};
+				console.log(TodaySummary)
 
 				// Save to database
 				fetch(`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`, {
@@ -622,7 +641,7 @@ const Staffs = () => {
 					}
 				</div>
 				{
-					location?.state?.pathname.includes('admin') || user_category === 'admin' ?
+					location?.state?.pathname?.includes('admin') || user_category === 'admin' ?
 						<div className='flex items-center justify-center gap-5 mb-10'>
 							<Link to={'/admin'} state={{ from: '/' }}>
 								<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
@@ -666,21 +685,21 @@ const Staffs = () => {
 									Enter 1
 								</button>
 								<button
-									disabled={!isAllowed || !!today_exit1_time || additional_movement_status || today_enter1_time === ''}
+									disabled={!isAllowed || !!today_exit1_time || today_enter1_time === '' || additional_movement_status }
 									onClick={() => handleTodayTime('today_exit1_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Exit 1
 								</button>
 								<button
-									disabled={!isAllowed || !!today_enter2_time || additional_movement_status || today_exit1_time === ''}
+									disabled={!isAllowed || !!today_enter2_time || today_exit1_time === '' || additional_movement_status }
 									onClick={() => handleTodayTime('today_enter2_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 2
 								</button>
 								<button
-									disabled={!isAllowed || !!today_exit2_time || additional_movement_status || today_enter2_time === ''}
+									disabled={!isAllowed || !!today_exit2_time || today_enter2_time === '' || additional_movement_status }
 									onClick={() => handleTodayTime('today_exit2_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
@@ -694,14 +713,14 @@ const Staffs = () => {
 								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center gap-5 lg:gap-10 justify-center flex-wrap`}>
 
 									<button
-										disabled={!isAllowed || !!additional_exit_time}
+										disabled={!!additional_movement_status || !isAllowed || !!additional_exit_time}
 										onClick={() => handleAdditionalTime('additional_exit_time', _id)}
 										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>
 										Exit
 									</button>
 									<button
-										disabled={!isAllowed || !!additional_enter_time || additional_exit_time === ''}
+										disabled={!!additional_movement_status || !isAllowed || !!additional_enter_time || additional_exit_time === ''}
 										onClick={() => handleAdditionalTime('additional_enter_time', _id)}
 										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>

@@ -83,7 +83,7 @@ const Voucher = () => {
                             transection_amount_ref.current.value = '';
                             payment_status_ref.current.value = '';
                             setModal(!modal);
-                            navigate(location.pathname)
+                            navigate(from)
                             Swal.fire({
                                 position: 'center',
                                 icon: 'success',

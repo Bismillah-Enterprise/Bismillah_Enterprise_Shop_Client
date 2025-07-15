@@ -3,7 +3,7 @@ import { Link, useLoaderData, useLocation } from 'react-router-dom';
 
 const StaffsMonthlyRecords = () => {
 	const staff = useLoaderData();
-	const { _id, name, hour_rate, uid, user_category, current_month_details, total_working_hour, bonus, fine, total_working_minute, total_income, withdrawal_amount, available_balance } = staff;
+	const { _id, name, hour_rate, uid, user_category, current_month_details, total_working_hour, bonus, total_working_minute, total_income, withdrawal_amount, available_balance } = staff;
 	const location = useLocation();
 	const from = location?.state?.pathname;
 
@@ -51,7 +51,6 @@ const StaffsMonthlyRecords = () => {
 				<div className='flex flex-wrap items-center justify-center gap-7 mt-10 sm:min-w-[70%]'>
 					<h1 className='text-pink-200 text-lg text-center font-semibold'>Total Earned: {total_income}</h1>
 					<h1 className='text-pink-200 text-lg text-center font-semibold'>Bonus: {bonus}</h1>
-					<h1 className='text-pink-200 text-lg text-center font-semibold'>Fine: {fine}</h1>
 					<h1 className='text-pink-200 text-lg text-center font-semibold'>Withdrawal Amount: {withdrawal_amount}</h1>
 					<h1 className='text-pink-200 text-lg text-center font-semibold'>Receiveable Amount: {available_balance}</h1>
 				</div>
@@ -73,11 +72,12 @@ const StaffsMonthlyRecords = () => {
 							<th>Exit 2</th>
 							<th>Additional Movement</th>
 							<th>Total Working Time</th>
+							<th>Bonus</th>
 							<th>Total Earn</th>
 						</tr>
 						{
-							current_month_details?.map(day =>
-								<tr>
+							current_month_details?.map((day, index) =>
+								<tr key={index}>
 									<td id="today_date">{day.current_date}</td>
 									<td id="today_day_name">{day.current_day_name}</td>
 									<td id="enter1_time">{day.today_enter1_time}</td>
@@ -86,6 +86,7 @@ const StaffsMonthlyRecords = () => {
 									<td id="exit2_time">{day.today_exit2_time}</td>
 									<td id="exit2_time">{day.additional_movement_hour || 0} Hours, {day.additional_movement_minute || 0} Minutes</td>
 									<td id="total_working_hour">{day.total_hour} Hours, {day.total_minute} Minutes</td>
+									<td id="total_working_hour">{day.today_bonus}</td>
 									<td id="total_earning">{day.total_earn} Taka</td>
 								</tr>
 							)
@@ -97,9 +98,10 @@ const StaffsMonthlyRecords = () => {
 							<td></td>
 							<td></td>
 							<td></td>
+							<td className='text-pink-400'>Total Worked</td>
+							<td className='text-pink-300'>{total_working_hour} Hours, {total_working_minute} Minutes</td>
 							<td></td>
-							<td>{total_working_hour} Hour, {total_working_minute} Minute</td>
-							<td>{total_income} Taka</td>
+							<td className='text-pink-300'>{total_income} Taka</td>
 						</tr>
 					</tbody>
 				</table>

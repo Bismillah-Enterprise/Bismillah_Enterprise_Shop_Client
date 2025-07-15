@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
-import { NumberFormatBase } from 'react-number-format';
+import { NumberFormatBase, NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
@@ -207,7 +207,7 @@ const ShopTransections = () => {
 			{/* modal */}
 			<div className={`${!revenueModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
 				<div className='flex justify-end -top-[10px] -right-[10px] relative'>
-					<MdOutlineCancel onClick={() => { !setRevenueModal(!revenueModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+					<MdOutlineCancel onClick={() => { setRevenueModal(!revenueModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
 				</div>
 				<div className='mb-4'>
 					<h1 className='text-lg font-semibold text-pink-300 text-center mb-2'>Transection Details</h1>
@@ -219,13 +219,14 @@ const ShopTransections = () => {
 							<h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
 
 							<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-								<NumberFormatBase
+								<NumericFormat
 									getInputRef={revenue_transection_amount_ref}
-									className='outline-none w-full h-full'
-									placeholder='Enter amount'
-									thousandSeparator={true}
+									className="outline-none w-full h-full"
+									placeholder="Enter Amount"
 									allowNegative={false}
-									isNumericString={true}
+									decimalScale={2}
+									fixedDecimalScale={false}
+									thousandSeparator={false}
 								/>
 							</div>
 						</div>
@@ -241,7 +242,7 @@ const ShopTransections = () => {
 			</div>
 			<div className={`${!expenseModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
 				<div className='flex justify-end -top-[10px] -right-[10px] relative'>
-					<MdOutlineCancel onClick={() => { !setExpenseModal(!expenseModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+					<MdOutlineCancel onClick={() => { setExpenseModal(!expenseModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
 				</div>
 				<div className='mb-4'>
 					<h1 className='text-lg font-semibold text-pink-300 text-center mb-2'>Transection Details</h1>
@@ -252,13 +253,14 @@ const ShopTransections = () => {
 						<div className='mt-2'>
 							<h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
 							<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-								<NumberFormatBase
+								<NumericFormat
 									getInputRef={expense_transection_amount_ref}
-									className='outline-none w-full h-full'
-									placeholder='Enter amount'
-									thousandSeparator={true}
+									className="outline-none w-full h-full"
+									placeholder="Enter Amount"
 									allowNegative={false}
-									isNumericString={true}
+									decimalScale={2}
+									fixedDecimalScale={false}
+									thousandSeparator={false}
 								/>
 							</div>
 						</div>

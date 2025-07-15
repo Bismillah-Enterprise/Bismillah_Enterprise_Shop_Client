@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NumberFormatBase, NumericFormat } from 'react-number-format';
-import { data, Link, useLoaderData, useLocation } from 'react-router-dom';
+import { data, Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const NewVoucher = () => {
@@ -8,6 +8,7 @@ const NewVoucher = () => {
     const location = useLocation();
     const from = location?.state?.pathname;
     const [voucherSl, setVoucherSl] = useState();
+    const navigate = useNavigate();
     useEffect(() => {
         fetch('https://bismillah-enterprise-server.onrender.com/voucher_sl')
             .then(res => res.json())
@@ -71,7 +72,7 @@ const NewVoucher = () => {
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch(`https://bismillah-enterprise-server.onrender.com/new_voucher/${client._id}`, {
-                    method: 'POST',
+                    method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(voucher)
                 })
@@ -80,21 +81,20 @@ const NewVoucher = () => {
                         if (data.acknowledged) {
                             fetch(`https://bismillah-enterprise-server.onrender.com/voucher_sl`, {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: { 'content-type': 'application/json' },
                                 body: JSON.stringify({ new_sl_no: newSlNo })
                             })
                                 .then(slres => slres.json())
                                 .then(slData => {
                                     if (slData.message === 'new sl set successfully') {
                                         setProducts([{ product_name: '', quantity: '', rate: '', total: 0 }]);
+                                        navigate(location?.state?.pathname);
                                         Swal.fire({
                                             position: "center",
                                             icon: "success",
                                             title: "Voucher Added Successfully",
                                             showConfirmButton: false,
                                             timer: 1000
-                                        }).then(() => {
-                                            navigate(location?.state?.pathname)
                                         })
                                     }
                                 })

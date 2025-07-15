@@ -22,6 +22,9 @@ const AdminNavbar = () => {
 				<Link to={`/staff/uid_query/${current_User?.uid}`} state={{ pathname: location.pathname }} className={`w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Staff Page
 				</Link>
+				<Link to={`/admin/products_manipulation`} state={{ pathname: location.pathname }} className={`w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+					Products Manipulation
+				</Link>
 				<Link to={`/admin/shop_transections`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/shop_transections') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/revenue_transections_details') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/expense_transections_details') ? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Shop Transections
 				</Link>
@@ -31,7 +34,7 @@ const AdminNavbar = () => {
 				<Link to={`/admin/self_transections`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/self_transections')? 'text-pink-400': 'text-pink-200'} ${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Abdul Kader Transections
 				</Link>
-				<Link to={"/admin/user_request"} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/user_request')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+				<Link to={"/admin/user_request"} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} ${location.pathname.includes('/admin/user_request')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					User Request
 				</Link>
 				<Link to={"/admin/additional_request"} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/additional_request')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
@@ -69,6 +72,9 @@ const AdminNavbar = () => {
 					<Link to={`/staff/uid_query/${current_User?.uid}`} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Staff Page
 					</Link>
+					<Link to={`/admin/products_manipulation`} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+						Products Manipulations
+					</Link>
 					<Link to={`/admin/shop_transections`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/shop_transections') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/revenue_transections_details') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/expense_transections_details') ? 'text-pink-400': 'text-pink-200'} px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Shop Transections
 					</Link>
@@ -78,7 +84,7 @@ const AdminNavbar = () => {
 					<Link to={`/admin/self_transections`} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Abdul Kader Transections
 					</Link>
-					<Link to={"/admin/user_request"} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+					<Link to={"/admin/user_request"} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						User Request
 					</Link>
 					<Link to={"/admin/additional_request"} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>

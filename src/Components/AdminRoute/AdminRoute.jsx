@@ -8,8 +8,6 @@ import useAuth from '../Hooks/useAuth';
 
 const AdminRoute = ({ children }) => {
 	const { user, loading } = useAuth();
-	console.log(user)
-	// const [siteUser, setSiteUser] = useState();
 	const [adminLoading, setAdminLoading] = useState(false);
 	const [isAdmin, isAdminLoading] = useAdmin();
 

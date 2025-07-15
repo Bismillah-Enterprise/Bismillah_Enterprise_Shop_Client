@@ -15,7 +15,7 @@ const UserManipulation = () => {
 			showCancelButton: true,
 			confirmButtonColor: "#3085d6",
 			cancelButtonColor: "#d33",
-			confirmButtonText: "Yes, reject it!"
+			confirmButtonText: "Yes, delete it!"
 		}).then((result) => {
 			if (result.isConfirmed) {
 				fetch(`https://bismillah-enterprise-server.onrender.com/staff/${id}`, {

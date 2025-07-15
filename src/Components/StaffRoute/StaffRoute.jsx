@@ -32,7 +32,7 @@ const StaffRoute = ({children}) => {
 	if (loading || staffLoading) {
 		return <Loading></Loading>
 	}
-	if (siteUser?.uid === user.uid || siteUser?.user_category === 'admin') {
+	if (siteUser?.uid === user?.uid || siteUser?.user_category === 'admin') {
 		return children;
 	}
 	return <NotAuthorized></NotAuthorized>

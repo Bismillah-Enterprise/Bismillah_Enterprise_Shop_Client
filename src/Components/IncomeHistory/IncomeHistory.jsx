@@ -25,16 +25,22 @@ const IncomeHistory = () => {
 					<tbody>
 						<tr className='text-pink-300'>
 							<th>Month Name</th>
+							<th>Total Worked Time</th>
+							<th>Previous Due</th>
 							<th>Total Income</th>
 							<th>Paid Amount</th>
-							<th>Paid Date</th>
+							<th>Receiveable Amount</th>
+							<th>Closing Date</th>
 						</tr>
 						{
 							income_history?.map(income =>
 								<tr className='text-pink-200'>
 									<td>{income.month_name}</td>
+									<td>{income.total_worked_time}</td>
+									<td>{income.previous_due}</td>
 									<td>{income.total_income}</td>
 									<td>{income.paid_amount}</td>
+									<td>{income.receiveable_amount}</td>
 									<td>{income.paid_date}</td>
 								</tr>
 							)

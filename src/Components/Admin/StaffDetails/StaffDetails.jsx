@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
-import { NumberFormatBase } from 'react-number-format';
+import { NumberFormatBase, NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
@@ -23,17 +23,27 @@ const StaffDetails = () => {
 		year: 'numeric',
 		month: 'long',
 	});
-
-	console.log(currentDate.split(' ')[0])
+	console.log(withdrawal_amount, typeof withdrawal_amount)
 	const handleTransections = (id) => {
 		const transection_amount = parseFloat(transection_amount_ref.current.value);
 		const transection_type = transection_type_ref.current.value;
 		const newWithdrawalAmmount = withdrawal_amount + transection_amount;
-		const newReceiveableAmount = total_income - newWithdrawalAmmount;
+		const newReceiveableAmount = last_month_due + total_income - newWithdrawalAmmount;
 		const comment = comment_ref.current.value;
 		const transection_id = String(parseInt(transection_amount)) + String(transection_type) + String(parseInt(newWithdrawalAmmount)) + String(parseInt(newReceiveableAmount));
 
-		const transectionData = { transection_id, currentDate, transection_amount, transection_type, withdrawal_amount: parseFloat(newWithdrawalAmmount).toFixed(2), available_balance: parseFloat(newReceiveableAmount).toFixed(2), comment }
+		const transectionData = {
+			transection_id,
+			currentDate,
+			transection_amount,
+			transection_type,
+			previous_withdrawal_amount: withdrawal_amount,
+			previous_available_balance: available_balance,
+			withdrawal_amount: parseFloat(newWithdrawalAmmount.toFixed(2)),
+			available_balance: parseFloat(newReceiveableAmount.toFixed(2)),
+			comment
+		}
+		console.log(newReceiveableAmount, typeof newReceiveableAmount)
 		Swal.fire({
 			title: "Are you sure?",
 			text: `You Are Giving ${transection_amount} Taka ${transection_type} to ${name}`,
@@ -55,6 +65,7 @@ const StaffDetails = () => {
 					.then(transectionDataSubmit => {
 						if (transectionDataSubmit.acknowledged) {
 							transection_amount_ref.current.value = '';
+							transection_type_ref.current.value = '';
 							navigate(location.pathname)
 							Swal.fire({
 								position: 'center',
@@ -74,9 +85,9 @@ const StaffDetails = () => {
 
 		setModal(!modal)
 	}
-	const transection_amount_ref = useRef();
-	const transection_type_ref = useRef();
-	const comment_ref = useRef();
+	const transection_amount_ref = useRef(null);
+	const transection_type_ref = useRef(null);
+	const comment_ref = useRef('');
 
 	const handleClosingMonth = () => {
 		Swal.fire({
@@ -130,21 +141,27 @@ const StaffDetails = () => {
 						<div className='mt-2'>
 							<h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
 							<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-								<NumberFormatBase
+								<NumericFormat
 									getInputRef={transection_amount_ref}
 									className='outline-none w-full h-full'
 									placeholder='Enter amount'
-									thousandSeparator={true}
 									allowNegative={false}
-									isNumericString={true}
+									decimalScale={2}
+									fixedDecimalScale={false}
+									thousandSeparator={false}
 								/>
 							</div>
 						</div>
-						<div className='mt-2 flex items-center gap-5'>
+						<div className='mt-2 flex items-center justify-between gap-5'>
 							<h1 className='lg:text-lg font-semibold'>Transection Type: </h1>
-							<select ref={transection_type_ref} className='px-3 outline-none border p-1 rounded-md' name="user_category_in_shop" id="user_category">
-								<option className='text-xs text-black bg-gray' value="lend">Lend</option>
-								<option className='text-xs text-black bg-gray' value="salary">Salary</option>
+							<select ref={transection_type_ref} className='px-3 outline-none border p-1 rounded-md text-xs' name="user_category_in_shop" id="user_category">
+								<option className='text-xs text-black bg-gray' value="Lend">Lend</option>
+								{
+									withdrawal_amount > 0 ?
+									<option className='text-xs text-black bg-gray' value="Payback Lend">Payback Lend</option>
+									:''
+								}
+								<option className='text-xs text-black bg-gray' value="Salary">Salary</option>
 							</select>
 						</div>
 						<div className='mt-5 flex items-center gap-5'>
@@ -179,6 +196,9 @@ const StaffDetails = () => {
 				<button onClick={() => setModal(!modal)} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					Make a Transections
 				</button>
+				<Link to={`/transections_history/${uid}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+					See All Transections
+				</Link>
 				<button onClick={() => handleClosingMonth()} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					Close The Month
 				</button>
