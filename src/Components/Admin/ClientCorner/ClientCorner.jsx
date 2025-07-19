@@ -1,10 +1,37 @@
 import React from 'react';
-import { Link, useLoaderData, useLocation } from 'react-router-dom';
+import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 const ClientCorner = () => {
     const allClient = useLoaderData();
     const location = useLocation();
     const from = location?.state?.pathname;
+    const navigate = useNavigate();
+    const handleDelete = (id) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`https://bismillah-enterprise-server.onrender.com/client/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(res => res.json())
+                Swal.fire({
+                    title: "Delete",
+                    text: "This Client has been Deleted.",
+                    icon: "success"
+                }).then(() => {
+                    navigate(location.pathname)
+                })
+            }
+        });
+    }
     return (
         <div>
             <div className='flex items-center justify-start'>
@@ -31,6 +58,7 @@ const ClientCorner = () => {
                             </div>
                             <div className='flex justify-end lg:flex-row gap-4 col-span-1'>
                                 <Link to={`/admin/client_details/${client?._id}`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>View Details</Link>
+                                <button onClick={() => { handleDelete(client?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>Delete</button>
                             </div>
                         </div>
                     </div>)

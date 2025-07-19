@@ -163,9 +163,9 @@ const StaffManipulation = () => {
 
 								{
 									staff.status ?
-										<Link onClick={() => { handleUserStatus(staff?.uid, false) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[100px] w-full`}>Block</Link> :
+										<Link onClick={() => { handleUserStatus(staff?.uid, false) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-24 w-full`}>Block</Link> :
 
-										<Link onClick={() => { handleUserStatus(staff?.uid, true) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-[100px] w-full`}>Unblock</Link>
+										<Link onClick={() => { handleUserStatus(staff?.uid, true) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold max-w-24 w-full`}>Unblock</Link>
 
 								}
 								{

@@ -286,9 +286,9 @@ const UserRequest = () => {
 								<h1 className=''>{user.email}</h1>
 							</div>
 							<div className='flex flex-col items-end justify- md:flex-row md:justify-end gap-4'>
-								<button onClick={() => { handleApprove(user?.email, user?.uid, user?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-[100px]'>Approve</button>
-								<button onClick={() => { handleReplace(user?.email, user?.uid, user?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-[100px]'>Replace</button>
-								<button onClick={() => { handleReject(user._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-[100px]'>Reject</button>
+								<button onClick={() => { handleApprove(user?.email, user?.uid, user?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-24'>Approve</button>
+								<button onClick={() => { handleReplace(user?.email, user?.uid, user?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-24'>Replace</button>
+								<button onClick={() => { handleReject(user._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-24'>Reject</button>
 							</div>
 						</div>
 					</div>)

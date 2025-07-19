@@ -11,12 +11,48 @@ const StaffsMonthlyRecords = () => {
 
 	const handlePrint = () => {
 		const printContents = printRef.current.innerHTML;
-		const originalContents = document.body.innerHTML;
+		// Create a hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
 
-		document.body.innerHTML = printContents;
-		window.print();
-		document.body.innerHTML = originalContents;
-		// window.location.reload(); // Optional: reload page to restore JS state
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentWindow.document;
+
+        // Optional: You can load Tailwind CSS from CDN inside iframe
+        doc.open();
+        doc.write(`
+      <html>
+        <head>
+          <title>Print</title>
+          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+          <style>
+            @page { size: A4; margin: 20mm; }
+            body { font-family: sans-serif; color: black; }
+          </style>
+        </head>
+        <body>
+          ${printContents}
+        </body>
+      </html>
+    `);
+        doc.close();
+
+        // Wait until iframe is ready then print
+        iframe.onload = () => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+
+            // Optional: Cleanup after printing
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        };te
 	};
 
 
@@ -122,7 +158,7 @@ const StaffsMonthlyRecords = () => {
 					<div className='text-center text-4xl font-bold'><h1>BISMILLAH ENTERPRISE</h1></div>
 				</div>
 				<div className='flex items-center justify-center my-3'>
-					<img className='w-[100px] h-[100px]' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
+					<img className='w-24 h-24' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
 				</div>
 				<div className='flex items-center justify-center'>
 					<h1 className="nunito text-lg lg:text-2xl text-center font-semibold px-5 py-2 border-2 rounded-lg">
@@ -138,41 +174,41 @@ const StaffsMonthlyRecords = () => {
 					<table className="nunito min-w-[380px] sm:min-w-[380px]">
 						<tbody>
 							<tr>
-								<th>Date</th>
-								<th>Day Name</th>
-								<th>Enter 1</th>
-								<th>Exit 1</th>
-								<th>Enter 2</th>
-								<th>Exit 2</th>
-								<th>Additional Movement</th>
-								<th>Total Working Time</th>
-								<th>Total Earn</th>
+								<th className='p-2 border'>Date</th>
+								<th className='p-2 border'>Day Name</th>
+								<th className='p-2 border'>Enter 1</th>
+								<th className='p-2 border'>Exit 1</th>
+								<th className='p-2 border'>Enter 2</th>
+								<th className='p-2 border'>Exit 2</th>
+								<th className='p-2 border'>Additional Movement</th>
+								<th className='p-2 border'>Total Working Time</th>
+								<th className='p-2 border'>Total Earn</th>
 							</tr>
 							{
 								current_month_details?.map(day =>
 									<tr>
-										<td id="today_date">{day.current_date}</td>
-										<td id="today_day_name">{day.current_day_name}</td>
-										<td id="enter1_time">{day.today_enter1_time}</td>
-										<td id="exit1_time">{day.today_exit1_time}</td>
-										<td id="enter2_time">{day.today_enter2_time}</td>
-										<td id="exit2_time">{day.today_exit2_time}</td>
-										<td id="exit2_time">{day.additional_movement_hour || 0} Hours, {day.additional_movement_minute || 0} Minutes</td>
-										<td id="total_working_hour">{day.total_hour} Hours, {day.total_minute} Minutes</td>
-										<td id="total_earning">{day.total_earn} Taka</td>
+										<td className='p-2 border' id="today_date">{day.current_date}</td>
+										<td className='p-2 border' id="today_day_name">{day.current_day_name}</td>
+										<td className='p-2 border' id="enter1_time">{day.today_enter1_time}</td>
+										<td className='p-2 border' id="exit1_time">{day.today_exit1_time}</td>
+										<td className='p-2 border' id="enter2_time">{day.today_enter2_time}</td>
+										<td className='p-2 border' id="exit2_time">{day.today_exit2_time}</td>
+										<td className='p-2 border' id="exit2_time">{day.additional_movement_hour || 0} Hours, {day.additional_movement_minute || 0} Minutes</td>
+										<td className='p-2 border' id="total_working_hour">{day.total_hour} Hours, {day.total_minute} Minutes</td>
+										<td className='p-2 border' id="total_earning">{day.total_earn} Taka</td>
 									</tr>
 								)
 							}
 							<tr>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td></td>
-								<td>{total_working_hour} Hour, {total_working_minute} Minute</td>
-								<td>{total_income} Taka</td>
+								<td className='p-2 border'></td>
+								<td className='p-2 border'></td>
+								<td className='p-2 border'></td>
+								<td className='p-2 border'></td>
+								<td className='p-2 border'></td>
+								<td className='p-2 border'></td>
+								<td className='p-2 border'></td>
+								<td className='p-2 border text-center'>{total_working_hour} Hour, {total_working_minute} Minute</td>
+								<td className='p-2 border'>{total_income} Taka</td>
 							</tr>
 						</tbody>
 					</table>

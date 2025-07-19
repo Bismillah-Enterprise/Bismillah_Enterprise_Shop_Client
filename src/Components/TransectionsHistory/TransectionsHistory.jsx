@@ -33,7 +33,7 @@ const TransectionsHistory = () => {
 							transections?.map(transection =>
 								<tr className='text-pink-200'>
 									<td>{transection.transection_date}</td>
-									<td className='max-w-[100px] text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{transection.comment}</td>
+									<td className='max-w-24 text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{transection.comment}</td>
 									<td>{transection.transection_type}</td>
 									<td>{transection.transection_amount}</td>
 								</tr>

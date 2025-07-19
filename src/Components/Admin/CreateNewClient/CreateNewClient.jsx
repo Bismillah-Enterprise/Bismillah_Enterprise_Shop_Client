@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const CreateNewClient = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const from = location.state?.pathname;
     const handleCreateNewClient = () => {
         const clientName = clientNameRef.current.value;
         const onBehalf = onBehalfRef.current.value;
@@ -40,7 +41,7 @@ const CreateNewClient = () => {
                         clientNameRef.current.value = ''
                         onBehalfRef.current.value = '';
                         addressRef.current.value = '';
-                        phoneNoRef.current.value ='';
+                        phoneNoRef.current.value = '';
                         Swal.fire({
                             position: "center",
                             icon: "success",
@@ -60,6 +61,13 @@ const CreateNewClient = () => {
     const phoneNoRef = useRef();
     return (
         <div>
+            <div className='flex items-center justify-start'>
+                <Link to={from}>
+                    <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        Back
+                    </button>
+                </Link>
+            </div>
             <h2 className="text-2xl text-pink-300 font-semibold text-center">Create A New Client</h2>
             <div className='h-fit min-h-[320px] flex lg:justify-center duration-300'>
                 <div className="text-pink-200 shadow-lg shadow-pink-200 flex flex-col items-center justify-center mt-10 w-fit rounded-2xl px-10 py-5">

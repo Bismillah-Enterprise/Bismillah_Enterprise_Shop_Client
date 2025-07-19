@@ -539,16 +539,24 @@ const Staffs = () => {
 						if (bonusdata.first_entry?.uid === uid && !bonusdata.second_entry.time) {
 							today_bonus = 50;
 							total_bonus = bonus + 50;
+							today_earned = today_earned + bonus;
 						}
-						if (bonusdata.first_entry?.uid === uid && bonusdata.second_entry.time) {
+						else if (bonusdata.first_entry.time === bonusdata.second_entry.time) {
+							today_bonus = 25;
+							total_bonus = bonus + 25;
+							today_earned = today_earned + bonus;
+						}
+						else if (bonusdata.first_entry?.uid === uid && bonusdata.second_entry.time) {
 							today_bonus = 30;
 							total_bonus = bonus + 30;
+							today_earned = today_earned + bonus;
 						}
-						if (bonusdata.first_entry.time && bonusdata.second_entry?.uid === uid) {
+						else if (bonusdata.first_entry.time && bonusdata.second_entry?.uid === uid) {
 							today_bonus = 20;
 							total_bonus = bonus + 20;
+							today_earned = today_earned + bonus;
 						}
-						if (!bonusdata.first_entry.time && !bonusdata.second_entry.time) {
+						else if (!bonusdata.first_entry.time && !bonusdata.second_entry.time) {
 							today_bonus = 0;
 							total_bonus = 0;
 						}
@@ -648,7 +656,7 @@ const Staffs = () => {
 									Admin
 								</button>
 							</Link>
-							<Link to={from} state={{ from: location.pathname }}>
+							<Link to={from || '/admin/staff_manipulation'} state={{ from: location.pathname }}>
 								<button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 									Back
 								</button>
@@ -680,28 +688,28 @@ const Staffs = () => {
 								<button
 									disabled={!isAllowed || !!today_enter1_time || additional_movement_status}
 									onClick={() => handleTodayTime('today_enter1_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
+									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 1
 								</button>
 								<button
 									disabled={!isAllowed || !!today_exit1_time || today_enter1_time === '' || additional_movement_status }
 									onClick={() => handleTodayTime('today_exit1_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
+									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Exit 1
 								</button>
 								<button
 									disabled={!isAllowed || !!today_enter2_time || today_exit1_time === '' || additional_movement_status }
 									onClick={() => handleTodayTime('today_enter2_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
+									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 2
 								</button>
 								<button
 									disabled={!isAllowed || !!today_exit2_time || today_enter2_time === '' || additional_movement_status }
 									onClick={() => handleTodayTime('today_exit2_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
+									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Exit 2
 								</button>
@@ -713,16 +721,16 @@ const Staffs = () => {
 								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center gap-5 lg:gap-10 justify-center flex-wrap`}>
 
 									<button
-										disabled={!!additional_movement_status || !isAllowed || !!additional_exit_time}
+										disabled={ !isAllowed || !!additional_exit_time}
 										onClick={() => handleAdditionalTime('additional_exit_time', _id)}
-										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
+										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>
 										Exit
 									</button>
 									<button
-										disabled={!!additional_movement_status || !isAllowed || !!additional_enter_time || additional_exit_time === ''}
+										disabled={ !isAllowed || !!additional_enter_time || additional_exit_time === ''}
 										onClick={() => handleAdditionalTime('additional_enter_time', _id)}
-										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-[100px] w-[70px] lg:w-[100px] shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
+										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>
 										Enter
 									</button>

@@ -12,12 +12,48 @@ const SelfTransectionsSummary = () => {
 
     const handlePrint = () => {
         const printContents = summaryPrintRef.current.innerHTML;
-        const originalContents = document.body.innerHTML;
+        // Create a hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
 
-        document.body.innerHTML = printContents;
-        window.print();
-        document.body.innerHTML = originalContents;
-        navigate(location.pathname)
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentWindow.document;
+
+        // Optional: You can load Tailwind CSS from CDN inside iframe
+        doc.open();
+        doc.write(`
+      <html>
+        <head>
+          <title>Print</title>
+          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+          <style>
+            @page { size: A4; margin: 20mm; }
+            body { font-family: sans-serif; color: black; }
+          </style>
+        </head>
+        <body>
+          ${printContents}
+        </body>
+      </html>
+    `);
+        doc.close();
+
+        // Wait until iframe is ready then print
+        iframe.onload = () => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+
+            // Optional: Cleanup after printing
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        };
     };
     return (
         <div className='pb-10'>
@@ -46,7 +82,7 @@ const SelfTransectionsSummary = () => {
                             allSummary?.map(summary =>
                                 <tr className='text-pink-200'>
                                     <td>{summary.month_name}</td>
-                                    <td className='max-w-[100px] text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{summary.total_revenue_amount}</td>
+                                    <td className='max-w-24 text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{summary.total_revenue_amount}</td>
                                     <td>{summary.total_expense_amount}</td>
                                     <td>{summary.hand_on_cash}</td>
                                 </tr>
@@ -65,7 +101,7 @@ const SelfTransectionsSummary = () => {
                     <div className='text-center text-4xl font-bold'><h1>BISMILLAH ENTERPRISE</h1></div>
                 </div>
                 <div className='flex items-center justify-center my-3'>
-                    <img className='w-[100px] h-[100px]' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
+                    <img className='w-24 h-24' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
                 </div>
                 <div className='flex items-center justify-center nunito'>
                     <h1 className="nunito text-lg lg:text-2xl text-center font-semibold px-5 py-2 border-2 rounded-lg text-black">
@@ -76,18 +112,18 @@ const SelfTransectionsSummary = () => {
                     <table className="nunito min-w-[380px] sm:min-w-[380px]">
                         <tbody>
                             <tr className='text-black'>
-                                <th>Month Name</th>
-                                <th>Total Revenue Amount</th>
-                                <th>Total Expense Amount</th>
-                                <th>Hand on Cash</th>
+                                <th className='p-2 border'>Month Name</th>
+                                <th className='p-2 border'>Total Revenue Amount</th>
+                                <th className='p-2 border'>Total Expense Amount</th>
+                                <th className='p-2 border'>Hand on Cash</th>
                             </tr>
                             {
                                 allSummary?.map(summary =>
                                     <tr className='text-black'>
-                                        <td>{summary.month_name}</td>
-                                        <td className='max-w-[100px] text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{summary.total_revenue_amount}</td>
-                                        <td>{summary.total_expense_amount}</td>
-                                        <td>{summary.hand_on_cash}</td>
+                                        <td className='p-2 border'>{summary.month_name}</td>
+                                        <td className='max-w-24 text-wrap cursor-context-menu p-2 border'>{summary.total_revenue_amount}</td>
+                                        <td className='p-2 border'>{summary.total_expense_amount}</td>
+                                        <td className='p-2 border'>{summary.hand_on_cash}</td>
                                     </tr>
                                 )
                             }

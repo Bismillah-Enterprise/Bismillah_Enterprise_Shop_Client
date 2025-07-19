@@ -90,8 +90,8 @@ const AdditionalRequest = () => {
 							</div>
 							<div className='flex justify-end lg:flex-row gap-4 col-span-1'>
 								<div className='flex flex-col sm:flex-row items-end  justify-end gap-4'>
-									<button onClick={() => { handleApproveRequest(requestData?.uid) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-[100px]'>Approve</button>
-									<button onClick={() => { handleRejectRequest(requestData?.uid) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-[100px]'>Reject</button>
+									<button onClick={() => { handleApproveRequest(requestData?.uid) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-24'>Approve</button>
+									<button onClick={() => { handleRejectRequest(requestData?.uid) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-24'>Reject</button>
 								</div>
 							</div>
 						</div>
