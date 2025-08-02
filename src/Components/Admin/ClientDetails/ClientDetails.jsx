@@ -9,7 +9,7 @@ const ClientDetails = () => {
         <div>
             <div className='md:grid grid-cols-3 items-center mt-5'>
                 <div className='flex items-center justify-start'>
-                    <Link to='/admin/client_corner'>
+                    <Link to={location.pathname.includes('admin') ? '/admin/client_corner' : '/client_corner'}>
                         <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                             Back
                         </button>
@@ -22,10 +22,10 @@ const ClientDetails = () => {
                 </div>
             </div>
             <div className='flex flex-col md:flex-row items-center justify-center mt-5 mb-2 gap-5'>
-                <Link to={`/admin/new_voucher/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                <Link to={location.pathname.includes('admin') ? `/admin/new_voucher/${client?._id}` : `/new_voucher/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                     Create A New Voucher
                 </Link>
-                <Link to={`/admin/client_transections/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                <Link to={location.pathname.includes('admin') ? `/admin/client_transections/${client?._id}` : `/client_transections/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                     See Client Transections
                 </Link>
             </div>
@@ -52,7 +52,7 @@ const ClientDetails = () => {
                                         <td>{voucher.due_amount}</td>
                                         <td className={`${voucher.payment_status === 'Paid' ? 'text-green-500' : 'text-red-500'}`}>{voucher.payment_status}</td>
                                         <td>
-                                            <Link to={`/admin/voucher/${client._id}/${voucher.voucher_no}`} state={{ pathname: location?.pathname }} className='text-pink-300 hover:text-pink-400 underline'>View Details</Link>
+                                            <Link to={location.pathname.includes('admin') ? `/admin/voucher/${client._id}/${voucher.voucher_no}` : `/voucher/${client._id}/${voucher.voucher_no}`} state={{ pathname: location?.pathname }} className='text-pink-300 hover:text-pink-400 underline'>View Details</Link>
                                         </td>
                                     </tr>
                                 )

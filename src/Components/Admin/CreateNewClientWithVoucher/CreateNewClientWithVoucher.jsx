@@ -1,15 +1,128 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { NumberFormatBase, NumericFormat } from 'react-number-format';
-import { data, Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
+import { NumericFormat } from 'react-number-format';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 
-const NewVoucher = () => {
-    const client = useLoaderData();
+const CreateNewClientWithVoucher = () => {
     const location = useLocation();
-    const from = location?.state?.pathname;
-    const [voucherSl, setVoucherSl] = useState();
     const navigate = useNavigate();
+    const from = location.state?.pathname;
+    const [clientName, setClientName] = useState('');
+    const [clientAddress, setClientAddress] = useState('');
+    const [clientNumber, setClientNumber] = useState('');
+    const handleClientInfoChange = (name) => {
+        if (name = 'clientName') {
+            setClientName(clientNameRef.current.value);
+        }
+        if (name = 'clientAddress') {
+            setClientAddress(addressRef.current.value);
+        }
+        if (name = 'clientNumber') {
+            setClientNumber(phoneNoRef.current.value);
+        }
+    }
+    const handleCreateNewClient = () => {
+        const clientName = clientNameRef.current.value;
+        const onBehalf = onBehalfRef.current.value;
+        const address = addressRef.current.value;
+        const phoneNo = phoneNoRef.current.value;
+        const newSlNo = String(voucherSl + 1);
+        const discountAmount = parseFloat(discount_amount_ref.current.value || '0');
+        // console.log(discountAmount);
+        const voucher = {
+            date: `${currentDate}, ${Time}`,
+            voucher_no: newSlNo,
+            products,
+            total: parseFloat(totalBill.toFixed(2)),
+            paid_amount: parseFloat(paid_amount_ref.current.value) || 0,
+            due_amount: parseFloat(paid || discount ? due.toFixed(2) : totalBill.toFixed(2)),
+            payment_status: status,
+            discount: discountAmount
+        }
+        const paymentDetails = {
+            date: `${currentDate}, ${Time}`,
+            reference_voucher: voucherSl + 1,
+            paid_amount: paid,
+            transection_amount: paid,
+            due_amount: parseFloat(paid || discount ? due.toFixed(2) : totalBill.toFixed(2)),
+            payment_status: status,
+            voucher_no: `${voucherSl + 1}`,
+            discount: discountAmount
+        }
+        const newClient = {
+            name: clientName,
+            on_behalf: onBehalf,
+            mobile_no: phoneNo,
+            address,
+            vouchers: [voucher],
+            transections: [paymentDetails]
+        }
+        // ----------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------
+        Swal.fire({
+            title: "Are you sure?",
+            text: `You Are Creating a New Client`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, I am Sure"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`https://bismillah-enterprise-server.onrender.com/new_client`, {
+                    method: 'POST',
+                    headers: {
+                        'content-type': 'application/json'
+                    },
+                    body: JSON.stringify(newClient)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        clientNameRef.current.value = ''
+                        onBehalfRef.current.value = '';
+                        addressRef.current.value = '';
+                        phoneNoRef.current.value = '';
+                        fetch(`https://bismillah-enterprise-server.onrender.com/voucher_sl`, {
+                            method: 'POST',
+                            headers: { 'content-type': 'application/json' },
+                            body: JSON.stringify({ new_sl_no: parseInt(newSlNo) })
+                        })
+                            .then(slres => slres.json())
+                            .then(slData => {
+                                if (slData.message === 'new sl set successfully') {
+                                    setProducts([{ product_name: '', quantity: '', rate: '', total: 0 }]);
+                                    navigate(location?.state?.pathname);
+                                    Swal.fire({
+                                        position: "center",
+                                        icon: "success",
+                                        title: "Voucher Added Successfully",
+                                        showConfirmButton: false,
+                                        timer: 1000
+                                    })
+                                }
+                            })
+                        Swal.fire({
+                            position: "center",
+                            icon: "success",
+                            title: "New Client Added Successfully With New Voucher",
+                            showConfirmButton: false,
+                            timer: 1000
+                        }).then(() => {
+                            navigate(location?.state?.pathname)
+                        })
+                    });
+            }
+        })
+    }
+    const clientNameRef = useRef();
+    const onBehalfRef = useRef();
+    const addressRef = useRef();
+    const phoneNoRef = useRef();
+
+
+    // -------------------------------------------------------
+    const [voucherSl, setVoucherSl] = useState();
     useEffect(() => {
         fetch('https://bismillah-enterprise-server.onrender.com/voucher_sl')
             .then(res => res.json())
@@ -17,12 +130,6 @@ const NewVoucher = () => {
                 setVoucherSl(data.sl_no)
             })
     }, [])
-    const toBanglaNumber = (input) => {
-        const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-        return input.toString().split('').map(char => {
-            return /\d/.test(char) ? banglaDigits[char] : char;
-        }).join('');
-    };
     const now = new Date();
     const Time = now.toLocaleTimeString('en-BD', {
         hour: '2-digit',
@@ -37,9 +144,6 @@ const NewVoucher = () => {
     const [products, setProducts] = useState([
         { product_name: '', quantity: '', rate: '', total: 0 },
     ]);
-    const [voucher_calculation, set_voucher_calculation] = useState({
-
-    })
     const totalBill = products.reduce((sum, item) => sum + item.total, 0);
 
     const discount_amount_ref = useRef();
@@ -66,20 +170,20 @@ const NewVoucher = () => {
         // Optional: You can load Tailwind CSS from CDN inside iframe
         doc.open();
         doc.write(`
-      <html>
-        <head>
-          <title>Print</title>
-          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-          <style>
-            @page { size: A4; margin: 20mm; }
-            body { font-family: sans-serif; color: black; }
-          </style>
-        </head>
-        <body>
-          ${content}
-        </body>
-      </html>
-    `);
+             <html>
+               <head>
+                 <title>Print</title>
+                 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+                 <style>
+                   @page { size: A4; margin: 20mm; }
+                   body { font-family: sans-serif; color: black; }
+                 </style>
+               </head>
+               <body>
+                 ${content}
+               </body>
+             </html>
+           `);
         doc.close();
 
         // Wait until iframe is ready then print
@@ -169,7 +273,6 @@ const NewVoucher = () => {
                                     date: `${currentDate}, ${Time}`,
                                     reference_voucher: voucherSl + 1,
                                     paid_amount: paid,
-                                    transection_amount: paid,
                                     due: parseFloat(paid || discount ? due.toFixed(2) : totalBill.toFixed(2)),
                                     payment_status: status,
                                     voucher_no: `${voucherSl + 1}`,
@@ -221,35 +324,64 @@ const NewVoucher = () => {
             }
         })
     };
+    // --------------------------------------------------------
+
+
     return (
         <div>
-            <div className='print:hidden'>
-                <div>
-                    <div className='flex items-center justify-start'>
-                        <Link to={from}>
-                            <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                                Back
-                            </button>
-                        </Link>
+            <div className='flex items-center justify-start'>
+                <Link to={from}>
+                    <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        Back
+                    </button>
+                </Link>
+            </div>
+            <h2 className="text-2xl text-pink-300 font-semibold text-center">Create A New Client With A New Voucher</h2>
+            <div className='h-fit min-h-[320px] flex lg:justify-center duration-300'>
+                <div className="text-pink-200 shadow-lg shadow-pink-200 flex flex-col items-center justify-center mt-10 w-fit rounded-2xl px-10 py-5">
+                    <h1 className='text-lg lg:text-2xl font-semibold'>Enter Client Informations</h1>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+                        <div>
+                            <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                                <p>Client Name</p>
+                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                    <input onChange={() => { handleClientInfoChange('clientName') }} ref={clientNameRef} type="text" className='outline-none w-full' />
+                                </div>
+                            </div>
+                            <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                                <p>On Behalf</p>
+                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                    <input ref={onBehalfRef} type="text" className='outline-none w-full' />
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                                <p>Address</p>
+                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                    <input onChange={() => { handleClientInfoChange('clientAddress') }} ref={addressRef} type="text" className='outline-none w-full' />
+                                </div>
+                            </div>
+                            <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                                <p>Phone Number</p>
+                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                    <input onChange={() => { handleClientInfoChange('clientNumber') }} ref={phoneNoRef} type="text" className='outline-none w-full' />
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+
+
+            {/* ------------------------------ */}
+            <div className='print:hidden mt-8'>
+                <div>
                     <div className='flex items-center justify-center nunito'>
                         <h1 className="nunito text-2xl text-center font-bold px-5 text-pink-300">
                             Voucher - {voucherSl + 1}
                         </h1>
-                    </div>
-                    <div className='flex items-center justify-center'>
-                        <div className='text-lg font-semibold grid grid-cols-2 text-pink-200 min-w-[380px] sm:min-w-[70%]'>
-                            <div className=''>
-                                <h1>Name: {client.name}</h1>
-                                <h1>Address: {client.address}</h1>
-                            </div>
-                            <div className='flex justify-end'>
-                                <div>
-                                    <h1>Date: {currentDate}</h1>
-                                    <h1>Mobile No: {client.mobile_no}</h1>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
@@ -354,7 +486,7 @@ const NewVoucher = () => {
                     <button onClick={addProduct} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                         + Add Product
                     </button>
-                    <button onClick={handleSubmit} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                    <button onClick={handleCreateNewClient} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                         Create Voucher
                     </button>
                     <button onClick={handlePrint} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
@@ -367,13 +499,13 @@ const NewVoucher = () => {
                 <div className='flex items-center justify-center'>
                     <div className='text-sm font-semibold grid grid-cols-2 text-black w-full'>
                         <div className=''>
-                            <h1>Name: {client.name}</h1>
-                            <h1>Address: {client.address}</h1>
+                            <h1>Name: {clientName}</h1>
+                            <h1>Address: {clientAddress}</h1>
                         </div>
                         <div className='flex justify-end'>
                             <div>
                                 <h1>Date: {currentDate}</h1>
-                                <h1>Mobile No: {client.mobile_no}</h1>
+                                <h1>Mobile No: {clientNumber}</h1>
                             </div>
                         </div>
                     </div>
@@ -494,8 +626,9 @@ const NewVoucher = () => {
                     </div>
                 </div>
             </div>
+            {/* ------------------------------ */}
         </div>
     );
 };
 
-export default NewVoucher;
+export default CreateNewClientWithVoucher;

@@ -3,13 +3,13 @@ import { Link, useLoaderData, useLocation } from 'react-router-dom';
 
 const TransectionsHistory = () => {
 	const staffData = useLoaderData();
-	const { name, transections } = staffData;
+	const { name, transections, uid } = staffData;
 	const location = useLocation();
 	const from = location?.state?.pathname;
 	return (
 		<div className='pb-10'>
 			<div className='flex items-center justify-center mt-8 mb-8'>
-				<Link to={from}>
+				<Link to={`/staff/uid_query/${uid}`}>
 					<button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Back
 					</button>

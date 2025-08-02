@@ -3,14 +3,16 @@ import { MdOutlineCancel } from 'react-icons/md';
 import { NumberFormatBase, NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 
 const Voucher = () => {
     const { voucher_no } = useParams();
     console.log(voucher_no);
     const client = useLoaderData();
     const matchedVoucher = client.vouchers.find(
-        (voucher) => voucher.voucher_no === voucher_no
+        (voucher) => parseInt(voucher.voucher_no) === parseInt(voucher_no)
     );
+    console.log(client);
     const [discount, setDiscount] = useState(matchedVoucher.discount);
     const [due, setDue] = useState(matchedVoucher.due_amount);
     const [paid, setPaid] = useState(matchedVoucher.paid_amount);
@@ -109,7 +111,8 @@ const Voucher = () => {
             date: `${currentDate}, ${Time}`,
             reference_voucher: voucher_no,
             paid_amount: paid,
-            due: parseFloat(newDue).toFixed(2),
+            transection_amount: parseFloat(transectionAmount),
+            due: parseFloat(newDue.toFixed(2)),
             payment_status: payment_status_ref.current.value,
             voucher_no: `${voucher_no}`,
             discount: discount
@@ -125,7 +128,7 @@ const Voucher = () => {
             confirmButtonText: "Yes, I am Sure"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:5000/take_payment/${id}`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/take_payment/${id}`, {
                     method: 'PUT',
                     headers: {
                         'content-type': 'application/json'
@@ -175,21 +178,6 @@ const Voucher = () => {
                         </div>
                     </div>
                     <div className='w-full'>
-                        <h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
-                        <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-                            <NumericFormat
-                                getInputRef={transection_amount_ref}
-                                onChange={handlePaidChange}
-                                className="outline-none w-full h-full"
-                                placeholder="Enter Amount"
-                                allowNegative={false}
-                                decimalScale={2}
-                                fixedDecimalScale={false}
-                                thousandSeparator={false}
-                            />
-                        </div>
-                    </div>
-                    <div className='w-full'>
                         <h1 className='lg:text-lg font-semibold mb-2'>More Discount</h1>
                         <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
                             <NumericFormat
@@ -204,12 +192,28 @@ const Voucher = () => {
                             />
                         </div>
                     </div>
+                    <div className='w-full'>
+                        <h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
+                        <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
+                            <NumericFormat
+                                getInputRef={transection_amount_ref}
+                                onChange={handlePaidChange}
+                                className="outline-none w-full h-full"
+                                placeholder="Enter Amount"
+                                allowNegative={false}
+                                decimalScale={2}
+                                fixedDecimalScale={false}
+                                thousandSeparator={false}
+                            />
+                        </div>
+                    </div>
+
                     <div className='mt-2 w-full'>
                         <div className='flex items-center gap-5'>
                             <h1 className='lg:text-lg font-semibold'>Transection Type: </h1>
                             <select ref={payment_status_ref} className='px-3 outline-none border p-1 rounded-md' name="user_category_in_shop" id="user_category">
                                 <option defaultChecked className='text-xs text-black bg-gray' value=""></option>
-                                <option className='text-xs text-black bg-gray' value="Due">Unpaid</option>
+                                <option className='text-xs text-black bg-gray' value="Unpaid">Unpaid</option>
                                 <option className='text-xs text-black bg-gray' value="Paid">Paid</option>
                             </select>
                         </div>
@@ -219,7 +223,7 @@ const Voucher = () => {
                 </div>
             </div>
             {/* end modal */}
-            <div>
+            <div onClick={() => { setModal(false) }}>
                 <div className='flex items-center justify-start'>
                     <Link to={from}>
                         <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
@@ -317,13 +321,7 @@ const Voucher = () => {
                 </div>
             </div>
             <div ref={voucherPrintRef} className='nunito w-[550px] hidden'>
-                <div className='flex items-center justify-center mt-3 gap-4 mb-5'>
-                    <img className='w-12 h-12' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
-                    <div className='text-center text-2xl font-bold'>
-                        <h1>BISMILLAH ENTERPRISE</h1>
-                        <h1 className='text-sm'>Jokshin Bazar, Lakshmipur</h1>
-                    </div>
-                </div>
+                <VoucherHeading></VoucherHeading>
                 <div className='flex items-center justify-center'>
                     <div className='text-sm font-semibold grid grid-cols-2 text-black w-full'>
                         <div className=''>

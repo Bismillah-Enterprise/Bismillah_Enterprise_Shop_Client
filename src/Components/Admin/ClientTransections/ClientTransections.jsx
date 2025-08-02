@@ -28,13 +28,14 @@ const ClientTransections = () => {
             </div>
             <div>
                 <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
+                    <table className="text-pink-200 min-w-[380px] sm:min-w-[70%] text-[14px]">
                         <tbody>
                             <tr>
                                 <th>SL No</th>
                                 <th>Date</th>
                                 <th>Reference Voucher No</th>
-                                <th>Paid Amount</th>
+                                <th>Transection Amount</th>
+                                <th>Total Paid</th>
                                 <th>Due Amount</th>
                                 <th>Status</th>
                             </tr>
@@ -44,6 +45,7 @@ const ClientTransections = () => {
                                         <td>{index + 1}</td>
                                         <td>{transection.date}</td>
                                         <td>{transection.reference_voucher}</td>
+                                        <td>{transection.transection_amount}</td>
                                         <td>{transection.paid_amount}</td>
                                         <td>{transection.due_amount}</td>
                                         <td className={`${transection.payment_status === 'Paid' ? 'text-green-500' : 'text-red-500'}`}>{transection.payment_status}</td>

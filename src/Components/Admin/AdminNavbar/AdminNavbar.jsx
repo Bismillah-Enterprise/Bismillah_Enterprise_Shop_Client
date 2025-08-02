@@ -28,7 +28,7 @@ const AdminNavbar = () => {
 				<Link to={`/admin/shop_transections`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/shop_transections') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/revenue_transections_details') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/expense_transections_details') ? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Shop Transections
 				</Link>
-				<Link to={`/admin/client_corner`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/client_corner')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+				<Link to={`/admin/client_corner`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/client_corner')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Client Corner
 				</Link>
 				<Link to={`/admin/self_transections`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/self_transections')? 'text-pink-400': 'text-pink-200'} ${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>

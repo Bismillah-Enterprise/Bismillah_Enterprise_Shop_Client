@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../Providers/AuthProvider';
 import Loading from '../Shared/Loading/Loading';
@@ -6,6 +6,7 @@ import useCurrentUser from '../Hooks/useCurrentUser';
 import Swal from 'sweetalert2'; // assuming you're using this
 import { PuffLoader } from 'react-spinners';
 import Clock from '../Clock/Clock';
+import { MdEdit } from 'react-icons/md';
 
 // Utility to calculate distance in meters
 function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
@@ -38,7 +39,7 @@ const Staffs = () => {
 	const { user } = useContext(AuthContext);
 	const [, , isAdmin, userHookLoading] = useCurrentUser();
 	const staff = useLoaderData();
-	const { _id, name, hour_rate, last_month_due, withdrawal_amount, today_enter1_time, today_exit1_time, bonus, available_balance, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = staff;
+	const { _id, name, hour_rate, last_month_due, withdrawal_amount, today_enter1_time, today_exit1_time, bonus, available_balance, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute, total_bonus } = staff;
 	const [isAllowed, setIsAllowed] = useState(false);
 	const [accuracy, setAccuracy] = useState('');
 	const [lat, setLat] = useState('')
@@ -145,7 +146,13 @@ const Staffs = () => {
 						total_earn: 0,
 						total_working_hour: updatedTotalHours,
 						total_working_minute: updatedTotalMinutesRemainder,
-						total_income: updatedEarn
+						total_income: parseFloat(updatedEarn.toFixed(2)),
+						available_balance,
+						additional_movement_hour,
+						additional_movement_minute,
+						today_bonus: 0,
+						total_bonus,
+						today_date: todayOnlyDateIntFormat
 					};
 
 					// Save to database
@@ -539,22 +546,38 @@ const Staffs = () => {
 						if (bonusdata.first_entry?.uid === uid && !bonusdata.second_entry.time) {
 							today_bonus = 50;
 							total_bonus = bonus + 50;
-							today_earned = today_earned + bonus;
-						}
-						else if (bonusdata.first_entry.time === bonusdata.second_entry.time) {
-							today_bonus = 25;
-							total_bonus = bonus + 25;
-							today_earned = today_earned + bonus;
+							today_earned = today_earned + 50;
+							fetch(`https://bismillah-enterprise-server.onrender.com/clear_bonus`, {
+								method: 'PUT',
+								headers: {
+									'content-type': 'application/json'
+								},
+								body: JSON.stringify({ name: 'first_entry' })
+							})
 						}
 						else if (bonusdata.first_entry?.uid === uid && bonusdata.second_entry.time) {
 							today_bonus = 30;
 							total_bonus = bonus + 30;
-							today_earned = today_earned + bonus;
+							today_earned = today_earned + 30;
+							fetch(`https://bismillah-enterprise-server.onrender.com/clear_bonus`, {
+								method: 'PUT',
+								headers: {
+									'content-type': 'application/json'
+								},
+								body: JSON.stringify({ name: 'first_entry' })
+							})
 						}
 						else if (bonusdata.first_entry.time && bonusdata.second_entry?.uid === uid) {
 							today_bonus = 20;
 							total_bonus = bonus + 20;
-							today_earned = today_earned + bonus;
+							today_earned = today_earned + 20;
+							fetch(`https://bismillah-enterprise-server.onrender.com/clear_bonus`, {
+								method: 'PUT',
+								headers: {
+									'content-type': 'application/json'
+								},
+								body: JSON.stringify({ name: 'second_entry' })
+							})
 						}
 						else if (!bonusdata.first_entry.time && !bonusdata.second_entry.time) {
 							today_bonus = 0;
@@ -569,7 +592,7 @@ const Staffs = () => {
 				const updatedTotalMinutesRemainder = updatedTotalMinutes % 60;
 
 				const previousEarn = total_income || 0;
-				const updatedEarn = previousEarn + today_earned + today_bonus;
+				const updatedEarn = previousEarn + today_earned;
 				const new_available_balance = parseFloat((last_month_due + updatedEarn - withdrawal_amount).toFixed(2));
 				const TodaySummary = {
 					currentDate,
@@ -580,7 +603,7 @@ const Staffs = () => {
 					today_exit2_time,
 					total_hour: today_hours,
 					total_minute: today_minutes,
-					total_earn: today_earned,
+					total_earn: parseFloat(today_earned.toFixed(2)),
 					available_balance: new_available_balance,
 					additional_movement_hour,
 					additional_movement_minute,
@@ -588,7 +611,8 @@ const Staffs = () => {
 					total_working_minute: updatedTotalMinutesRemainder,
 					today_bonus,
 					total_bonus,
-					total_income: updatedEarn,
+					total_income: parseFloat(updatedEarn.toFixed(2)),
+					today_date: today_only_date_number
 				};
 				console.log(TodaySummary)
 
@@ -616,6 +640,133 @@ const Staffs = () => {
 			}
 		});
 	};
+	const [isEnableEdit, setIsEnableEdit] = useState(false);
+	const [editEnter1Time, setEditEnter1Time] = useState(false);
+	const [editExit1Time, setEditExit1Time] = useState(false);
+	const [editEnter2Time, setEditEnter2Time] = useState(false);
+	const [editExit2Time, setEditExit2Time] = useState(false);
+	const enter1ref = useRef();
+	const exit1ref = useRef();
+	const enter2ref = useRef();
+	const exit2ref = useRef();
+	const handleEditTime = (name) => {
+		if (name === 'today_enter1_time') {
+			setEditEnter1Time(true);
+			setIsEnableEdit(true);
+			setTimeout(() => {
+				enter1ref.current?.focus();
+			}, 50);
+		}
+		if (name === 'today_exit1_time') {
+			setEditExit1Time(true);
+			setIsEnableEdit(true);
+			setTimeout(() => {
+				exit1ref.current?.focus();
+			}, 50);
+		}
+		if (name === 'today_enter2_time') {
+			setEditEnter2Time(true);
+			setIsEnableEdit(true);
+			setTimeout(() => {
+				enter2ref.current?.focus();
+			}, 50);
+		}
+		if (name === 'today_exit2_time') {
+			setEditExit2Time(true);
+			setIsEnableEdit(true);
+			setTimeout(() => {
+				exit2ref.current?.focus();
+			}, 50);
+		}
+
+	}
+	const handleChangeTime = (id) => {
+		if (editEnter1Time) {
+			fetch(`https://bismillah-enterprise-server.onrender.com/change_time/${id}`, {
+				method: 'PUT',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({ name: 'today_enter1_time', time: enter1ref.current.value })
+			}).then(res => res.json()).then(data => {
+				if (data.acknowledged) {
+					Swal.fire({
+						position: 'center',
+						icon: 'success',
+						title: 'Time Edited Successfully',
+						showConfirmButton: false,
+						timer: 1000,
+					});
+				}
+			})
+			setEditEnter1Time(false);
+			setIsEnableEdit(false);
+		}
+		if (editExit1Time) {
+			fetch(`https://bismillah-enterprise-server.onrender.com/change_time/${id}`, {
+				method: 'PUT',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({ name: 'today_exit1_time', time: exit1ref.current.value })
+			}).then(res => res.json()).then(data => {
+				if (data.acknowledged) {
+					Swal.fire({
+						position: 'center',
+						icon: 'success',
+						title: 'Time Edited Successfully',
+						showConfirmButton: false,
+						timer: 1000,
+					});
+				}
+			})
+			setEditExit1Time(false);
+			setIsEnableEdit(false);
+		}
+		if (editEnter2Time) {
+			fetch(`https://bismillah-enterprise-server.onrender.com/change_time/${id}`, {
+				method: 'PUT',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({ name: 'today_enter2_time', time: enter2ref.current.value })
+			}).then(res => res.json()).then(data => {
+				if (data.acknowledged) {
+					Swal.fire({
+						position: 'center',
+						icon: 'success',
+						title: 'Time Edited Successfully',
+						showConfirmButton: false,
+						timer: 1000,
+					});
+				}
+			})
+			setEditEnter2Time(false);
+			setIsEnableEdit(false);
+		}
+		if (editExit2Time) {
+			fetch(`https://bismillah-enterprise-server.onrender.com/change_time/${id}`, {
+				method: 'PUT',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify({ name: 'today_exit2_time', time: exit2ref.current.value })
+			}).then(res => res.json()).then(data => {
+				if (data.acknowledged) {
+					Swal.fire({
+						position: 'center',
+						icon: 'success',
+						title: 'Time Edited Successfully',
+						showConfirmButton: false,
+						timer: 1000,
+					});
+				}
+			})
+			setEditExit2Time(false);
+			setIsEnableEdit(false);
+		}
+		navigate(`/staff/uid_query/${uid}`);
+	}
 
 	if (locationLoading || dateCheckLoading) {
 		return (
@@ -635,13 +786,13 @@ const Staffs = () => {
 									Home
 								</button>
 							</Link>
-							<Link to={`/monthly_records/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+							<Link to={`/monthly_records/${uid}`} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 								See Your Montly Records
 							</Link>
-							<Link to={`/transections_history/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+							<Link to={`/transections_history/${uid}`} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 								Transections History
 							</Link>
-							<Link to={`/income_history/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+							<Link to={`/income_history/${uid}`} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 								Income History
 							</Link>
 						</div>
@@ -649,7 +800,7 @@ const Staffs = () => {
 					}
 				</div>
 				{
-					location?.state?.pathname?.includes('admin') || user_category === 'admin' ?
+					user?.uid !== uid || user_category === 'admin' ?
 						<div className='flex items-center justify-center gap-5 mb-10'>
 							<Link to={'/admin'} state={{ from: '/' }}>
 								<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
@@ -686,28 +837,28 @@ const Staffs = () => {
 						<div>
 							<div className="flex items-center gap-5 lg:gap-10 justify-center mt-10 flex-wrap">
 								<button
-									disabled={!isAllowed || !!today_enter1_time || additional_movement_status}
+									disabled={!isAllowed || currentDayName === 'Friday' || !!today_enter1_time || additional_movement_status}
 									onClick={() => handleTodayTime('today_enter1_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 1
 								</button>
 								<button
-									disabled={!isAllowed || !!today_exit1_time || today_enter1_time === '' || additional_movement_status }
+									disabled={!isAllowed || currentDayName === 'Friday' || !!today_exit1_time || today_enter1_time === '' || additional_movement_status}
 									onClick={() => handleTodayTime('today_exit1_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Exit 1
 								</button>
 								<button
-									disabled={!isAllowed || !!today_enter2_time || today_exit1_time === '' || additional_movement_status }
+									disabled={!isAllowed || currentDayName === 'Friday' || !!today_enter2_time || today_exit1_time === '' || additional_movement_status}
 									onClick={() => handleTodayTime('today_enter2_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
 									Enter 2
 								</button>
 								<button
-									disabled={!isAllowed || !!today_exit2_time || today_enter2_time === '' || additional_movement_status }
+									disabled={!isAllowed || currentDayName === 'Friday' || !!today_exit2_time || today_enter2_time === '' || additional_movement_status}
 									onClick={() => handleTodayTime('today_exit2_time', _id)}
 									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 								>
@@ -721,14 +872,14 @@ const Staffs = () => {
 								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center gap-5 lg:gap-10 justify-center flex-wrap`}>
 
 									<button
-										disabled={ !isAllowed || !!additional_exit_time}
+										disabled={!isAllowed || !!additional_exit_time}
 										onClick={() => handleAdditionalTime('additional_exit_time', _id)}
 										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>
 										Exit
 									</button>
 									<button
-										disabled={ !isAllowed || !!additional_enter_time || additional_exit_time === ''}
+										disabled={!isAllowed || !!additional_enter_time || additional_exit_time === ''}
 										onClick={() => handleAdditionalTime('additional_enter_time', _id)}
 										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
 									>
@@ -771,15 +922,50 @@ const Staffs = () => {
 							<tr>
 								<td id="today_date">{currentDate}</td>
 								<td id="today_day_name">{currentDayName}</td>
-								<td id="enter1_time">{today_enter1_time}</td>
-								<td id="exit1_time">{today_exit1_time}</td>
-								<td id="enter2_time">{today_enter2_time}</td>
-								<td id="exit2_time">{today_exit2_time}</td>
+								<td id="enter1_time">
+									<div className='flex items-center justify-between gap-0'>
+										<div className='max-w-[100px] overflow-hidden'>
+											<input ref={enter1ref} autoFocus={true} className={`${editEnter1Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_enter1_time} type="text" />
+										</div>
+										<h1 className={`flex-1 ${editEnter1Time ? 'hidden' : 'block'}`}>{today_enter1_time}</h1>
+										<MdEdit onClick={() => { handleEditTime('today_enter1_time') }} className={`text-end cursor-pointer ${isAdmin && isAllowed ? 'block' : 'hidden'}`} />
+									</div>
+								</td>
+								<td id="exit1_time">
+									<div className='flex items-center justify-between gap-0'>
+										<div className='max-w-[100px] overflow-hidden'>
+											<input ref={exit1ref} className={`${editExit1Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_exit1_time} type="text" />
+										</div>
+										<h1 className={`flex-1 ${editExit1Time ? 'hidden' : 'block'}`}>{today_exit1_time}</h1>
+										<MdEdit onClick={() => { handleEditTime('today_exit1_time') }} className={`text-end cursor-pointer ${isAdmin && isAllowed ? 'block' : 'hidden'}`} />
+									</div>
+								</td>
+								<td id="enter2_time">
+									<div className='flex items-center justify-between gap-0'>
+										<div className='max-w-[100px] overflow-hidden'>
+											<input ref={enter2ref} className={`${editEnter2Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_enter2_time} type="text" />
+										</div>
+										<h1 className={`flex-1 ${editEnter2Time ? 'hidden' : 'block'}`}>{today_enter2_time}</h1>
+										<MdEdit onClick={() => { handleEditTime('today_enter2_time') }} className={`text-end cursor-pointer ${isAdmin && isAllowed ? 'block' : 'hidden'}`} />
+									</div>
+								</td>
+								<td id="exit2_time">
+									<div className='flex items-center justify-between gap-0'>
+										<div className='max-w-[100px] overflow-hidden'>
+											<input ref={exit2ref} className={`${editExit2Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_exit2_time} type="text" />
+										</div>
+										<h1 className={`flex-1 ${editExit2Time ? 'hidden' : 'block'}`}>{today_exit2_time}</h1>
+										<MdEdit onClick={() => { handleEditTime('today_exit2_time') }} className={`text-end cursor-pointer ${isAdmin && isAllowed ? 'block' : 'hidden'}`} />
+									</div>
+								</td>
 							</tr>
 						</tbody>
 					</table>
 				</div>
 				<div className='flex flex-col gap-10 items-center justify-center mt-5 mb-10'>
+					<button onClick={() => { handleChangeTime(_id) }} disabled={!isEnableEdit} className={`${isAdmin ? 'block' : 'hidden'} disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold`}>
+						Submit Edited Time
+					</button>
 					<button onClick={() => { handleSubmitWorkTime(uid) }} disabled={!workSubmitButton} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Submit Your Work Time
 					</button>

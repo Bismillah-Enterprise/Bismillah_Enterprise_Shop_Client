@@ -1,32 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLoaderData, useLocation } from 'react-router-dom';
+import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 
 const StaffsMonthlyRecords = () => {
 	const staff = useLoaderData();
 	const { _id, name, hour_rate, uid, user_category, current_month_details, total_working_hour, bonus, total_working_minute, total_income, withdrawal_amount, available_balance } = staff;
 	const location = useLocation();
 	const from = location?.state?.pathname;
+	const navigate = useNavigate();
 
 	const printRef = useRef();
 
 	const handlePrint = () => {
 		const printContents = printRef.current.innerHTML;
 		// Create a hidden iframe
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
+		const iframe = document.createElement('iframe');
+		iframe.style.position = 'fixed';
+		iframe.style.right = '0';
+		iframe.style.bottom = '0';
+		iframe.style.width = '0';
+		iframe.style.height = '0';
+		iframe.style.border = '0';
 
-        document.body.appendChild(iframe);
+		document.body.appendChild(iframe);
 
-        const doc = iframe.contentWindow.document;
+		const doc = iframe.contentWindow.document;
 
-        // Optional: You can load Tailwind CSS from CDN inside iframe
-        doc.open();
-        doc.write(`
+		// Optional: You can load Tailwind CSS from CDN inside iframe
+		doc.open();
+		doc.write(`
       <html>
         <head>
           <title>Print</title>
@@ -41,23 +42,56 @@ const StaffsMonthlyRecords = () => {
         </body>
       </html>
     `);
-        doc.close();
+		doc.close();
 
-        // Wait until iframe is ready then print
-        iframe.onload = () => {
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
+		// Wait until iframe is ready then print
+		iframe.onload = () => {
+			iframe.contentWindow.focus();
+			iframe.contentWindow.print();
 
-            // Optional: Cleanup after printing
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 1000);
-        };te
+			// Optional: Cleanup after printing
+			setTimeout(() => {
+				document.body.removeChild(iframe);
+			}, 1000);
+		}; te
 	};
 
+	const handleDeleteRecord = (staffId, deletedDate) => {
+		Swal.fire({
+			title: "Are you sure?",
+			text: "You won't be able to revert this!",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Yes, Submit"
+		}).then(async (result) => {
+			if (result.isConfirmed) {
+				fetch(`https://bismillah-enterprise-server.onrender.com/staff/remove_attendance/${staffId}`, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ dateToRemove: `${deletedDate}` })
+				})
+					.then(res => res.json())
+					.then(data => {
+						navigate(location.pathname)
+						if (data.acknowledged) {
+							Swal.fire({
+								position: 'center',
+								icon: 'success',
+								title: 'Deleted Record Successfully',
+								showConfirmButton: false,
+								timer: 1000,
+							});
+						}
+					});
+			}
+		})
 
 
-
+	}
 	return (
 		<div className='overflow-auto scrollbar-hide'>
 			<div className='flex items-center justify-center my-7 gap-5'>
@@ -66,7 +100,7 @@ const StaffsMonthlyRecords = () => {
 						Home
 					</button>
 				</Link>
-				<Link to={from}>
+				<Link to={`/staff/uid_query/${uid}`}>
 					<button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Back
 					</button>
@@ -110,6 +144,7 @@ const StaffsMonthlyRecords = () => {
 							<th>Total Working Time</th>
 							<th>Bonus</th>
 							<th>Total Earn</th>
+							<th></th>
 						</tr>
 						{
 							current_month_details?.map((day, index) =>
@@ -124,6 +159,7 @@ const StaffsMonthlyRecords = () => {
 									<td id="total_working_hour">{day.total_hour} Hours, {day.total_minute} Minutes</td>
 									<td id="total_working_hour">{day.today_bonus}</td>
 									<td id="total_earning">{day.total_earn} Taka</td>
+									<td onClick={() => { handleDeleteRecord(_id, day.current_date) }} className='text-pink-400 cursor-pointer underline' id="total_earning">Delete</td>
 								</tr>
 							)
 						}

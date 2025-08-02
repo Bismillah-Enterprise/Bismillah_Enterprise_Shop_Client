@@ -37,6 +37,7 @@ import ClientTransections from '../Admin/ClientTransections/ClientTransections';
 import SelfRevenueTransectionsDetails from '../Admin/SelfRevenueTransectionsDetails/SelfRevenueTransectionsDetails';
 import SelfTransectionsSummary from '../Admin/SelfTransectionsSummary/SelfTransectionsSummary';
 import ProductsManipulation from '../Admin/ProductsManipulation/ProductsManipulation';
+import CreateNewClientWithVoucher from '../Admin/CreateNewClientWithVoucher/CreateNewClientWithVoucher';
 
 const router = createBrowserRouter([
 	{
@@ -71,6 +72,40 @@ const router = createBrowserRouter([
 			{
 				path: '/not_authorized',
 				element: <NotAuthorized></NotAuthorized>
+			},
+			{
+				path: '/client_corner',
+				element: <ClientCorner></ClientCorner>,
+				loader: () => fetch('https://bismillah-enterprise-server.onrender.com/client_corner'),
+			},
+			{
+				path: '/new_client',
+				element: <CreateNewClient></CreateNewClient>,
+			},
+			{
+				path: '/new_client_new_voucher',
+				element: <CreateNewClientWithVoucher></CreateNewClientWithVoucher>,
+			},
+			{
+				path: '/client_details/:id',
+				element: <ClientDetails></ClientDetails>,
+				loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+			},
+			{
+				path: '/client_transections/:id',
+				element: <ClientTransections></ClientTransections>,
+				loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+			},
+			{
+				path: '/new_voucher/:id',
+				element: <NewVoucher></NewVoucher>,
+				loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+			},
+			{
+				path: '/voucher/:id/:voucher_no',
+				element: <Voucher></Voucher>,
+				loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+
 			},
 			{
 				path: '/admin',
@@ -121,6 +156,40 @@ const router = createBrowserRouter([
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/self_transections_summary`)
 					},
 					{
+						path: '/admin/client_corner',
+						element: <AdminRoute><ClientCorner></ClientCorner></ AdminRoute>,
+						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/client_corner'),
+					},
+					{
+						path: '/admin/new_client',
+						element: <AdminRoute><CreateNewClient></CreateNewClient></ AdminRoute>
+					},
+					{
+						path: '/admin/new_client_new_voucher',
+						element: <AdminRoute><CreateNewClientWithVoucher></CreateNewClientWithVoucher></ AdminRoute>
+					},
+					{
+						path: '/admin/client_details/:id',
+						element: <AdminRoute><ClientDetails></ClientDetails></ AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+					},
+					{
+						path: '/admin/client_transections/:id',
+						element: <AdminRoute><ClientTransections></ClientTransections></ AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+					},
+					{
+						path: '/admin/new_voucher/:id',
+						element: <AdminRoute><NewVoucher></NewVoucher></ AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+					},
+					{
+						path: '/admin/voucher/:id/:voucher_no',
+						element: <AdminRoute><Voucher></Voucher></ AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+
+					},
+					{
 						path: '/admin/set_shop_code',
 						element: <AdminRoute><SetShopCode></SetShopCode></ AdminRoute>
 					},
@@ -147,36 +216,6 @@ const router = createBrowserRouter([
 						path: '/admin/self_transections',
 						element: <AdminRoute><SelfTransections></SelfTransections></ AdminRoute>,
 						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/self_transections'),
-					},
-					{
-						path: '/admin/client_corner',
-						element: <AdminRoute><ClientCorner></ClientCorner></ AdminRoute>,
-						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/client_corner'),
-					},
-					{
-						path: '/admin/new_client',
-						element: <AdminRoute><CreateNewClient></CreateNewClient></ AdminRoute>
-					},
-					{
-						path: '/admin/client_details/:id',
-						element: <AdminRoute><ClientDetails></ClientDetails></ AdminRoute>,
-						loader: ({params}) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
-					},
-					{
-						path: '/admin/client_transections/:id',
-						element: <AdminRoute><ClientTransections></ClientTransections></ AdminRoute>,
-						loader: ({params}) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
-					},
-					{
-						path: '/admin/new_voucher/:id',
-						element: <AdminRoute><NewVoucher></NewVoucher></ AdminRoute>,
-						loader: ({params}) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
-					},
-					{
-						path: '/admin/voucher/:id/:voucher_no',
-						element: <AdminRoute><Voucher></Voucher></ AdminRoute>,
-						loader: ({params}) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
-
 					},
 					{
 						path: '/admin/products_manipulation',
