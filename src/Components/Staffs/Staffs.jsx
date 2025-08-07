@@ -884,7 +884,7 @@ const Staffs = () => {
 											<input ref={enter1ref} autoFocus={true} className={`${editEnter1Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_enter1_time} type="text" />
 										</div>
 										<h1 className={`flex-1 ${editEnter1Time ? 'hidden' : 'block'}`}>{today_enter1_time}</h1>
-										<MdEdit onClick={() => { handleEditTime('today_enter1_time') }} className={`text-end cursor-pointer ${isAdmin && isAllowed ? 'block' : 'hidden'}`} />
+										<MdEdit onClick={() => { handleEditTime('today_enter1_time') }} className={`text-end cursor-pointer ${isAdmin ? 'block' : 'hidden'}`} />
 									</div>
 								</td>
 								<td id="exit1_time">
@@ -893,7 +893,7 @@ const Staffs = () => {
 											<input ref={exit1ref} className={`${editExit1Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_exit1_time} type="text" />
 										</div>
 										<h1 className={`flex-1 ${editExit1Time ? 'hidden' : 'block'}`}>{today_exit1_time}</h1>
-										<MdEdit onClick={() => { handleEditTime('today_exit1_time') }} className={`text-end cursor-pointer ${isAdmin && isAllowed ? 'block' : 'hidden'}`} />
+										<MdEdit onClick={() => { handleEditTime('today_exit1_time') }} className={`text-end cursor-pointer ${isAdmin ? 'block' : 'hidden'}`} />
 									</div>
 								</td>
 								<td id="enter2_time">
@@ -902,7 +902,7 @@ const Staffs = () => {
 											<input ref={enter2ref} className={`${editEnter2Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_enter2_time} type="text" />
 										</div>
 										<h1 className={`flex-1 ${editEnter2Time ? 'hidden' : 'block'}`}>{today_enter2_time}</h1>
-										<MdEdit onClick={() => { handleEditTime('today_enter2_time') }} className={`text-end cursor-pointer ${isAdmin && isAllowed ? 'block' : 'hidden'}`} />
+										<MdEdit onClick={() => { handleEditTime('today_enter2_time') }} className={`text-end cursor-pointer ${isAdmin ? 'block' : 'hidden'}`} />
 									</div>
 								</td>
 								<td id="exit2_time">
@@ -911,7 +911,7 @@ const Staffs = () => {
 											<input ref={exit2ref} className={`${editExit2Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_exit2_time} type="text" />
 										</div>
 										<h1 className={`flex-1 ${editExit2Time ? 'hidden' : 'block'}`}>{today_exit2_time}</h1>
-										<MdEdit onClick={() => { handleEditTime('today_exit2_time') }} className={`text-end cursor-pointer ${isAdmin && isAllowed ? 'block' : 'hidden'}`} />
+										<MdEdit onClick={() => { handleEditTime('today_exit2_time') }} className={`text-end cursor-pointer ${isAdmin ? 'block' : 'hidden'}`} />
 									</div>
 								</td>
 							</tr>
