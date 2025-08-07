@@ -25,13 +25,11 @@ const LocationDetails = () => {
 		return R * c;
 	}
 	const handleLocation = () => {
-		console.log('first')
 		setLocationLoading(true);
 		fetch('https://bismillah-enterprise-server.onrender.com/shop_location')
 			.then(res => res.json())
 			.then(currentLocationData => {
 				setCurrentLocation(currentLocationData);
-				console.log(currentLocation)
 				navigator.geolocation.getCurrentPosition(
 					(position) => {
 						const { latitude, longitude, accuracy } = position.coords;

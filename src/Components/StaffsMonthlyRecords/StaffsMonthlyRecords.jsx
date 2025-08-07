@@ -174,6 +174,7 @@ const StaffsMonthlyRecords = () => {
 							<td className='text-pink-300'>{total_working_hour} Hours, {total_working_minute} Minutes</td>
 							<td></td>
 							<td className='text-pink-300'>{total_income} Taka</td>
+							<td></td>
 						</tr>
 					</tbody>
 				</table>

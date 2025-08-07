@@ -28,6 +28,9 @@ const AdminNavbar = () => {
 				<Link to={`/admin/shop_transections`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/shop_transections') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/revenue_transections_details') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/expense_transections_details') ? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Shop Transections
 				</Link>
+				<Link to={`/admin/air_ticket_client_corner`} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} ${location.pathname.includes('/air_ticket_client_corner')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+					Air Ticket Clients
+				</Link>
 				<Link to={`/admin/client_corner`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/client_corner')? 'text-pink-400': 'text-pink-200'} w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Client Corner
 				</Link>
@@ -77,6 +80,9 @@ const AdminNavbar = () => {
 					</Link>
 					<Link to={`/admin/shop_transections`} state={{ pathname: location.pathname }} className={`${location.pathname.includes('/admin/shop_transections') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/revenue_transections_details') ? 'text-pink-400': 'text-pink-200'} ${location.pathname.includes('/admin/expense_transections_details') ? 'text-pink-400': 'text-pink-200'} px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Shop Transections
+					</Link>
+					<Link to={`/admin/air_ticket_client_corner`} state={{ pathname: location.pathname }} className={`${current_User?.email === 'bismillah786e@gmail.com' ? 'block': 'hidden'} px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
+						Air Ticket Clients
 					</Link>
 					<Link to={`/admin/client_corner`} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Client Corner

@@ -3,7 +3,7 @@ import { NumericFormat } from 'react-number-format';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const CreateNewClient = () => {
+const AirTicketNewClient = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const from = location.state?.pathname;
@@ -11,13 +11,11 @@ const CreateNewClient = () => {
     const [numberAlert, setNumberAlert] = useState(false);
     const handleCreateNewClient = () => {
         const clientName = clientNameRef.current.value;
-        const onBehalf = onBehalfRef.current.value;
         const address = addressRef.current.value;
         const phoneNo = phoneNoRef.current.value;
         const newClient = {
             name: clientName,
-            on_behalf: onBehalf,
-            mobile_no: phoneNo,
+            mobile_no: `0${phoneNo}`,
             address,
             vouchers: [],
             transections: []
@@ -37,7 +35,7 @@ const CreateNewClient = () => {
             confirmButtonText: "Yes, I am Sure"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/new_client`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_new_client`, {
                     method: 'POST',
                     headers: {
                         'content-type': 'application/json'
@@ -47,7 +45,7 @@ const CreateNewClient = () => {
                     .then(res => res.json())
                     .then(data => {
                         clientNameRef.current.value = ''
-                        onBehalfRef.current.value = '';
+                        destinationRef.current.value = '';
                         addressRef.current.value = '';
                         phoneNoRef.current.value = '';
                         Swal.fire({
@@ -65,7 +63,7 @@ const CreateNewClient = () => {
         })
     }
     const clientNameRef = useRef();
-    const onBehalfRef = useRef();
+    const destinationRef = useRef();
     const addressRef = useRef();
     const phoneNoRef = useRef();
     return (
@@ -82,43 +80,34 @@ const CreateNewClient = () => {
                 <div className="text-pink-200 shadow-lg shadow-pink-200 flex flex-col items-center justify-center mt-10 w-fit rounded-2xl px-10 py-5">
                     <h1 className='text-lg lg:text-2xl font-semibold'>Enter Client Informations</h1>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-                        <div>
-                            <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
-                                <p>Client Name</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
-                                    <input ref={clientNameRef} type="text" className='outline-none w-full' />
-                                </div>
-                            </div>
-                            <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
-                                <p>On Behalf</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
-                                    <input ref={onBehalfRef} type="text" className='outline-none w-full' />
-                                </div>
+
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                            <p>Client Name</p>
+                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                <input ref={clientNameRef} type="text" className='outline-none w-full' placeholder='Enter Client Name' />
                             </div>
                         </div>
-                        <div>
-                            <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
-                                <p>Address</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
-                                    <input ref={addressRef} type="text" className='outline-none w-full' />
-                                </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                            <p>Phone Number</p>
+                            <div className={`${numberAlert ? 'border-red-500' : ''} px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full`}>
+                                <NumericFormat
+                                    getInputRef={phoneNoRef}
+                                    className="outline-none w-full h-full"
+                                    placeholder="Enter Phone Number"
+                                    format="0##########"
+                                    allowEmptyFormatting={false}
+                                    mask="_"
+                                    onValueChange={(values) => setValue(values.value)}
+                                    isAllowed={(values) => {
+                                        return values.value.length <= 11;
+                                    }}
+                                />
                             </div>
-                            <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
-                                <p>Phone Number</p>
-                                <div className={`${numberAlert ? 'border-red-500' : ''} px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full`}>
-                                    <NumericFormat
-                                        getInputRef={phoneNoRef}
-                                        className="outline-none w-full h-full"
-                                        placeholder="Enter Phone Number"
-                                        format="0##########"
-                                        allowEmptyFormatting={false}
-                                        mask="_"
-                                        onValueChange={(values) => setValue(values.value)}
-                                        isAllowed={(values) => {
-                                            return values.value.length <= 11;
-                                        }}
-                                    />
-                                </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 col-span-2'>
+                            <p>Address</p>
+                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                <input ref={addressRef} type="text" className='outline-none w-full' placeholder='Enter Client Address' />
                             </div>
                         </div>
                     </div>
@@ -129,4 +118,4 @@ const CreateNewClient = () => {
     );
 };
 
-export default CreateNewClient;
+export default AirTicketNewClient;

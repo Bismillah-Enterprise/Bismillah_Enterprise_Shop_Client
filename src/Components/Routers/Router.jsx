@@ -38,6 +38,13 @@ import SelfRevenueTransectionsDetails from '../Admin/SelfRevenueTransectionsDeta
 import SelfTransectionsSummary from '../Admin/SelfTransectionsSummary/SelfTransectionsSummary';
 import ProductsManipulation from '../Admin/ProductsManipulation/ProductsManipulation';
 import CreateNewClientWithVoucher from '../Admin/CreateNewClientWithVoucher/CreateNewClientWithVoucher';
+import AirTicketClient from '../Admin/AirTicketClilent/AirTicketClient';
+import AirTicketNewClient from '../Admin/AirTicketNewClient/AirTicketNewClient';
+import AirTicketNewClientWithNewVoucher from '../Admin/AirTicketNewClientWithNewVoucher/AirTicketNewClientWithNewVoucher';
+import AirTicketClientDetails from '../Admin/AirTicketClientDetails/AirTicketClientDetails';
+import AirTicketClientTransections from '../Admin/AirTicketClientTransections/AirTicketClientTransections';
+import AirTicketNewVoucher from '../Admin/AirTicketNewVoucher/AirTicketNewVoucher';
+import AirTicketVoucher from '../Admin/AirTicketVoucher/AirTicketVoucher';
 
 const router = createBrowserRouter([
 	{
@@ -161,12 +168,25 @@ const router = createBrowserRouter([
 						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/client_corner'),
 					},
 					{
+						path: '/admin/air_ticket_client_corner',
+						element: <AdminRoute><AirTicketClient></AirTicketClient></ AdminRoute>,
+						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/air_ticket_client_corner'),
+					},
+					{
 						path: '/admin/new_client',
 						element: <AdminRoute><CreateNewClient></CreateNewClient></ AdminRoute>
 					},
 					{
+						path: '/admin/air_ticket_new_client',
+						element: <AdminRoute><AirTicketNewClient></AirTicketNewClient></ AdminRoute>
+					},
+					{
 						path: '/admin/new_client_new_voucher',
 						element: <AdminRoute><CreateNewClientWithVoucher></CreateNewClientWithVoucher></ AdminRoute>
+					},
+					{
+						path: '/admin/air_ticket_new_client_new_voucher',
+						element: <AdminRoute><AirTicketNewClientWithNewVoucher></AirTicketNewClientWithNewVoucher></ AdminRoute>
 					},
 					{
 						path: '/admin/client_details/:id',
@@ -174,9 +194,19 @@ const router = createBrowserRouter([
 						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 					},
 					{
+						path: '/admin/air_ticket_client_details/:id',
+						element: <AdminRoute><AirTicketClientDetails></AirTicketClientDetails></ AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_client_details/${params.id}`),
+					},
+					{
 						path: '/admin/client_transections/:id',
 						element: <AdminRoute><ClientTransections></ClientTransections></ AdminRoute>,
 						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+					},
+					{
+						path: '/admin/air_ticket_client_transections/:id',
+						element: <AdminRoute><AirTicketClientTransections></AirTicketClientTransections></ AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_client_details/${params.id}`),
 					},
 					{
 						path: '/admin/new_voucher/:id',
@@ -184,9 +214,20 @@ const router = createBrowserRouter([
 						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 					},
 					{
+						path: '/admin/air_ticket_new_voucher/:id',
+						element: <AdminRoute><AirTicketNewVoucher></AirTicketNewVoucher></ AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_client_details/${params.id}`),
+					},
+					{
 						path: '/admin/voucher/:id/:voucher_no',
 						element: <AdminRoute><Voucher></Voucher></ AdminRoute>,
 						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+
+					},
+					{
+						path: '/admin/air_ticket_voucher/:id/:voucher_no',
+						element: <AdminRoute><AirTicketVoucher></AirTicketVoucher></ AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_client_details/${params.id}`),
 
 					},
 					{

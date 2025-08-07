@@ -25,8 +25,6 @@ const SelfTransections = () => {
         year: 'numeric',
         month: 'long',
     });
-    console.log(shop_transections[0])
-    console.log(currentDate.split(' ')[0])
     const handleRevenueTransections = (transectionType) => {
         const revenue_transection_amount = parseFloat(revenue_transection_amount_ref.current.value);
         const transection_type = transectionType;
@@ -35,8 +33,7 @@ const SelfTransections = () => {
         const comment = revenue_comment_ref.current.value;
         const transection_id = String(parseInt(revenue_transection_amount)) + String(transection_type) + String(new_total_revenue_amount) + String(new_hand_on_cash);
 
-        const transectionData = { transection_id, transection_date: currentDate, transection_amount: revenue_transection_amount, transection_type, transection_explaination: comment, total_revenue_amount: new_total_revenue_amount, hand_on_cash: new_hand_on_cash }
-        console.log(transectionData);
+        const transectionData = { transection_id, transection_date: currentDate, transection_amount: revenue_transection_amount, transection_type, transection_explaination: comment, total_revenue_amount: new_total_revenue_amount, hand_on_cash: new_hand_on_cash };
         Swal.fire({
             title: "Are you sure?",
             text: `You Are Adding ${transection_type} ${revenue_transection_amount} Taka `,
@@ -85,8 +82,7 @@ const SelfTransections = () => {
         const comment = expense_comment_ref.current.value;
         const transection_id = String(parseInt(expense_transection_amount)) + String(transection_type) + String(new_total_expense_amount) + String(new_hand_on_cash);
 
-        const transectionData = { transection_id, transection_date: currentDate, transection_amount: expense_transection_amount, transection_type, transection_explaination: comment, total_expense_amount: new_total_expense_amount, hand_on_cash: new_hand_on_cash }
-        console.log(transectionData);
+        const transectionData = { transection_id, transection_date: currentDate, transection_amount: expense_transection_amount, transection_type, transection_explaination: comment, total_expense_amount: new_total_expense_amount, hand_on_cash: new_hand_on_cash };
         Swal.fire({
             title: "Are you sure?",
             text: `You Are Adding ${transection_type} ${expense_transection_amount} Taka `,

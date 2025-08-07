@@ -73,7 +73,6 @@ const Navbar = () => {
 																	});
 																}
 																else {
-																	console.log('Something is Wrong');
 																}
 															})
 													}

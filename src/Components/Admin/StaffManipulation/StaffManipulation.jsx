@@ -9,7 +9,6 @@ const StaffManipulation = () => {
 	const allStaffs = useLoaderData();
 	const [modal, setModal] = useState(false);
 	const [staffId, setStaffId] = useState('');
-	console.log(staffId);
 	const navigate = useNavigate();
 	const location = useLocation();
 

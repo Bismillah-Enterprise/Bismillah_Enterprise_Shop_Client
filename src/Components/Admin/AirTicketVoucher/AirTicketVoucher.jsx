@@ -5,7 +5,7 @@ import { Link, useLoaderData, useLocation, useNavigate, useParams } from 'react-
 import Swal from 'sweetalert2';
 import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 
-const Voucher = () => {
+const AirTicketVoucher = () => {
     const { voucher_no } = useParams();
     const client = useLoaderData();
     const [isEdit, setIsEdit] = useState(false);
@@ -32,103 +32,6 @@ const Voucher = () => {
         month: 'long',
     });
 
-
-    // Add new products functions
-
-
-    const [products, setProducts] = useState([
-        ...matchedVoucher.products
-    ]);
-    const [voucher_calculation, set_voucher_calculation] = useState({
-
-    })
-    const totalBill = products.reduce((sum, item) => sum + item.total, 0);
-
-    const discount_amount_ref = useRef();
-    const paid_amount_ref = useRef();
-    const status_ref = useRef();
-
-
-    // Handle input change for each field
-    const handleChange = (index, field, value) => {
-        const newProducts = [...products];
-        newProducts[index][field] = value;
-
-        // auto-calculate total
-        const quantity = parseFloat(newProducts[index].quantity || 0);
-        const rate = parseFloat(newProducts[index].rate || 0);
-        newProducts[index].total = parseFloat((quantity * rate).toFixed(2));
-
-        setProducts(newProducts);
-    };
-    // updated code
-
-    const total = totalBill; // Replace this with your actual total bill
-
-    const [Ndiscount, setNDiscount] = useState(0);
-    const [Npaid, setNPaid] = useState(0);
-    const [Ndue, setNDue] = useState(total);
-    const [status, setStatus] = useState('Unpaid');
-    // updated code
-
-    // Add new product row
-    const addProduct = () => {
-        setIsEdit(true);
-        setProducts([...products, { product_name: '', quantity: '', rate: '', total: 0 }]);
-    };
-    const handleNChange = (index, field, value) => {
-        const newProducts = [...products];
-        newProducts[index][field] = value;
-
-        // auto-calculate total
-        const quantity = parseFloat(newProducts[index].quantity || 0);
-        const rate = parseFloat(newProducts[index].rate || 0);
-        newProducts[index].total = parseFloat((quantity * rate).toFixed(2));
-
-        setProducts(newProducts);
-    };
-    const handleEditVoucher = (vn) => {
-        const voucher = {
-            voucher_no: vn,
-            products,
-            total: parseFloat(totalBill.toFixed(2)),
-            due_amount: parseFloat((totalBill - matchedVoucher.paid_amount - matchedVoucher.discount).toFixed(2)),
-            status: 'Unpaid'
-        }
-        Swal.fire({
-            title: "Are you sure?",
-            text: `You Are Adding Those Items`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, I am Sure"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/edit_voucher/${client._id}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(voucher)
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.acknowledged) {
-                            navigate(location?.pathname);
-                            setIsEdit(false);
-                            Swal.fire({
-                                position: "center",
-                                icon: "success",
-                                title: "Voucher Edited Successfully",
-                                showConfirmButton: false,
-                                timer: 1000
-                            })
-                        }
-                    })
-            }
-        })
-    }
-
-    // End Add new products functions
     const transection_amount_ref = useRef();
     const payment_status_ref = useRef();
     const more_discount_ref = useRef();
@@ -136,15 +39,19 @@ const Voucher = () => {
 
     const handleDiscountPaidChange = () => {
         const discountVal = parseFloat(more_discount_ref.current.value || 0);
+        const paidVal = parseFloat(transection_amount_ref.current.value || 0);
         const totalDiscount = parseFloat(matchedVoucher.discount + discountVal)
-        const totalDue = parseFloat(matchedVoucher.due_amount - discountVal)
+        const totalDue = parseFloat(matchedVoucher.due_amount - discountVal - paidVal)
         setDiscount(parseFloat(totalDiscount.toFixed(2)));
         setDue(parseFloat(totalDue.toFixed(2)));
     };
     const handlePaidChange = () => {
+        const discountVal = parseFloat(more_discount_ref.current.value || 0);
         const paidVal = parseFloat(transection_amount_ref.current.value || 0);
-        const totalPaid = parseFloat(matchedVoucher.paid_amount + paidVal)
+        const totalPaid = parseFloat(matchedVoucher.paid_amount + paidVal);
+        const totalDue = parseFloat(matchedVoucher.due_amount - paidVal - discountVal)
         setPaid(parseFloat(totalPaid.toFixed(2)));
+        setDue(parseFloat(totalDue.toFixed(2)));
     };
 
     const handlePrint = () => {
@@ -202,7 +109,7 @@ const Voucher = () => {
             paid_amount: paid,
             transection_amount: parseFloat(transectionAmount),
             due: parseFloat((matchedVoucher.due_amount - transectionAmount - moreDiscountAmount).toFixed(2)),
-            payment_status: matchedVoucher.total <= (discount + paid) ? 'Paid' : 'Unpaid',
+            payment_status: matchedVoucher.ticket_price <= (discount + paid) ? 'Paid' : 'Unpaid',
             voucher_no: `${voucher_no}`,
             discount: discount
         }
@@ -216,7 +123,7 @@ const Voucher = () => {
             confirmButtonText: "Yes, I am Sure"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/take_payment/${id}`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_take_payment/${id}`, {
                     method: 'PUT',
                     headers: {
                         'content-type': 'application/json'
@@ -257,7 +164,7 @@ const Voucher = () => {
                 <div className='text-pink-200 flex flex-col gap-5 px-8 pt-0 pb-7 items-center h-full w-full'>
                     <div className='mt-2 w-full'>
                         <div className='flex items-center justify-between'>
-                            <h1 className='lg:text-lg font-semibold mb-2'>Bill: {matchedVoucher.total}</h1>
+                            <h1 className='lg:text-lg font-semibold mb-2'>Bill: {matchedVoucher.ticket_price}</h1>
                             <h1 className='lg:text-lg font-semibold mb-2'>Discount: {discount}</h1>
                         </div>
                         <div className='flex items-center justify-between'>
@@ -269,7 +176,6 @@ const Voucher = () => {
                         <h1 className='lg:text-lg font-semibold mb-2'>More Discount</h1>
                         <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
                             <NumericFormat
-                                defaultValue={0}
                                 getInputRef={more_discount_ref}
                                 onChange={handleDiscountPaidChange}
                                 className="outline-none w-full h-full"
@@ -302,7 +208,7 @@ const Voucher = () => {
             {/* end modal */}
             <div onClick={() => { setModal(false) }}>
                 <div className='flex items-center justify-start'>
-                    <Link to={`/admin/client_details/${client._id}`}>
+                    <Link to={`/admin/air_ticket_client_details/${client._id}`}>
                         <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                             Back
                         </button>
@@ -332,39 +238,26 @@ const Voucher = () => {
                         <table className="text-pink-200 min-w-[380px] sm:min-w-[100%]">
                             <thead>
                                 <tr className="text-pink-300">
-                                    <th className="p-2 border">SL</th>
-                                    <th className="p-2 border">Product Name</th>
-                                    <th className="p-2 border">Quantity</th>
-                                    <th className="p-2 border">Rate</th>
-                                    <th className="p-2 border">Total</th>
+                                    <th className="border p-2">Destination</th>
+                                    <th className="border p-2">Flight Date</th>
+                                    <th className="border p-2">Ticket Price</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {matchedVoucher.products?.map((product, index) => (
-                                    <tr key={index}>
-                                        <td className="p-2 border">{index + 1}</td>
-                                        <td className="p-2 border">{product.product_name}</td>
-                                        <td className="p-2 border">{product.quantity}</td>
-                                        <td className="p-2 border">
-                                            {product.rate.$numberDouble || product.rate}
-                                        </td>
-                                        <td className="p-2 border">{product.total}</td>
-                                    </tr>
-                                ))}
-                                <tr className='font-semibold text-pink-300'>
-                                    <td className="p-2 border" colSpan={3}></td>
-                                    <td className="p-2 border text-right">Total Bill</td>
-                                    <td className="p-2 border">{matchedVoucher.total}</td>
+                                <tr>
+                                    <td className="p-2 border">{matchedVoucher.destination}</td>
+                                    <td className="p-2 border">{matchedVoucher.flight_date}</td>
+                                    <td className="p-2 border">{matchedVoucher.ticket_price}</td>
                                 </tr>
                                 <tr className="text-right font-semibold text-pink-300">
-                                    <td colSpan="3" className="p-2 border"></td>
+                                    <td className="p-2 border"></td>
                                     <td className="p-2 border">Discount</td>
                                     <td className="p-2 border text-right">
                                         {matchedVoucher.discount}
                                     </td>
                                 </tr>
                                 <tr className="text-right font-semibold text-pink-300">
-                                    <td colSpan="3" className="p-2 border"></td>
+                                    <td className="p-2 border"></td>
                                     <td className="p-2 border">Paid Amount</td>
                                     <td className="p-2 border text-right">
                                         {matchedVoucher.paid_amount}
@@ -372,7 +265,7 @@ const Voucher = () => {
                                 </tr>
 
                                 <tr className="text-right font-semibold text-pink-300">
-                                    <td colSpan="3" className="p-2 border text-center">{matchedVoucher.payment_status}</td>
+                                    <td className="p-2 border text-center">{matchedVoucher.payment_status}</td>
                                     <td className="p-2 border">Due Amount</td>
                                     <td className="p-2 border text-right">
                                         {matchedVoucher.due_amount}
@@ -385,73 +278,6 @@ const Voucher = () => {
                         <p className="text-red-600 mt-4">Voucher not found.</p>
                     )}
                 </div>
-                {/* -------------- Add more products */}
-
-
-                <div className={`${!isEdit ? 'hidden' : 'flex'} items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg`}>
-                    <table className="text-pink-200 min-w-[380px] sm:min-w-[100%]">
-                        <thead>
-                            <tr className="text-pink-300">
-                                <th className="border p-2">SL</th>
-                                <th className="border p-2">Product</th>
-                                <th className="border p-2">Qty</th>
-                                <th className="border p-2">Rate</th>
-                                <th className="border p-2">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products?.map((item, index) => (
-                                <tr key={index}>
-                                    <td className="p-2">
-                                        {index + 1}
-                                    </td>
-                                    <td className="p-2">
-                                        <input
-                                            type="text"
-                                            value={item.product_name}
-                                            onChange={(e) => handleNChange(index, 'product_name', e.target.value)}
-                                            className="w-full p-1 outline-none"
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={item.quantity}
-                                            onChange={(e) => handleNChange(index, 'quantity', e.target.value)}
-                                            className='outline-none w-full h-full'
-                                            placeholder='Enter Qantity'
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={item.rate}
-                                            onValueChange={(values) => handleNChange(index, 'rate', values.floatValue)}
-                                            className="outline-none w-full h-full"
-                                            placeholder="Enter Rate"
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                    <td className="border p-2 text-right">{item.total.toFixed(2)}</td>
-                                </tr>
-                            ))}
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
-                                <td className="p-2 border">Total Bill</td>
-                                <td className="p-2 border text-right min-w-[120px]">{totalBill.toFixed(2)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-
-
-                {/* -------------- End Add more products */}
             </div>
 
 
@@ -459,12 +285,6 @@ const Voucher = () => {
                 <div className='flex items-center justify-center gap-5'>
                     <button onClick={() => { setModal(true) }} disabled={matchedVoucher.due_amount < 1 || isEdit} className={`${isEdit ? 'hidden' : 'block'} disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold`}>
                         Take A Payment
-                    </button>
-                    <button onClick={addProduct} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                        + Add More Products
-                    </button>
-                    <button onClick={() => { handleEditVoucher(voucher_no) }} className={`${isEdit ? 'block' : 'hidden'} text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold`}>
-                        Done
                     </button>
                     <button onClick={handlePrint} className={`${isEdit ? 'hidden' : 'block'} disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold`}>
                         Print
@@ -501,47 +321,34 @@ const Voucher = () => {
                     <table className="text-black w-full">
                         <thead>
                             <tr className="text-black">
-                                <th className="p-2 border">SL</th>
-                                <th className="p-2 border">Product Name</th>
-                                <th className="p-2 border">Quantity</th>
-                                <th className="p-2 border">Rate</th>
-                                <th className="p-2 border">Total</th>
+                                <th className="border p-2 text-center">Destination</th>
+                                <th className="border p-2 text-center">Flight Date</th>
+                                <th className="border p-2 text-center">Ticket Price</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {matchedVoucher.products?.map((product, index) => (
-                                <tr key={index}>
-                                    <td className="p-2 border">{index + 1}</td>
-                                    <td className="p-2 border">{product.product_name}</td>
-                                    <td className="p-2 border">{product.quantity}</td>
-                                    <td className="p-2 border">
-                                        {product.rate.$numberDouble || product.rate}
-                                    </td>
-                                    <td className="p-2 border text-center">{product.total}</td>
-                                </tr>
-                            ))}
-                            <tr className='text-black'>
-                                <td className="p-2 border" colSpan={3}></td>
-                                <td className="p-2 border text-right">Total Bill</td>
-                                <td className="p-2 border text-center">{matchedVoucher.total}</td>
+                            <tr>
+                                <td className="p-2 border text-center">{matchedVoucher.destination}</td>
+                                <td className="p-2 border text-center">{matchedVoucher.flight_date}</td>
+                                <td className="p-2 border text-center">{matchedVoucher.ticket_price}</td>
                             </tr>
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
+                            <tr className="text-right font-semibold text-black">
+                                <td className="p-2 border"></td>
                                 <td className="p-2 border">Discount</td>
                                 <td className="p-2 border text-center">
                                     {matchedVoucher.discount}
                                 </td>
                             </tr>
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
+                            <tr className="text-right font-semibold text-black">
+                                <td className="p-2 border"></td>
                                 <td className="p-2 border">Paid Amount</td>
                                 <td className="p-2 border text-center">
                                     {matchedVoucher.paid_amount}
                                 </td>
                             </tr>
 
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border text-center">{matchedVoucher.payment_status}</td>
+                            <tr className="text-right font-semibold text-black">
+                                <td className="p-2 border text-center">{matchedVoucher.payment_status}</td>
                                 <td className="p-2 border">Due Amount</td>
                                 <td className="p-2 border text-center">
                                     {matchedVoucher.due_amount}
@@ -564,4 +371,4 @@ const Voucher = () => {
     );
 };
 
-export default Voucher;
+export default AirTicketVoucher;

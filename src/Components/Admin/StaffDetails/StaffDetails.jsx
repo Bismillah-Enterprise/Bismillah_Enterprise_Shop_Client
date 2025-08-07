@@ -23,7 +23,6 @@ const StaffDetails = () => {
 		year: 'numeric',
 		month: 'long',
 	});
-	console.log(withdrawal_amount, typeof withdrawal_amount)
 	const handleTransections = (id) => {
 		const transection_amount = parseFloat(transection_amount_ref.current.value);
 		const transection_type = transection_type_ref.current.value;
@@ -43,7 +42,6 @@ const StaffDetails = () => {
 			available_balance: parseFloat(newReceiveableAmount.toFixed(2)),
 			comment
 		}
-		console.log(newReceiveableAmount, typeof newReceiveableAmount)
 		Swal.fire({
 			title: "Are you sure?",
 			text: `You Are Giving ${transection_amount} Taka ${transection_type} to ${name}`,

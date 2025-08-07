@@ -8,7 +8,6 @@ const useShopCode = () => {
 		fetch(`https://bismillah-enterprise-server.onrender.com/shop_code/${import.meta.env.VITE_shop_code_object_id}`)
 			.then(res => res.json())
 			.then(data => {
-				console.log(data);
 				setShopCode(data[0].shop_code)
 			})
 	}, [user]);

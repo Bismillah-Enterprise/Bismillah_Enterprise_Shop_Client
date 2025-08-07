@@ -3,7 +3,7 @@ import { MdOutlineCancel } from 'react-icons/md';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const ClientCorner = () => {
+const AirTicketClient = () => {
     const loadClient = useLoaderData();
     const [allClient, setAllClient] = useState(loadClient);
     const location = useLocation();
@@ -20,7 +20,7 @@ const ClientCorner = () => {
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/client/${id}`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_client/${id}`, {
                     method: 'DELETE'
                 })
                     .then(res => res.json())
@@ -68,8 +68,8 @@ const ClientCorner = () => {
                 </div>
             </div>
             <div className='flex items-center justify-center gap-5 mt-5'>
-                <Link to={location.pathname.includes('admin') ? `/admin/new_client` : `/new_client`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client</Link>
-                <Link to={location.pathname.includes('admin') ? `/admin/new_client_new_voucher` : `/new_client_new_voucher`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client With New Voucher</Link>
+                <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_new_client` : `/new_client`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client</Link>
+                <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_new_client_new_voucher` : `/new_client_new_voucher`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client With New Voucher</Link>
             </div>
             {
                 allClient?.map((client, index) =>
@@ -80,13 +80,13 @@ const ClientCorner = () => {
                                 <div>
                                     <h1 className='font-semibold md:text-xl'>{client.name}</h1>
                                     <div className='flex items-center gap-3 flex-col lg:flex-row'>
-                                        <h1 className='font-semibold md:text-md'>{client.on_behalf}</h1>
+                                        <h1 className='font-semibold md:text-md'>{client?.vouchers[0]?.destination}</h1>
                                         <h1 className='font-semibold md:text-md'>{client.mobile_no}</h1>
                                     </div>
                                 </div>
                             </div>
                             <div className='flex justify-end lg:flex-row gap-4 col-span-1'>
-                                <Link to={location.pathname.includes('admin') ? `/admin/client_details/${client?._id}` : `/client_details/${client?._id}`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>View Details</Link>
+                                <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_client_details/${client?._id}` : `/client_details/${client?._id}`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>View Details</Link>
                                 <button onClick={() => { handleDelete(client?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>Delete</button>
                             </div>
                         </div>
@@ -96,4 +96,4 @@ const ClientCorner = () => {
     );
 };
 
-export default ClientCorner;
+export default AirTicketClient;

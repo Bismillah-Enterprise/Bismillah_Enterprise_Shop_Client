@@ -26,6 +26,23 @@ const Home = () => {
 	});
 	const today_only_date_number = parseInt(currentDate.split(' ')[1].split(',')[0]);
 	useEffect(() => {
+		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
+			.then(bonusRes => bonusRes.json())
+			.then(bonusData => {
+				if (bonusData.date !== currentDate) {
+					fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
+						method: 'PUT',
+						headers: { 'content-type': 'application/json' },
+						body: JSON.stringify({ entry_type: 'new day', date: currentDate }),
+					}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
+						if (firstEntryData.acknowledged) {
+
+						}
+					})
+				}
+			})
+	}, [])
+	useEffect(() => {
 		setDateCheckLoading(true);
 		const todayFullDate = new Date();
 		const todayOnlyDate = todayFullDate.toLocaleDateString('en-BD', { day: 'numeric' });
@@ -34,8 +51,6 @@ const Home = () => {
 			.then(res => res.json())
 			.then(data => {
 				const { _id, today_date, name, hour_rate, last_month_due, withdrawal_amount, today_enter1_time, today_exit1_time, bonus, available_balance, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, total_bonus, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = data;
-				console.log(today_date, todayOnlyDateIntFormat)
-				console.log(today_date !== todayOnlyDateIntFormat)
 				if (today_date !== todayOnlyDateIntFormat) {
 					const TodaySummary = {
 						currentDate,
@@ -68,7 +83,6 @@ const Home = () => {
 						.then(res => res.json())
 						.then(() => {
 							setDateCheckLoading(false);
-							console.log('submited')
 						});
 				}
 				else {
@@ -80,7 +94,7 @@ const Home = () => {
 
 	}, [user])
 
-	if (userHookLoading && loading ) {
+	if (userHookLoading && loading) {
 		return (<div className='h-full rounded-2xl overflow-hidden'><Loading></Loading></div>);
 	}
 	else {
@@ -116,7 +130,7 @@ const Home = () => {
 				{/* This wrapper div takes remaining space and centers the glow box */}
 				<div className="flex-1 flex items-center justify-center w-full">
 					<div className="border-2 border-white rounded-2xl w-[300px] lg:w-[500px] h-[200px] lg:h-[300px] flex items-center justify-center div-glow">
-						<h1 className="text-center text-2xl lg:text-4xl font-semibold">
+						<h1 className="cursor-pointer text-center text-2xl lg:text-4xl font-semibold">
 							Welcome <br /> To The Shop
 						</h1>
 					</div>

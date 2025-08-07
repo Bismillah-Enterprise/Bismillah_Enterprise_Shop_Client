@@ -10,7 +10,6 @@ const StaffRoute = ({children}) => {
 	const [staffLoading, setStaffLoading] = useState(false);
 	const location = useLocation();
 	const navigate = useNavigate();
-	console.log(siteUser);
 
 	useEffect(() => {
 		setLoading(true);

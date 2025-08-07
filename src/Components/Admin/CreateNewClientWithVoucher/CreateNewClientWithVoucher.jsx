@@ -11,6 +11,8 @@ const CreateNewClientWithVoucher = () => {
     const [clientName, setClientName] = useState('');
     const [clientAddress, setClientAddress] = useState('');
     const [clientNumber, setClientNumber] = useState('');
+    const [value, setValue] = useState('');
+    const [numberAlert, setNumberAlert] = useState(false);
     const handleClientInfoChange = (name) => {
         if (name = 'clientName') {
             setClientName(clientNameRef.current.value);
@@ -29,7 +31,11 @@ const CreateNewClientWithVoucher = () => {
         const phoneNo = phoneNoRef.current.value;
         const newSlNo = String(voucherSl + 1);
         const discountAmount = parseFloat(discount_amount_ref.current.value || '0');
-        // console.log(discountAmount);
+        const pn = `0${phoneNo}`
+        if (pn.length < 11 || pn.length > 11 || value.charAt(0) !== '1') {
+            setNumberAlert(true);
+            return;
+        }
         const voucher = {
             date: `${currentDate}, ${Time}`,
             voucher_no: newSlNo,
@@ -109,7 +115,8 @@ const CreateNewClientWithVoucher = () => {
                             showConfirmButton: false,
                             timer: 1000
                         }).then(() => {
-                            navigate(location?.state?.pathname)
+                            setNumberAlert(false);
+                            navigate(location?.state?.pathname);
                         })
                     });
             }
@@ -239,7 +246,7 @@ const CreateNewClientWithVoucher = () => {
     const handleSubmit = async () => {
         const newSlNo = voucherSl + 1;
         const discountAmount = parseFloat(discount_amount_ref.current.value || '0');
-        // console.log(discountAmount);
+
         const voucher = {
             date: `${currentDate}, ${Time}`,
             voucher_no: newSlNo,
@@ -364,8 +371,20 @@ const CreateNewClientWithVoucher = () => {
                             </div>
                             <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
                                 <p>Phone Number</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
-                                    <input onChange={() => { handleClientInfoChange('clientNumber') }} ref={phoneNoRef} type="text" className='outline-none w-full' />
+                                <div className={`${numberAlert ? 'border-red-500' : ''} px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full`}>
+                                    <NumericFormat
+                                        getInputRef={phoneNoRef}
+                                        onChange={() => { handleClientInfoChange('clientNumber') }}
+                                        className="outline-none w-full h-full"
+                                        placeholder="Enter Phone Number"
+                                        format="0##########"
+                                        allowEmptyFormatting={false}
+                                        mask="_"
+                                        onValueChange={(values) => setValue(values.value)}
+                                        isAllowed={(values) => {
+                                            return values.value.length <= 11;
+                                        }}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -516,12 +535,12 @@ const CreateNewClientWithVoucher = () => {
                     </h1>
                 </div>
                 <div className="flex items-center justify-center mt-1 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-md">
-                    <table className="text-black w-full">
-                        <div className='absolute w-full flex items-center justify-center'>
-                            <div className=''>
-                                <h1 className='text-7xl font-bold opacity-20'>{status}</h1>
-                            </div>
+                    <div className='absolute w-full flex items-center justify-center'>
+                        <div className=''>
+                            <h1 className='text-7xl font-bold opacity-20'>{status}</h1>
                         </div>
+                    </div>
+                    <table className="text-black w-full">
                         <thead>
                             <tr className="text-black">
                                 <th className="border p-2">Product</th>

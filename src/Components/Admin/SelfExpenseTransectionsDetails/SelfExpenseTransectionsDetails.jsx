@@ -4,9 +4,7 @@ import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom'
 
 const SelfExpenseTransectionsDetails = () => {
     const shopTransections = useLoaderData();
-    console.log(shopTransections)
     const { expense_transections, total_expense_amount, month_name } = shopTransections[0];
-    console.log(expense_transections);
     const location = useLocation();
     const from = location?.state?.pathname;
     const navigate = useNavigate();

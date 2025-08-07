@@ -116,7 +116,6 @@ const UserRequest = () => {
 		const hour_rate = parseFloat(hour_rate_field.current.value);
 		const uid = user_uid_field.current.value;
 		const id = user_old_id_field.current.value;
-		console.log(id)
 		const userAllData = {
 			name,
 			email,

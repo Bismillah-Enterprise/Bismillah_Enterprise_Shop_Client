@@ -4,7 +4,7 @@ import { data, Link, useLoaderData, useLocation, useNavigate } from 'react-route
 import Swal from 'sweetalert2';
 import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 
-const NewVoucher = () => {
+const AirTicketNewVoucher = () => {
     const client = useLoaderData();
     const location = useLocation();
     const from = location?.state?.pathname;
@@ -17,12 +17,7 @@ const NewVoucher = () => {
                 setVoucherSl(data.sl_no)
             })
     }, [])
-    const toBanglaNumber = (input) => {
-        const banglaDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
-        return input.toString().split('').map(char => {
-            return /\d/.test(char) ? banglaDigits[char] : char;
-        }).join('');
-    };
+
     const now = new Date();
     const Time = now.toLocaleTimeString('en-BD', {
         hour: '2-digit',
@@ -34,18 +29,20 @@ const NewVoucher = () => {
         year: 'numeric',
         month: 'long',
     });
-    const [products, setProducts] = useState([
-        { product_name: '', quantity: '', rate: '', total: 0 },
-    ]);
-    const [voucher_calculation, set_voucher_calculation] = useState({
 
-    })
-    const totalBill = products.reduce((sum, item) => sum + item.total, 0);
-
+    const destination_ref = useRef();
+    const flight_date_ref = useRef();
     const discount_amount_ref = useRef();
+    const ticket_price_ref = useRef();
     const paid_amount_ref = useRef();
     const status_ref = useRef();
     const voucherPrintRef = useRef();
+    // const [products, setProducts] = useState([
+    //     { destination: '', flight_date: '', ticket_price: 0 },
+    // ]);
+    // const addProduct = () => {
+    //     setProducts([...products, { product_name: '', quantity: '', rate: '', total: 0 }]);
+    // };
 
     const handlePrint = () => {
         const content = voucherPrintRef.current.innerHTML;
@@ -94,32 +91,20 @@ const NewVoucher = () => {
         };
     };
 
-    // Handle input change for each field
-    const handleChange = (index, field, value) => {
-        const newProducts = [...products];
-        newProducts[index][field] = value;
-
-        // auto-calculate total
-        const quantity = parseFloat(newProducts[index].quantity || 0);
-        const rate = parseFloat(newProducts[index].rate || 0);
-        newProducts[index].total = parseFloat((quantity * rate).toFixed(2));
-
-        setProducts(newProducts);
-    };
-    // updated code
-
-    const total = totalBill; // Replace this with your actual total bill
-
-    const [discount, setDiscount] = useState(0);
-    const [paid, setPaid] = useState(0);
-    const [due, setDue] = useState(total);
+    const [destination, setDestination] = useState('');
+    const [flightDate, setFlightDate] = useState('');
+    const [ticketPrice, setTicketPrice] = useState();
+    const [discount, setDiscount] = useState();
+    const [paid, setPaid] = useState();
+    const [due, setDue] = useState(0);
     const [status, setStatus] = useState('Unpaid');
-
 
     const handleDiscountPaidChange = () => {
         const discountVal = parseFloat((discount_amount_ref.current.value) || 0);
+        const ticketPriceVal = parseFloat((ticket_price_ref.current.value) || 0);
         const paidVal = parseFloat(paid_amount_ref.current.value || 0);
-        const calculatedDue = total - discountVal - paidVal;
+        const calculatedDue = ticketPriceVal - discountVal - paidVal;
+        setTicketPrice(ticketPriceVal);
         setStatus(calculatedDue > 0 ? 'Unpaid' : 'Paid')
         setDiscount(discountVal);
         setPaid(paidVal);
@@ -127,24 +112,23 @@ const NewVoucher = () => {
     };
     // updated code
 
-    // Add new product row
-    const addProduct = () => {
-        setProducts([...products, { product_name: '', quantity: '', rate: '', total: 0 }]);
-    };
-    // Send all product data to your backend
     const handleSubmit = async () => {
         const newSlNo = voucherSl + 1;
         const discountAmount = parseFloat(discount_amount_ref.current.value || '0');
+        const ticketPrice = parseFloat(ticket_price_ref.current.value || '0');
+        const dueAmount = parseFloat(due);
         const voucher = {
             date: `${currentDate}, ${Time}`,
             voucher_no: newSlNo,
-            products,
-            total: parseFloat(totalBill.toFixed(2)),
+            destination: destination,
+            flight_date: flightDate,
+            ticket_price: ticketPrice,
             paid_amount: parseFloat(paid_amount_ref.current.value) || 0,
-            due_amount: parseFloat(paid || discount ? due.toFixed(2) : totalBill.toFixed(2)),
+            due_amount: dueAmount,
             payment_status: status,
             discount: discountAmount
         }
+        console.log(voucher);
         Swal.fire({
             title: "Are you sure?",
             text: `You Are Creating a New Voucher`,
@@ -155,7 +139,7 @@ const NewVoucher = () => {
             confirmButtonText: "Yes, I am Sure"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/new_voucher/${client._id}`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_new_voucher/${client._id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(voucher)
@@ -169,12 +153,13 @@ const NewVoucher = () => {
                                     reference_voucher: voucherSl + 1,
                                     paid_amount: paid,
                                     transection_amount: paid,
-                                    due: parseFloat(paid || discount ? due.toFixed(2) : totalBill.toFixed(2)),
+                                    due: dueAmount,
                                     payment_status: status,
                                     voucher_no: `${voucherSl + 1}`,
                                     discount: discountAmount
                                 }
-                                fetch(`https://bismillah-enterprise-server.onrender.com/take_payment/${client._id}`, {
+                                console.log(paymentDetails)
+                                fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_take_payment/${client._id}`, {
                                     method: 'PUT',
                                     headers: {
                                         'content-type': 'application/json'
@@ -204,7 +189,6 @@ const NewVoucher = () => {
                                 .then(slres => slres.json())
                                 .then(slData => {
                                     if (slData.message === 'new sl set successfully') {
-                                        setProducts([{ product_name: '', quantity: '', rate: '', total: 0 }]);
                                         navigate(location?.state?.pathname);
                                         Swal.fire({
                                             position: "center",
@@ -252,64 +236,48 @@ const NewVoucher = () => {
                     </div>
                 </div>
                 <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
+                    <table className="text-pink-200 min-w-[380px] sm:min-w-[100%]">
                         <thead>
                             <tr className="text-pink-300">
-                                <th className="border p-2">SL</th>
-                                <th className="border p-2">Product</th>
-                                <th className="border p-2">Qty</th>
-                                <th className="border p-2">Rate</th>
-                                <th className="border p-2">Total</th>
+                                <th className="border p-2">Destination</th>
+                                <th className="border p-2">Flight Date</th>
+                                <th className="border p-2">Ticket Price</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {products?.map((item, index) => (
-                                <tr key={index}>
-                                    <td className="p-2">
-                                        {index + 1}
-                                    </td>
-                                    <td className="p-2">
-                                        <input
-                                            type="text"
-                                            value={item.product_name}
-                                            onChange={(e) => handleChange(index, 'product_name', e.target.value)}
-                                            className="w-full p-1 outline-none"
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={item.quantity}
-                                            onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-                                            className='outline-none w-full h-full'
-                                            placeholder='Enter Qantity'
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={item.rate}
-                                            onValueChange={(values) => handleChange(index, 'rate', values.floatValue)}
-                                            className="outline-none w-full h-full"
-                                            placeholder="Enter Rate"
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                    <td className="border p-2 text-right">{item.total.toFixed(2)}</td>
-                                </tr>
-                            ))}
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
-                                <td className="p-2 border">Total Bill</td>
-                                <td className="p-2 border text-right">{totalBill.toFixed(2)}</td>
+                            <tr>
+                                <td className="border p-2">
+                                    <input
+                                        type="text"
+                                        onChange={(e) => { setDestination(e.target.value) }}
+                                        getInputRef={destination_ref}
+                                        className="w-full p-1 outline-none"
+                                    />
+                                </td>
+                                <td className="border p-2">
+                                    <input
+                                        type="text"
+                                        onChange={(e) => { setFlightDate(e.target.value) }}
+                                        getInputRef={flight_date_ref}
+                                        className="w-full p-1 outline-none"
+                                    />
+                                </td>
+                                <td className="border p-2">
+                                    <NumericFormat
+                                        value={ticketPrice}
+                                        getInputRef={ticket_price_ref}
+                                        onChange={handleDiscountPaidChange}
+                                        className="outline-none w-full h-full text-center"
+                                        placeholder="Enter Price"
+                                        allowNegative={false}
+                                        decimalScale={2}
+                                        fixedDecimalScale={false}
+                                        thousandSeparator={false}
+                                    />
+                                </td>
                             </tr>
                             <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
+                                <td className="p-2 border"></td>
                                 <td className="p-2 border">Discount</td>
                                 <td className="p-2 border text-right">
                                     <NumericFormat
@@ -326,7 +294,7 @@ const NewVoucher = () => {
                                 </td>
                             </tr>
                             <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
+                                <td className="p-2 border"></td>
                                 <td className="p-2 border">Paid Amount</td>
                                 <td className="p-2 border text-right">
                                     <NumericFormat
@@ -344,19 +312,19 @@ const NewVoucher = () => {
                             </tr>
 
                             <tr className="text-right font-semibold">
-                                <td colSpan="3" ref={status_ref} className="p-2 border text-center">{status}</td>
+                                <td ref={status_ref} className="p-2 border text-center">{status}</td>
                                 <td className="p-2 border">Due Amount</td>
                                 <td className="p-2 border text-right">
-                                    {paid || discount ? due.toFixed(2) : totalBill.toFixed(2)}
+                                    {due}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
                 <div className='flex items-center justify-center gap-5 mt-5'>
-                    <button onClick={addProduct} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                    {/* <button onClick={addProduct} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                         + Add Product
-                    </button>
+                    </button> */}
                     <button onClick={handleSubmit} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                         Create Voucher
                     </button>
@@ -395,93 +363,43 @@ const NewVoucher = () => {
                     <table className="text-black w-full">
                         <thead>
                             <tr className="text-black">
-                                <th className="border p-2">Product</th>
-                                <th className="border p-2">Qty</th>
-                                <th className="border p-2">Rate</th>
-                                <th className="border p-2">Total</th>
+                                <th className="border p-2">Destination</th>
+                                <th className="border p-2">Flight Date</th>
+                                <th className="border p-2">Ticket Price</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {products?.map((item, index) => (
-                                <tr key={index}>
-                                    <td className="border p-2">
-                                        <input
-                                            type="text"
-                                            value={item.product_name}
-                                            onChange={(e) => handleChange(index, 'product_name', e.target.value)}
-                                            className="w-full p-1 "
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={item.quantity}
-                                            onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-                                            className='outline-none w-full h-full text-center'
-                                            placeholder='Enter Qantity'
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={item.rate}
-                                            onValueChange={(values) => handleChange(index, 'rate', values.floatValue)}
-                                            className="outline-none w-full h-full text-center"
-                                            placeholder="Enter Rate"
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                    <td className="border p-2 text-center">{item.total.toFixed(2)}</td>
-                                </tr>
-                            ))}
-                            <tr className="text-right font-semibold">
-                                <td colSpan="2" className="p-2 border"></td>
-                                <td className="p-2 border">Total Bill</td>
-                                <td className="p-2 border text-center">{totalBill.toFixed(2)}</td>
-                            </tr>
-                            <tr className="text-right font-semibold">
-                                <td colSpan="2" className="p-2 border"></td>
-                                <td className="p-2 border">Discount</td>
-                                <td className="p-2 border text-right">
-                                    <NumericFormat
-                                        value={discount}
-                                        onChange={handleDiscountPaidChange}
-                                        className='outline-none w-full h-full text-center'
-                                        placeholder='Enter discount'
-                                        allowNegative={false}
-                                        decimalScale={2}
-                                        fixedDecimalScale={false}
-                                        thousandSeparator={false}
-                                    />
+                            <tr>
+                                <td className="border p-2 text-center">
+                                    {destination}
+                                </td>
+                                <td className="border p-2 text-center">
+                                    {flightDate}
+                                </td>
+                                <td className="border p-2 text-center">
+                                    {ticketPrice}
                                 </td>
                             </tr>
                             <tr className="text-right font-semibold">
-                                <td colSpan="2" className="p-2 border"></td>
+                                <td className="p-2 border"></td>
+                                <td className="p-2 border">Discount</td>
+                                <td className="p-2 border text-center">
+                                    {discount}
+                                </td>
+                            </tr>
+                            <tr className="text-right font-semibold">
+                                <td className="p-2 border"></td>
                                 <td className="p-2 border">Paid Amount</td>
-                                <td className="p-2 border text-right">
-                                    <NumericFormat
-                                        value={paid}
-                                        onChange={handleDiscountPaidChange}
-                                        className='outline-none w-full h-full text-center'
-                                        placeholder='Enter amount'
-                                        allowNegative={false}
-                                        decimalScale={2}
-                                        fixedDecimalScale={false}
-                                        thousandSeparator={false}
-                                    />
+                                <td className="p-2 border text-center">
+                                    {paid}
                                 </td>
                             </tr>
 
                             <tr className="text-right font-semibold">
-                                <td colSpan="2" className="p-2 border"></td>
+                                <td ref={status_ref} className="p-2 border text-center">{status}</td>
                                 <td className="p-2 border">Due Amount</td>
                                 <td className="p-2 border text-center">
-                                    {due.toFixed(2)}
+                                    {due}
                                 </td>
                             </tr>
                         </tbody>
@@ -500,4 +418,4 @@ const NewVoucher = () => {
     );
 };
 
-export default NewVoucher;
+export default AirTicketNewVoucher;

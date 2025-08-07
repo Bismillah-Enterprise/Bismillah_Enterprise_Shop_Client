@@ -53,7 +53,6 @@ const Staffs = () => {
 	const [dateCheckLoading, setDateCheckLoading] = useState(false);
 	const location = useLocation();
 	const from = location?.state?.pathname;
-	console.log(location);
 	// Time
 	const now = new Date();
 	const Time = now.toLocaleTimeString('en-BD', {
@@ -69,6 +68,23 @@ const Staffs = () => {
 		month: 'long',
 	});
 	const today_only_date_number = parseInt(currentDate.split(' ')[1].split(',')[0]);
+
+	useEffect(() => {
+		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
+			.then(bonusRes => bonusRes.json())
+			.then(bonusData => {
+				if (bonusData.date !== currentDate) {
+					fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
+						method: 'PUT',
+						headers: { 'content-type': 'application/json' },
+						body: JSON.stringify({ entry_type: 'new day', date: currentDate }),
+					}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
+						if (firstEntryData.acknowledged) {
+						}
+					})
+				}
+			})
+	}, [])
 
 	useEffect(() => {
 		setDateCheckLoading(true);
@@ -114,22 +130,6 @@ const Staffs = () => {
 		const previousEarn = parseFloat(staff.total_income || 0);
 		const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2));
 
-		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
-			.then(bonusRes => bonusRes.json())
-			.then(bonusData => {
-				console.log(bonusData.date === currentDate);
-				if (bonusData.date !== currentDate) {
-					fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
-						method: 'PUT',
-						headers: { 'content-type': 'application/json' },
-						body: JSON.stringify({ entry_type: 'new day', date: currentDate }),
-					}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
-						if (firstEntryData.acknowledged) {
-							console.log('bonus date changed')
-						}
-					})
-				}
-			})
 		fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${uid}`)
 			.then(res => res.json())
 			.then(data => {
@@ -186,7 +186,6 @@ const Staffs = () => {
 		} else {
 			setWorkSubmitButton(false); // no shift completed
 		}
-		console.log(workSubmitButton);
 	}, [user, staff])
 
 	useEffect(() => {
@@ -203,7 +202,6 @@ const Staffs = () => {
 			.then(res => res.json())
 			.then(currentLocationData => {
 				setCurrentLocation(currentLocationData);
-				console.log(currentLocationData)
 				navigator.geolocation.getCurrentPosition(
 					(position) => {
 						const { latitude, longitude, accuracy } = position.coords;
@@ -216,36 +214,29 @@ const Staffs = () => {
 						);
 
 						const isOwnStaffPage = location.pathname === `/staff/uid_query/${user?.uid}`;
-						console.log(isOwnStaffPage);
 
 						// CASE 1: Admin viewing own staff page → check accuracy + distance
 						if (user_category === 'admin' && isOwnStaffPage) {
 							if (accuracy <= 100 && distance <= currentLocationData?.shop_range) {
 								setIsAllowed(true);
-								console.log('Step 1: Admin viewing own page with valid location');
 							} else {
 								setIsAllowed(false);
-								console.log('Step 1 failed: Admin viewing own page but invalid location');
 							}
 							setLocationLoading(false);
 						}
 
 						// CASE 2: Admin viewing someone else’s staff page → allow directly
-						console.log(user_category === 'admin', !isOwnStaffPage);
-						console.log(user_category)
+
 						if (user_category === 'admin' && !isOwnStaffPage) {
 							setIsAllowed(true);
-							console.log('Step 2: Admin viewing other staff page, allowed without location check');
 							setLocationLoading(false);
 						}
 
 						// CASE 3: Non-admin (e.g. staff) → must pass location check
 						if (accuracy <= 100 && distance <= currentLocationData?.shop_range) {
 							setIsAllowed(true);
-							console.log('Step 3: Staff in valid location');
 						} else {
 							setIsAllowed(false);
-							console.log('Step 4: Staff in invalid location');
 						}
 						setLocationLoading(false);
 
@@ -283,7 +274,6 @@ const Staffs = () => {
 				})
 					.then((res) => res.json())
 					.then((data) => {
-						console.log(data);
 						Swal.fire({
 							position: 'center',
 							icon: 'success',
@@ -407,7 +397,6 @@ const Staffs = () => {
 				})
 					.then((res) => res.json())
 					.then(async (data) => {
-						console.log(name)
 						if (data.acknowledged && name === 'additional_enter_time') {
 							const parseTime = (timeStr) => {
 								if (!timeStr) return null;
@@ -419,29 +408,21 @@ const Staffs = () => {
 							};
 
 							let totalMinutes = 0;
-							console.log(additional_exit_time, Time)
 							const exit = parseTime(additional_exit_time);
 							const enter = parseTime(Time);
-							console.log(exit, enter);
 							if (exit !== null && enter !== null && enter > exit) {
 								totalMinutes += enter - exit;
 							}
-							console.log(totalMinutes);
 
 							const previousAdditionalTotalMinutes = (additional_movement_hour || 0) * 60 + (additional_movement_minute || 0);
-							console.log(previousAdditionalTotalMinutes);
 							const updatedAdditionalTotalMinutes = previousAdditionalTotalMinutes + totalMinutes;
-							console.log(updatedAdditionalTotalMinutes)
 							const updatedAdditionalTotalHours = Math.floor(updatedAdditionalTotalMinutes / 60);
-							console.log(updatedAdditionalTotalHours)
 							const updatedAdditionalTotalMinutesRemainder = updatedAdditionalTotalMinutes % 60;
-							console.log(updatedAdditionalTotalMinutesRemainder)
 
 							const AdditionalMovementSummary = {
 								additional_movement_hour: updatedAdditionalTotalHours,
 								additional_movement_minute: updatedAdditionalTotalMinutesRemainder,
 							};
-							console.log(AdditionalMovementSummary);
 							await fetch(`https://bismillah-enterprise-server.onrender.com/additional_movement_submit/${_id}`, {
 								method: 'PUT',
 								headers: {
@@ -527,9 +508,7 @@ const Staffs = () => {
 				}
 
 				if (additional_movement_hour || additional_movement_minute) {
-					console.log(totalMinutes)
 					totalMinutes = totalMinutes - (additional_movement_hour * 60) - additional_movement_minute;
-					console.log(totalMinutes)
 				}
 
 				const today_hours = Math.floor(totalMinutes / 60);
@@ -542,42 +521,20 @@ const Staffs = () => {
 				await fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
 					.then(bonusres => bonusres.json())
 					.then(bonusdata => {
-						console.log(bonusdata)
 						if (bonusdata.first_entry?.uid === uid && !bonusdata.second_entry.time) {
 							today_bonus = 50;
 							total_bonus = bonus + 50;
 							today_earned = today_earned + 50;
-							fetch(`https://bismillah-enterprise-server.onrender.com/clear_bonus`, {
-								method: 'PUT',
-								headers: {
-									'content-type': 'application/json'
-								},
-								body: JSON.stringify({ name: 'first_entry' })
-							})
 						}
 						else if (bonusdata.first_entry?.uid === uid && bonusdata.second_entry.time) {
 							today_bonus = 30;
 							total_bonus = bonus + 30;
 							today_earned = today_earned + 30;
-							fetch(`https://bismillah-enterprise-server.onrender.com/clear_bonus`, {
-								method: 'PUT',
-								headers: {
-									'content-type': 'application/json'
-								},
-								body: JSON.stringify({ name: 'first_entry' })
-							})
 						}
 						else if (bonusdata.first_entry.time && bonusdata.second_entry?.uid === uid) {
 							today_bonus = 20;
 							total_bonus = bonus + 20;
 							today_earned = today_earned + 20;
-							fetch(`https://bismillah-enterprise-server.onrender.com/clear_bonus`, {
-								method: 'PUT',
-								headers: {
-									'content-type': 'application/json'
-								},
-								body: JSON.stringify({ name: 'second_entry' })
-							})
 						}
 						else if (!bonusdata.first_entry.time && !bonusdata.second_entry.time) {
 							today_bonus = 0;
@@ -614,7 +571,6 @@ const Staffs = () => {
 					total_income: parseFloat(updatedEarn.toFixed(2)),
 					today_date: today_only_date_number
 				};
-				console.log(TodaySummary)
 
 				// Save to database
 				fetch(`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`, {
