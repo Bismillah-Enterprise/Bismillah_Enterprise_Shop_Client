@@ -59,7 +59,7 @@ const CreateNewClientWithVoucher = () => {
         const newClient = {
             name: clientName,
             on_behalf: onBehalf,
-            mobile_no: phoneNo,
+            mobile_no: pn,
             address,
             vouchers: [voucher],
             transections: [paymentDetails]
@@ -524,7 +524,7 @@ const CreateNewClientWithVoucher = () => {
                         <div className='flex justify-end'>
                             <div>
                                 <h1>Date: {currentDate}</h1>
-                                <h1>Mobile No: {clientNumber}</h1>
+                                <h1>Mobile No: 0{clientNumber}</h1>
                             </div>
                         </div>
                     </div>

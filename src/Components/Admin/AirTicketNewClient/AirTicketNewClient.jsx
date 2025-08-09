@@ -13,9 +13,15 @@ const AirTicketNewClient = () => {
         const clientName = clientNameRef.current.value;
         const address = addressRef.current.value;
         const phoneNo = phoneNoRef.current.value;
+        const dateOfBirth = dateOfBirthRef.current.value;
+        const passportNo = passportNoRef.current.value;
+        const dateOfExpiry = dateOfExpiryRef.current.value;
         const newClient = {
             name: clientName,
             mobile_no: `0${phoneNo}`,
+            date_of_birth: dateOfBirth,
+            passport_no: passportNo,
+            date_of_expiry: dateOfExpiry,
             address,
             vouchers: [],
             transections: []
@@ -44,8 +50,10 @@ const AirTicketNewClient = () => {
                 })
                     .then(res => res.json())
                     .then(data => {
-                        clientNameRef.current.value = ''
-                        destinationRef.current.value = '';
+                        clientNameRef.current.value = '';
+                        dateOfBirthRef.current.value = '';
+                        passportNoRef.current.value = '';
+                        dateOfExpiryRef.current.value = '';
                         addressRef.current.value = '';
                         phoneNoRef.current.value = '';
                         Swal.fire({
@@ -63,9 +71,11 @@ const AirTicketNewClient = () => {
         })
     }
     const clientNameRef = useRef();
-    const destinationRef = useRef();
     const addressRef = useRef();
     const phoneNoRef = useRef();
+    const dateOfBirthRef = useRef();
+    const passportNoRef = useRef();
+    const dateOfExpiryRef = useRef();
     return (
         <div>
             <div className='flex items-center justify-start'>
@@ -80,14 +90,31 @@ const AirTicketNewClient = () => {
                 <div className="text-pink-200 shadow-lg shadow-pink-200 flex flex-col items-center justify-center mt-10 w-fit rounded-2xl px-10 py-5">
                     <h1 className='text-lg lg:text-2xl font-semibold'>Enter Client Informations</h1>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-2'>
                             <p>Client Name</p>
                             <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
                                 <input ref={clientNameRef} type="text" className='outline-none w-full' placeholder='Enter Client Name' />
                             </div>
                         </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-2'>
+                            <p>Date of Birth</p>
+                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                <input ref={dateOfBirthRef} type="text" className='outline-none w-full' placeholder='Enter Client Date of Birth' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-2'>
+                            <p>Passport No</p>
+                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                <input ref={passportNoRef} type="text" className='outline-none w-full' placeholder='Enter Client Passport No' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-2'>
+                            <p>Date of Expiry</p>
+                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                <input ref={dateOfExpiryRef} type="text" className='outline-none w-full' placeholder='Passport Date of Expiry' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-2'>
                             <p>Phone Number</p>
                             <div className={`${numberAlert ? 'border-red-500' : ''} px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full`}>
                                 <NumericFormat
@@ -104,7 +131,7 @@ const AirTicketNewClient = () => {
                                 />
                             </div>
                         </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 col-span-2'>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-2'>
                             <p>Address</p>
                             <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
                                 <input ref={addressRef} type="text" className='outline-none w-full' placeholder='Enter Client Address' />

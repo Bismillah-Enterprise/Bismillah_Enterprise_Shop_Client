@@ -52,7 +52,7 @@ const AirTicketClient = () => {
                     </button>
                 </Link>
             </div>
-            <h2 className="text-2xl text-pink-300 font-semibold text-center">Client Corner</h2>
+            <h2 className="text-2xl text-pink-300 font-semibold text-center">Air Ticket Client Corner</h2>
             <div className='flex justify-center mt-3'>
                 <div className='flex items-center justify-center border-2 border-pink-300 w-[50%] pl-2 pr-1 py-1 rounded-2xl'>
                     <div className='flex-1'>
@@ -68,7 +68,7 @@ const AirTicketClient = () => {
                 </div>
             </div>
             <div className='flex items-center justify-center gap-5 mt-5'>
-                <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_new_client` : `/new_client`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client</Link>
+                {/* <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_new_client` : `/new_client`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client</Link> */}
                 <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_new_client_new_voucher` : `/new_client_new_voucher`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client With New Voucher</Link>
             </div>
             {

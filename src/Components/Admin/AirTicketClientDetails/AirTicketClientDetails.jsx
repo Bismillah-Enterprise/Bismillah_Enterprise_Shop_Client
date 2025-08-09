@@ -16,9 +16,15 @@ const AirTicketClientDetails = () => {
         const clientName = clientNameRef.current.value;
         const address = addressRef.current.value;
         const phoneNo = phoneNoRef.current.value;
+        const dateOfBirth = dateOfBirthRef.current.value;
+        const passportNo = passportNoRef.current.value;
+        const dateOfExpiry = dateOfExpiryRef.current.value;
         const ClientData = {
             name: clientName,
             mobile_no: `0${phoneNo}`,
+            date_of_birth: dateOfBirth,
+            passport_no: passportNo,
+            date_of_expiry: dateOfExpiry,
             address,
         }
         const pn = `0${phoneNo}`
@@ -64,20 +70,24 @@ const AirTicketClientDetails = () => {
     const clientNameRef = useRef();
     const addressRef = useRef();
     const phoneNoRef = useRef();
+    const dateOfBirthRef = useRef();
+    const passportNoRef = useRef();
+    const dateOfExpiryRef = useRef();
     return (
         <div>
-            <div className='md:grid grid-cols-3 items-center mt-5'>
-                <div className='flex items-center justify-start'>
-                    <Link to={location.pathname.includes('admin') ? '/admin/air_ticket_client_corner' : '/client_corner'}>
-                        <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                            Back
-                        </button>
-                    </Link>
-                </div>
+            <div className='flex items-center justify-start'>
+                <Link to={location.pathname.includes('admin') ? '/admin/air_ticket_client_corner' : '/client_corner'}>
+                    <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        Back
+                    </button>
+                </Link>
+            </div>
+            <div className='flex justify-center items-center mt-5'>
                 <div>
                     <h1 className='font-semibold md:text-2xl text-pink-300 text-center'>{client.name}</h1>
                     <h1 className='font-semibold md:text-sm text-pink-300 text-center'>{client.address}</h1>
-                    <h1 className='font-semibold md:text-md text-pink-300 text-center'>Destination: {client.destination}  Mobile No: {client.mobile_no}</h1>
+                    <h1 className='font-semibold md:text-md text-pink-300 text-center'>Destination: {client?.vouchers[0]?.destination},  Mobile No: {client.mobile_no}</h1>
+                    <h1 className='font-semibold md:text-md text-pink-300 text-center'>Destination: {client?.passport_no},  Date of Expiry: {client.date_of_expiry}</h1>
                     <h1 onClick={() => { setIsEdit(true) }} className='underline cursor-pointer text-xs text-pink-300 text-center'>Edit Client Data</h1>
                 </div>
             </div>
@@ -95,6 +105,24 @@ const AirTicketClientDetails = () => {
                             </div>
                         </div>
                         <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                            <p>Client Date of Birth</p>
+                            <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full'>
+                                <input defaultValue={client.date_of_birth} ref={dateOfBirthRef} type="text" className='outline-none w-full' placeholder='Enter Date Of Birth' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
+                            <p>Client Passport No</p>
+                            <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full'>
+                                <input defaultValue={client.passport_no} ref={passportNoRef} type="text" className='outline-none w-full' placeholder='Enter Client Passport No' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
+                            <p>Date of Expiry</p>
+                            <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full'>
+                                <input defaultValue={client.date_of_expiry} ref={dateOfExpiryRef} type="text" className='outline-none w-full' placeholder='Passport Date of Expiry' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
                             <p>Phone Number</p>
                             <div className={`px-3 ${numberAlert ? 'border-red-500' : ''} border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full`}>
                                 {/* <input defaultValue={client.mobile_no} onChange={() => { handleClientInfoChange('clientNumber') }} ref={phoneNoRef} type="text" className='outline-none w-full' /> */}
@@ -113,7 +141,7 @@ const AirTicketClientDetails = () => {
                                 />
                             </div>
                         </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 col-span-2'>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
                             <p>Address</p>
                             <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300 w-full'>
                                 <input defaultValue={client.address} ref={addressRef} type="text" className='outline-none w-full' placeholder='Enter Client Address' />

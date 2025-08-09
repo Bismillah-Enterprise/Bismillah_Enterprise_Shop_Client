@@ -224,12 +224,15 @@ const AirTicketNewVoucher = () => {
                         <div className='text-lg font-semibold grid grid-cols-2 text-pink-200 min-w-[380px] sm:min-w-[70%]'>
                             <div className=''>
                                 <h1>Name: {client.name}</h1>
+                                <h1>Mobile No: {client.mobile_no}</h1>
+                                <h1>Date of Birth: {client.date_of_birth}</h1>
                                 <h1>Address: {client.address}</h1>
                             </div>
                             <div className='flex justify-end'>
                                 <div>
                                     <h1>Date: {currentDate}</h1>
-                                    <h1>Mobile No: {client.mobile_no}</h1>
+                                    <h1>Passport No: {client.passport_no}</h1>
+                                    <h1>Date of Expiry: {client.date_of_expiry}</h1>
                                 </div>
                             </div>
                         </div>
@@ -339,12 +342,15 @@ const AirTicketNewVoucher = () => {
                     <div className='text-sm font-semibold grid grid-cols-2 text-black w-full'>
                         <div className=''>
                             <h1>Name: {client.name}</h1>
+                            <h1>Mobile No: {client.mobile_no}</h1>
+                            <h1>Date of Birth: {client.date_of_birth}</h1>
                             <h1>Address: {client.address}</h1>
                         </div>
                         <div className='flex justify-end'>
                             <div>
                                 <h1>Date: {currentDate}</h1>
-                                <h1>Mobile No: {client.mobile_no}</h1>
+                                <h1>Passport No: {client.passport_no}</h1>
+                                <h1>Date of Expiry: {client.date_of_expiry}</h1>
                             </div>
                         </div>
                     </div>

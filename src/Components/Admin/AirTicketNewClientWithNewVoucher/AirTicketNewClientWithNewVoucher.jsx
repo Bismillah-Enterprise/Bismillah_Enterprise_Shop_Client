@@ -11,6 +11,9 @@ const AirTicketNewClientWithNewVoucher = () => {
     const [clientName, setClientName] = useState('');
     const [clientAddress, setClientAddress] = useState('');
     const [clientNumber, setClientNumber] = useState('');
+    const [clientDateOfBirth, setClientDateOfBirth] = useState('');
+    const [clientPassportNo, setClientPassportNo] = useState('');
+    const [clientDateOfExpiry, setClientDateOfExpiry] = useState('');
     const [value, setValue] = useState('');
     const [numberAlert, setNumberAlert] = useState(false);
 
@@ -77,11 +80,23 @@ const AirTicketNewClientWithNewVoucher = () => {
         if (name = 'clientNumber') {
             setClientNumber(phoneNoRef.current.value);
         }
+        if (name = 'dateOfBirth') {
+            setClientDateOfBirth(dateOfBirthRef.current.value);
+        }
+        if (name = 'passportNo') {
+            setClientPassportNo(passportNoRef.current.value);
+        }
+        if (name = 'dateOfExpiry') {
+            setClientDateOfExpiry(dateOfExpiryRef.current.value);
+        }
     }
     const handleCreateNewClient = () => {
         const clientName = clientNameRef.current.value;
         const address = addressRef.current.value;
         const phoneNo = phoneNoRef.current.value;
+        const dateOfBirth = dateOfBirthRef.current.value;
+        const passportNo = passportNoRef.current.value;
+        const dateOfExpiry = dateOfExpiryRef.current.value;
         const newSlNo = String(voucherSl + 1);
         const discountAmount = parseFloat(discount_amount_ref.current.value || '0');
         const ticketPrice = parseFloat(ticket_price_ref.current.value || '0');
@@ -115,7 +130,10 @@ const AirTicketNewClientWithNewVoucher = () => {
         console.log(voucher, paymentDetails)
         const newClient = {
             name: clientName,
-            mobile_no: `0${phoneNo}`,
+            mobile_no: pn,
+            date_of_birth: dateOfBirth,
+            passport_no: passportNo,
+            date_of_expiry: dateOfExpiry,
             address,
             vouchers: [voucher],
             transections: [paymentDetails]
@@ -179,6 +197,9 @@ const AirTicketNewClientWithNewVoucher = () => {
     const clientNameRef = useRef();
     const addressRef = useRef();
     const phoneNoRef = useRef();
+    const dateOfBirthRef = useRef();
+    const passportNoRef = useRef();
+    const dateOfExpiryRef = useRef();
 
     const destination_ref = useRef();
     const flight_date_ref = useRef();
@@ -226,13 +247,6 @@ const AirTicketNewClientWithNewVoucher = () => {
         setDue(calculatedDue > 0 ? parseFloat(calculatedDue.toFixed(2)) : 0);
     };
 
-    // updated code
-
-    // Add new product row
-    // const addProduct = () => {
-    //     setProducts([...products, { product_name: '', quantity: '', rate: '', total: 0 }]);
-    // };
-
     // --------------------------------------------------------
 
 
@@ -249,15 +263,32 @@ const AirTicketNewClientWithNewVoucher = () => {
             <div className='h-fit min-h-[320px] flex lg:justify-center duration-300'>
                 <div className="text-pink-200 shadow-lg shadow-pink-200 flex flex-col items-center justify-center mt-10 w-fit rounded-2xl px-10 py-5">
                     <h1 className='text-lg lg:text-2xl font-semibold'>Enter Client Informations</h1>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
-
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
                             <p>Client Name</p>
                             <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
                                 <input onChange={() => { handleClientInfoChange('clientName') }} ref={clientNameRef} type="text" className='outline-none w-full' placeholder='Enter Client Name' />
                             </div>
                         </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
+                            <p>Date of Birth</p>
+                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                <input onChange={() => { handleClientInfoChange('dateOfBirth') }} ref={dateOfBirthRef} type="text" className='outline-none w-full' placeholder='Enter Client Date of Birth' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
+                            <p>Passport No</p>
+                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                <input onChange={() => { handleClientInfoChange('passportNo') }} ref={passportNoRef} type="text" className='outline-none w-full' placeholder='Enter Client Passport No' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
+                            <p>Date of Expiry</p>
+                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+                                <input onChange={() => { handleClientInfoChange('dateOfExpiry') }} ref={dateOfExpiryRef} type="text" className='outline-none w-full' placeholder='Passport Date of Expiry' />
+                            </div>
+                        </div>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
                             <p>Phone Number</p>
                             <div className={`${numberAlert ? 'border-red-500' : ''} px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full`}>
                                 <NumericFormat
@@ -275,7 +306,7 @@ const AirTicketNewClientWithNewVoucher = () => {
                                 />
                             </div>
                         </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 col-span-2'>
+                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
                             <p>Address</p>
                             <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
                                 <input onChange={() => { handleClientInfoChange('clientAddress') }} ref={addressRef} type="text" className='outline-none w-full' placeholder='Enter Client Address' />
@@ -400,12 +431,15 @@ const AirTicketNewClientWithNewVoucher = () => {
                     <div className='text-sm font-semibold grid grid-cols-2 text-black w-full'>
                         <div className=''>
                             <h1>Name: {clientName}</h1>
+                            <h1>Mobile No: 0{clientNumber}</h1>
+                            <h1>Date of Birth: {clientDateOfBirth}</h1>
                             <h1>Address: {clientAddress}</h1>
                         </div>
                         <div className='flex justify-end'>
                             <div>
                                 <h1>Date: {currentDate}</h1>
-                                <h1>Mobile No: {clientNumber}</h1>
+                                <h1>Passport No: {clientPassportNo}</h1>
+                                <h1>Date of Expiry: {clientDateOfExpiry}</h1>
                             </div>
                         </div>
                     </div>
