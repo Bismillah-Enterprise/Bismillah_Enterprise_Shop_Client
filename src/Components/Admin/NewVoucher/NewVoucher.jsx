@@ -126,7 +126,23 @@ const NewVoucher = () => {
         setDue(calculatedDue > 0 ? parseFloat(calculatedDue.toFixed(2)) : 0);
     };
     // updated code
-
+    const handleDeleteRow = (indexNo) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: `You Are Deleting A Row`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, I am Sure"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const allProducts = [...products]
+                allProducts.splice(parseInt(indexNo), 1);
+                setProducts(allProducts)
+            }
+        })
+    }
     // Add new product row
     const addProduct = () => {
         setProducts([...products, { product_name: '', quantity: '', rate: '', total: 0 }]);
@@ -255,6 +271,7 @@ const NewVoucher = () => {
                     <table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
                         <thead>
                             <tr className="text-pink-300">
+                                <th className="border p-2"></th>
                                 <th className="border p-2">SL</th>
                                 <th className="border p-2">Product</th>
                                 <th className="border p-2">Qty</th>
@@ -265,6 +282,9 @@ const NewVoucher = () => {
                         <tbody>
                             {products?.map((item, index) => (
                                 <tr key={index}>
+                                    <td onClick={() => { handleDeleteRow(index) }} className="p-2 cursor-pointer text-red-500">
+                                        -
+                                    </td>
                                     <td className="p-2">
                                         {index + 1}
                                     </td>
@@ -304,12 +324,12 @@ const NewVoucher = () => {
                                 </tr>
                             ))}
                             <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
+                                <td colSpan="4" className="p-2 border"></td>
                                 <td className="p-2 border">Total Bill</td>
                                 <td className="p-2 border text-right">{totalBill.toFixed(2)}</td>
                             </tr>
                             <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
+                                <td colSpan="4" className="p-2 border"></td>
                                 <td className="p-2 border">Discount</td>
                                 <td className="p-2 border text-right">
                                     <NumericFormat
@@ -326,7 +346,7 @@ const NewVoucher = () => {
                                 </td>
                             </tr>
                             <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
+                                <td colSpan="4" className="p-2 border"></td>
                                 <td className="p-2 border">Paid Amount</td>
                                 <td className="p-2 border text-right">
                                     <NumericFormat
@@ -344,7 +364,7 @@ const NewVoucher = () => {
                             </tr>
 
                             <tr className="text-right font-semibold">
-                                <td colSpan="3" ref={status_ref} className="p-2 border text-center">{status}</td>
+                                <td colSpan="4" ref={status_ref} className="p-2 border text-center">{status}</td>
                                 <td className="p-2 border">Due Amount</td>
                                 <td className="p-2 border text-right">
                                     {paid || discount ? due.toFixed(2) : totalBill.toFixed(2)}

@@ -101,7 +101,7 @@ const Home = () => {
 		return (
 			<div className="flex flex-col items-center text-white px-4 pt-4 pb-8 h-full">
 				<Marquee speed={50} className='mb-4'>
-					<p className='text-pink-200 text-lg'>{notice[0].notice}</p>
+					<p className='text-pink-200 text-lg'>{notice[0]?.notice}</p>
 				</Marquee>
 				{
 					user ? <div className="flex items-center justify-center gap-5 mb-10">

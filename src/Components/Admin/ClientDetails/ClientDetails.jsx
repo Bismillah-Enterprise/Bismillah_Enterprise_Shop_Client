@@ -161,10 +161,10 @@ const ClientDetails = () => {
                                 client.vouchers?.map((voucher, index) =>
                                     <tr key={index}>
                                         <td>{index + 1}</td>
-                                        <td>{voucher.date}</td>
-                                        <td>{voucher.voucher_no}</td>
-                                        <td>{voucher.paid_amount}</td>
-                                        <td>{voucher.due_amount}</td>
+                                        <td>{voucher?.date}</td>
+                                        <td>{voucher?.voucher_no}</td>
+                                        <td>{voucher?.paid_amount}</td>
+                                        <td>{voucher?.due_amount}</td>
                                         <td className={`${voucher.payment_status === 'Paid' ? 'text-green-500' : 'text-red-500'}`}>{voucher.payment_status}</td>
                                         <td>
                                             <Link to={location.pathname.includes('admin') ? `/admin/voucher/${client._id}/${voucher.voucher_no}` : `/voucher/${client._id}/${voucher.voucher_no}`} state={{ pathname: location?.pathname }} className='text-pink-300 hover:text-pink-400 underline'>View Details</Link>

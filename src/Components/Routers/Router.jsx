@@ -244,6 +244,11 @@ const router = createBrowserRouter([
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/staffs`)
 					},
 					{
+						path: '/admin/transections_history/:uid',
+						element: <AdminRoute><TransectionsHistory></TransectionsHistory></AdminRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${params.uid}`)
+					},
+					{
 						path: '/admin/additional_request',
 						element: <AdminRoute><AdditionalRequest></AdditionalRequest></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/additional_movement_request`)

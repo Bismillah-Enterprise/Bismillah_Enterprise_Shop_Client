@@ -12,7 +12,7 @@ const Voucher = () => {
     const matchedVoucher = client.vouchers.find(
         (voucher) => parseInt(voucher.voucher_no) === parseInt(voucher_no)
     );
-    const [discount, setDiscount] = useState(matchedVoucher.discount);
+    const [discount, setDiscount] = useState(matchedVoucher?.discount);
     const [due, setDue] = useState(matchedVoucher.due_amount);
     const [paid, setPaid] = useState(matchedVoucher.paid_amount);
     const location = useLocation();
@@ -42,14 +42,13 @@ const Voucher = () => {
     const [voucher_calculation, set_voucher_calculation] = useState({
 
     })
-    const totalBill = products.reduce((sum, item) => sum + item.total, 0);
+    let totalBill = products.reduce((sum, item) => sum + item.total, 0);
 
     const discount_amount_ref = useRef();
     const paid_amount_ref = useRef();
     const status_ref = useRef();
-
-
     // Handle input change for each field
+
     const handleChange = (index, field, value) => {
         const newProducts = [...products];
         newProducts[index][field] = value;
@@ -71,6 +70,24 @@ const Voucher = () => {
     const [status, setStatus] = useState('Unpaid');
     // updated code
 
+
+    const handleDeleteRow = (indexNo) => {
+        Swal.fire({
+            title: "Are you sure?",
+            text: `You Are Deleting A Row`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, I am Sure"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const allProducts = [...products]
+                allProducts.splice(parseInt(indexNo), 1);
+                setProducts(allProducts)
+            }
+        })
+    }
     // Add new product row
     const addProduct = () => {
         setIsEdit(true);
@@ -93,7 +110,7 @@ const Voucher = () => {
             products,
             total: parseFloat(totalBill.toFixed(2)),
             due_amount: parseFloat((totalBill - matchedVoucher.paid_amount - matchedVoucher.discount).toFixed(2)),
-            status: 'Unpaid'
+            status: `${due > 0 ? 'Unpaid' : 'Paid'}`
         }
         Swal.fire({
             title: "Are you sure?",
@@ -388,10 +405,11 @@ const Voucher = () => {
                 {/* -------------- Add more products */}
 
 
-                <div className={`${!isEdit ? 'hidden' : 'flex'} items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg`}>
+                <div className={`${!isEdit ? 'hidden' : 'flex'} flex-col items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg`}>
                     <table className="text-pink-200 min-w-[380px] sm:min-w-[100%]">
                         <thead>
                             <tr className="text-pink-300">
+                                <th className="border p-2"></th>
                                 <th className="border p-2">SL</th>
                                 <th className="border p-2">Product</th>
                                 <th className="border p-2">Qty</th>
@@ -402,6 +420,9 @@ const Voucher = () => {
                         <tbody>
                             {products?.map((item, index) => (
                                 <tr key={index}>
+                                    <td onClick={() => { handleDeleteRow(index) }} className="p-2 cursor-pointer text-red-500">
+                                        -
+                                    </td>
                                     <td className="p-2">
                                         {index + 1}
                                     </td>
@@ -441,12 +462,13 @@ const Voucher = () => {
                                 </tr>
                             ))}
                             <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
+                                <td colSpan="4" className="p-2 border"></td>
                                 <td className="p-2 border">Total Bill</td>
                                 <td className="p-2 border text-right min-w-[120px]">{totalBill.toFixed(2)}</td>
                             </tr>
                         </tbody>
                     </table>
+                    {/* <p onClick={handleDeleteRow} className='text-xs underline text-pink-400 mt-2 cursor-pointer'>Delete Last Row</p> */}
                 </div>
 
 

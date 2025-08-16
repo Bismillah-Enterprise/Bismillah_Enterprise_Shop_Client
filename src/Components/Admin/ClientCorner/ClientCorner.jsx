@@ -78,7 +78,7 @@ const ClientCorner = () => {
                             <div className='col-span-1 text-pink-300 flex items-center gap-5'>
                                 <div className='flex items-center justify-center text-lg font-bold text-pink-400 h-10 w-10 rounded-full border-2 border-r-pink-400 p-5'>{index + 1}</div>
                                 <div>
-                                    <h1 className='font-semibold md:text-xl'>{client.name}</h1>
+                                    <h1 className={`font-semibold md:text-xl ${client.vouchers.filter(voucher => voucher.payment_status === 'Unpaid').length > 0 ? 'text-red-500' : ''}`}>{client.name}</h1>
                                     <div className='flex items-center gap-3 flex-col lg:flex-row'>
                                         <h1 className='font-semibold md:text-md'>{client.on_behalf}</h1>
                                         <h1 className='font-semibold md:text-md'>{client.mobile_no}</h1>

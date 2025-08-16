@@ -9,7 +9,7 @@ const TransectionsHistory = () => {
 	return (
 		<div className='pb-10'>
 			<div className='flex items-center justify-center mt-8 mb-8'>
-				<Link to={`/staff/uid_query/${uid}`}>
+				<Link to={from}>
 					<button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
 						Back
 					</button>

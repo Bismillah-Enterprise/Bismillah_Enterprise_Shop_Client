@@ -194,7 +194,7 @@ const StaffDetails = () => {
 				<button onClick={() => setModal(!modal)} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					Make a Transections
 				</button>
-				<Link to={`/transections_history/${uid}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
+				<Link to={`/admin/transections_history/${uid}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					See All Transections
 				</Link>
 				<button onClick={() => handleClosingMonth()} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
