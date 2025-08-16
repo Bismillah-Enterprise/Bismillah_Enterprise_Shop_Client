@@ -363,7 +363,7 @@ const Voucher = () => {
                                         <td className="p-2 border">{product.product_name}</td>
                                         <td className="p-2 border">{product.quantity}</td>
                                         <td className="p-2 border">
-                                            {product.rate.$numberDouble || product.rate}
+                                            {product.rate}
                                         </td>
                                         <td className="p-2 border">{product.total}</td>
                                     </tr>
@@ -537,7 +537,7 @@ const Voucher = () => {
                                     <td className="p-2 border">{product.product_name}</td>
                                     <td className="p-2 border">{product.quantity}</td>
                                     <td className="p-2 border">
-                                        {product.rate.$numberDouble || product.rate}
+                                        {product.rate}
                                     </td>
                                     <td className="p-2 border text-center">{product.total}</td>
                                 </tr>

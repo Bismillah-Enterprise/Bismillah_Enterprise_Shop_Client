@@ -352,7 +352,6 @@ const AirTicketVoucher = () => {
                                     {matchedVoucher.paid_amount}
                                 </td>
                             </tr>
-
                             <tr className="text-right font-semibold text-black">
                                 <td className="p-2 border text-center">{matchedVoucher.payment_status}</td>
                                 <td className="p-2 border">Due Amount</td>
