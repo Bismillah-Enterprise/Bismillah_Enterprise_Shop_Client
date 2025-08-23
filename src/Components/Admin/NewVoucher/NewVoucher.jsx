@@ -71,7 +71,7 @@ const NewVoucher = () => {
           <title>Print</title>
           <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
           <style>
-            @page { size: A4 landscape; margin: 10mm; }
+            @page { size: A4 landscape; }
             body { font-family: sans-serif; color: black; display: flex; justify-content: end; width: 100% }
             .voucher-wrapper {
             width: 48%;
@@ -282,9 +282,9 @@ const NewVoucher = () => {
                                 <th className="border p-2"></th>
                                 <th className="border p-2">SL</th>
                                 <th className="border p-2">Product</th>
-                                <th className="border p-2">Qty</th>
-                                <th className="border p-2">Rate</th>
-                                <th className="border p-2">Total</th>
+                                <th className="border p-2 w-28">Qty</th>
+                                <th className="border p-2 w-28">Rate</th>
+                                <th className="border p-2 w-28">Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -382,7 +382,7 @@ const NewVoucher = () => {
                     </table>
                 </div>
                 <div className='flex items-center justify-center gap-5 mt-5'>
-                    <button onClick={addProduct} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                    <button onClick={addProduct} disabled={products.length > 9} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                         + Add Product
                     </button>
                     <button onClick={handleSubmit} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
@@ -423,15 +423,17 @@ const NewVoucher = () => {
                     <table className="text-black w-full text-xs">
                         <thead>
                             <tr className="text-black">
+                                <th className="border p-2">SL</th>
                                 <th className="border p-2">Product</th>
-                                <th className="border p-2">Qty</th>
-                                <th className="border p-2">Rate</th>
-                                <th className="border p-2">Total</th>
+                                <th className="border p-2 w-28">Quantity</th>
+                                <th className="border p-2 w-28">Rate</th>
+                                <th className="border p-2 w-28">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             {products?.map((item, index) => (
                                 <tr key={index}>
+                                    <td className="p-2 border text-center">{index + 1}</td>
                                     <td className="border p-2">
                                         <input
                                             type="text"
@@ -468,12 +470,12 @@ const NewVoucher = () => {
                                 </tr>
                             ))}
                             <tr className="text-right font-semibold">
-                                <td colSpan="2" className="p-2 border"></td>
+                                <td colSpan="3" className="p-2 border"></td>
                                 <td className="p-2 border">Total Bill</td>
                                 <td className="p-2 border text-center">{totalBill.toFixed(2)}</td>
                             </tr>
                             <tr className="text-right font-semibold">
-                                <td colSpan="2" className="p-2 border"></td>
+                                <td colSpan="3" className="p-2 border"></td>
                                 <td className="p-2 border">Discount</td>
                                 <td className="p-2 border text-right">
                                     <NumericFormat
@@ -489,7 +491,7 @@ const NewVoucher = () => {
                                 </td>
                             </tr>
                             <tr className="text-right font-semibold">
-                                <td colSpan="2" className="p-2 border"></td>
+                                <td colSpan="3" className="p-2 border"></td>
                                 <td className="p-2 border">Paid Amount</td>
                                 <td className="p-2 border text-right">
                                     <NumericFormat
@@ -506,7 +508,7 @@ const NewVoucher = () => {
                             </tr>
 
                             <tr className="text-right font-semibold">
-                                <td colSpan="2" className="p-2 border"></td>
+                                <td colSpan="3" className="p-2 border"></td>
                                 <td className="p-2 border">Due Amount</td>
                                 <td className="p-2 border text-center">
                                     {due.toFixed(2)}
@@ -515,7 +517,7 @@ const NewVoucher = () => {
                         </tbody>
                     </table>
                 </div>
-                <div className='flex items-center justify-between mt-20 text-xs absolute bottom-5 w-1/2'>
+                <div className='flex items-center justify-between mt-20 text-xs absolute bottom-0 w-1/2'>
                     <div className='border-t-2 pt-1 w-fit px-5 ml-4'>
                         <h1>Buyer Sign</h1>
                     </div>

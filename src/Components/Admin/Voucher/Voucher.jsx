@@ -359,9 +359,9 @@ const Voucher = () => {
                                 <tr className="text-pink-300">
                                     <th className="p-2 border">SL</th>
                                     <th className="p-2 border">Product Name</th>
-                                    <th className="p-2 border">Quantity</th>
-                                    <th className="p-2 border">Rate</th>
-                                    <th className="p-2 border">Total</th>
+                                    <th className="p-2 border w-28">Quantity</th>
+                                    <th className="p-2 border w-28">Rate</th>
+                                    <th className="p-2 border w-28">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -420,9 +420,9 @@ const Voucher = () => {
                                 <th className="border p-2"></th>
                                 <th className="border p-2">SL</th>
                                 <th className="border p-2">Product</th>
-                                <th className="border p-2">Qty</th>
-                                <th className="border p-2">Rate</th>
-                                <th className="border p-2">Total</th>
+                                <th className="border p-2 w-28">Qty</th>
+                                <th className="border p-2 w-28">Rate</th>
+                                <th className="border p-2 w-28">Total</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -490,7 +490,7 @@ const Voucher = () => {
                     <button onClick={() => { setModal(true) }} disabled={matchedVoucher.due_amount < 1 || isEdit} className={`${isEdit ? 'hidden' : 'block'} disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold`}>
                         Take A Payment
                     </button>
-                    <button onClick={addProduct} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                    <button onClick={addProduct} disabled={products.length > 9} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
                         + Add More Products
                     </button>
                     <button onClick={() => { handleEditVoucher(voucher_no) }} className={`${isEdit ? 'block' : 'hidden'} text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold`}>
@@ -533,24 +533,24 @@ const Voucher = () => {
                             <tr className="text-black">
                                 <th className="p-2 border">SL</th>
                                 <th className="p-2 border">Product Name</th>
-                                <th className="p-2 border">Quantity</th>
-                                <th className="p-2 border">Rate</th>
-                                <th className="p-2 border">Total</th>
+                                <th className="p-2 border w-28">Quantity</th>
+                                <th className="p-2 border w-28">Rate</th>
+                                <th className="p-2 border w-28">Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             {matchedVoucher.products?.map((product, index) => (
                                 <tr key={index}>
-                                    <td className="p-2 border">{index + 1}</td>
+                                    <td className="p-2 border text-center">{index + 1}</td>
                                     <td className="p-2 border">{product.product_name}</td>
-                                    <td className="p-2 border">{product.quantity}</td>
-                                    <td className="p-2 border">
+                                    <td className="p-2 border text-center">{product.quantity}</td>
+                                    <td className="p-2 border text-center">
                                         {product.rate}
                                     </td>
                                     <td className="p-2 border text-center">{product.total}</td>
                                 </tr>
                             ))}
-                            <tr className='text-black'>
+                            <tr className='text-black font-semibold'>
                                 <td className="p-2 border" colSpan={3}></td>
                                 <td className="p-2 border text-right">Total Bill</td>
                                 <td className="p-2 border text-center">{matchedVoucher.total}</td>
@@ -581,7 +581,7 @@ const Voucher = () => {
                     </table>
                 </div>
 
-                <div className='flex items-center justify-between mt-20 text-xs absolute bottom-5 w-1/2'>
+                <div className='flex items-center justify-between mt-20 text-xs absolute bottom-0 w-1/2'>
                     <div className='border-t-2 pt-1 w-fit px-5 ml-4'>
                         <h1>Buyer Sign</h1>
                     </div>
