@@ -294,7 +294,7 @@ const Staffs = () => {
 										if (modifier === 'AM' && hours === 12) hours = 0;
 										return hours * 60 + minutes;
 									};
-									if (!bonusData.first_entry.time && !bonusData.second_entry.time && parseTime(Time) < bonusData?.time) {
+									if (!bonusData.first_entry.time && !bonusData.second_entry.time && parseTime(Time) < bonusData?.end_time) {
 										fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
 											method: 'PUT',
 											headers: { 'content-type': 'application/json' },
