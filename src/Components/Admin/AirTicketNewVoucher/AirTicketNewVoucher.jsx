@@ -113,6 +113,16 @@ const AirTicketNewVoucher = () => {
     // updated code
 
     const handleSubmit = async () => {
+        if (String(ticket_price_ref.current.value) === '0' || String(ticket_price_ref.current.value) === '') {
+            Swal.fire({
+                position: 'center',
+                icon: 'warning',
+                title: 'Ticket Price Is Not Allowed As 0',
+                showConfirmButton: false,
+                timer: 2000,
+            })
+            return;
+        }
         const newSlNo = voucherSl + 1;
         const discountAmount = parseFloat(discount_amount_ref.current.value || '0');
         const ticketPrice = parseFloat(ticket_price_ref.current.value || '0');

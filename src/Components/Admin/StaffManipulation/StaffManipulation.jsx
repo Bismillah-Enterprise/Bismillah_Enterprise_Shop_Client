@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { AuthContext } from '../../Providers/AuthProvider';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { MdOutlineCancel } from 'react-icons/md';
@@ -9,8 +9,33 @@ const StaffManipulation = () => {
 	const allStaffs = useLoaderData();
 	const [modal, setModal] = useState(false);
 	const [staffId, setStaffId] = useState('');
+	const [isTimeEdit, setIsTimeEdit] = useState(false);
+	const [startTime, setStartTime] = useState();
+	const [endTime, setEndTime] = useState();
 	const navigate = useNavigate();
 	const location = useLocation();
+
+	useEffect(() => {
+		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
+			.then(res => res.json())
+			.then(data => {
+				const formatTime = (totalMinutes) => {
+					if (totalMinutes == null) return null;
+
+					let hours = Math.floor(totalMinutes / 60);
+					let minutes = totalMinutes % 60;
+
+					const modifier = hours >= 12 ? 'PM' : 'AM';
+
+					hours = hours % 12;
+					if (hours === 0) hours = 12; // handle midnight / noon
+
+					return `${hours}:${minutes.toString().padStart(2, '0')} ${modifier}`;
+				};
+				setStartTime(formatTime(data.start_time));
+				setEndTime(formatTime(data.end_time));
+			})
+	}, [])
 
 	const handleUserCategory = (uid, newUserCategory) => {
 		Swal.fire({
@@ -102,6 +127,44 @@ const StaffManipulation = () => {
 				}
 			})
 	}
+	const handleSetBonusTime = (newStartTime, newEndTime) => {
+		const parseTime = (timeStr) => {
+			if (!timeStr) return null;
+			const [time, modifier] = timeStr.split(' ');
+			let [hours, minutes] = time.split(':').map(Number);
+			if (modifier === 'PM' && hours !== 12) hours += 12;
+			if (modifier === 'AM' && hours === 12) hours = 0;
+			return hours * 60 + minutes;
+		};
+		const bonusStartTime = parseTime(newStartTime);
+		const bonusEndTime = parseTime(newEndTime);
+		console.log(bonusStartTime, bonusEndTime);
+		fetch(`https://bismillah-enterprise-server.onrender.com/set_bonus_time`, {
+			method: 'PATCH',
+			headers: {
+				'content-type': 'application/json'
+			},
+			body: JSON.stringify({ start_time: bonusStartTime, end_time: bonusEndTime })
+		})
+			.then(res => res.json())
+			.then(data => {
+				if (data.acknowledged) {
+					navigate(location.pathname);
+					setStartTime(newStartTime);
+					setEndTime(newEndTime);
+					setIsTimeEdit(false)
+					Swal.fire({
+						position: 'center',
+						icon: 'success',
+						title: 'Bonus Time Set Successfully',
+						showConfirmButton: false,
+						timer: 1000,
+					})
+				}
+			})
+	}
+	const bonusTimeStartRef = useRef();
+	const bonusTimeEndRef = useRef();
 	return (
 		<div className='w-full h-full lg:p-5 flex flex-col text-pink-200 scrollbar-hide'>
 			{/* modal */}
@@ -134,7 +197,26 @@ const StaffManipulation = () => {
 				</div>
 			</div>
 			{/* end modal */}
-			<h1 className='font-semibold text-2xl text-pink-300 mb-5'>Staff Manipulation</h1>
+			<h1 className='font-semibold text-2xl text-pink-300 mb-2'>Staff Manipulation</h1>
+			<div className={`${isTimeEdit ? 'hidden' : 'flex'} items-center gap-5`}>
+				<h1>Bonus Start Time: <span className='font-bold text-pink-400'>{startTime}</span> and Bonus End Time: <span className='font-bold text-pink-400'>{endTime}</span></h1>
+				<button onClick={() => { setIsTimeEdit(true) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-xs font-semibold max-w-24 w-full`}>Edit Time</button>
+			</div>
+			<div className={`${isTimeEdit ? 'flex' : 'hidden'} items-end lg:w-[400px] gap-5 mb-4`}>
+				<div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+					<p className='text-xs'>Bonus Time Start From</p>
+					<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+						<input ref={bonusTimeStartRef} defaultValue={startTime} type="text" className='outline-none w-full' />
+					</div>
+				</div>
+				<div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
+					<p className='text-xs'>Bonus Time End At</p>
+					<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+						<input ref={bonusTimeEndRef} defaultValue={endTime} type="text" className='outline-none w-full' />
+					</div>
+				</div>
+				<button onClick={() => { handleSetBonusTime(bonusTimeStartRef.current.value, bonusTimeEndRef.current.value) }} className={`text-center text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-md font-semibold max-w-24 w-full`}>Submit</button>
+			</div>
 			{
 				allStaffs?.map(staff =>
 					<div key={staff._id}>

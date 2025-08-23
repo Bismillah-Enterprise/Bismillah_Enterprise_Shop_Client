@@ -104,23 +104,28 @@ const Home = () => {
 					<p className='text-pink-200 text-lg'>{notice[0]?.notice}</p>
 				</Marquee>
 				{
-					user ? <div className="flex items-center justify-center gap-5 mb-10">
+					user ? <div className="flex flex-wrap items-center justify-center gap-5 mb-10">
 
 						<Link to={!isStaff ? `/not_authorized` : `/staff/uid_query/${current_User?.uid}`} state={{ pathname: location.pathname }}>
-							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-								Staff
+							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
+								Attendence
 							</button>
 						</Link>
 						<Link to={!isStaff ? `/not_authorized` : `/client_corner`} state={{ pathname: location.pathname }}>
-							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
 								Client Corner
+							</button>
+						</Link>
+						<Link to={!isStaff ? `/not_authorized` : `/products`} state={{ pathname: location.pathname }}>
+							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
+								Products
 							</button>
 						</Link>
 
 						{
 							isAdmin ?
 								<Link to="/admin" state={{ pathname: "/" }}>
-									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
 										Admin
 									</button>
 								</Link> : ''

@@ -20,7 +20,7 @@ const AdminNavbar = () => {
 					Home
 				</Link>
 				<Link to={`/staff/uid_query/${current_User?.uid}`} state={{ pathname: location.pathname }} className={`w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
-					Staff Page
+					Attendence Page
 				</Link>
 				<Link to={`/admin/products_manipulation`} state={{ pathname: location.pathname }} className={`w-full shadow-md hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 					Products Manipulation
@@ -73,7 +73,7 @@ const AdminNavbar = () => {
 						Home
 					</Link>
 					<Link to={`/staff/uid_query/${current_User?.uid}`} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
-						Staff Page
+						Attendence Page
 					</Link>
 					<Link to={`/admin/products_manipulation`} state={{ pathname: location.pathname }} className={`px-3 w-full ${isMenu ? 'shadow-md' : 'shadow-none'} hover:shadow-pink-400 rounded-t-2xl shadow-pink-300 py-3 font-semibold text-center cursor-pointer`}>
 						Products Manipulations

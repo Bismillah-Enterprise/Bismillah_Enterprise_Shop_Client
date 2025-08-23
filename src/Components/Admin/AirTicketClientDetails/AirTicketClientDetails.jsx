@@ -87,7 +87,7 @@ const AirTicketClientDetails = () => {
                     <h1 className='font-semibold md:text-2xl text-pink-300 text-center'>{client.name}</h1>
                     <h1 className='font-semibold md:text-sm text-pink-300 text-center'>{client.address}</h1>
                     <h1 className='font-semibold md:text-md text-pink-300 text-center'>Destination: {client?.vouchers[0]?.destination},  Mobile No: {client.mobile_no}</h1>
-                    <h1 className='font-semibold md:text-md text-pink-300 text-center'>Destination: {client?.passport_no},  Date of Expiry: {client.date_of_expiry}</h1>
+                    <h1 className='font-semibold md:text-md text-pink-300 text-center'>Passport No: {client?.passport_no},  Date of Expiry: {client.date_of_expiry}</h1>
                     <h1 onClick={() => { setIsEdit(true) }} className='underline cursor-pointer text-xs text-pink-300 text-center'>Edit Client Data</h1>
                 </div>
             </div>

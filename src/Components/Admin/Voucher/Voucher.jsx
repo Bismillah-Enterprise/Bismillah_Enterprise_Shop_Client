@@ -188,12 +188,20 @@ const Voucher = () => {
           <title>Print</title>
           <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
           <style>
-            @page { size: A4; margin: 20mm; }
-            body { font-family: sans-serif; color: black; }
+            @page { size: A4 landscape; margin: 10mm; }
+            body { font-family: sans-serif; color: black; display: flex; justify-content: end; width: 100% }
+            .voucher-wrapper {
+            width: 48%;
+            height: 100%;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+            }
           </style>
         </head>
         <body>
-          ${content}
+            <div class="voucher-wrapper">
+                ${content}
+            </div>
         </body>
       </html>
     `);
@@ -496,7 +504,7 @@ const Voucher = () => {
             <div ref={voucherPrintRef} className='nunito w-[550px] hidden'>
                 <VoucherHeading></VoucherHeading>
                 <div className='flex items-center justify-center'>
-                    <div className='text-sm font-semibold grid grid-cols-2 text-black w-full'>
+                    <div className='text-xs font-semibold grid grid-cols-2 text-black w-full'>
                         <div className=''>
                             <h1>Name: {client.name}</h1>
                             <h1>Address: {client.address}</h1>
@@ -510,17 +518,17 @@ const Voucher = () => {
                     </div>
                 </div>
                 <div className='flex items-center justify-center nunito'>
-                    <h1 className="nunito text-xl text-center font-bold px-5 text-black">
+                    <h1 className="nunito text-md text-center font-bold px-5 text-black">
                         Voucher - {voucher_no}
                     </h1>
                 </div>
                 <div className="flex items-center justify-center mt-1 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-md">
                     <div className='absolute w-full flex items-center justify-center'>
                         <div className=''>
-                            <h1 className='text-7xl font-bold opacity-20'>{matchedVoucher.payment_status}</h1>
+                            <h1 className='text-5xl font-bold opacity-20'>{matchedVoucher.payment_status}</h1>
                         </div>
                     </div>
-                    <table className="text-black w-full">
+                    <table className="text-black w-full text-xs">
                         <thead>
                             <tr className="text-black">
                                 <th className="p-2 border">SL</th>
@@ -573,11 +581,11 @@ const Voucher = () => {
                     </table>
                 </div>
 
-                <div className='flex items-center justify-between mt-20'>
-                    <div className='border-t-2 pt-1 w-fit px-5'>
+                <div className='flex items-center justify-between mt-20 text-xs absolute bottom-5 w-1/2'>
+                    <div className='border-t-2 pt-1 w-fit px-5 ml-4'>
                         <h1>Buyer Sign</h1>
                     </div>
-                    <div className='border-t-2 pt-1 w-fit px-5'>
+                    <div className='border-t-2 pt-1 w-fit px-5 mr-8'>
                         <h1>Seller Sign</h1>
                     </div>
                 </div>

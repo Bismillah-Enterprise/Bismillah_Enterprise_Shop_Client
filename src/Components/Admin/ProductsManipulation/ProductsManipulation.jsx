@@ -1,16 +1,30 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { MdOutlineCancel } from 'react-icons/md';
 import { NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const ProductsManipulation = () => {
-    const allProducts = useLoaderData();
+    const loadedProducts = useLoaderData();
+    const [allProducts, setAllProducts] = useState(loadedProducts);
     const location = useLocation();
     const from = location?.state?.pathname;
     const [modal, setModal] = useState(false);
     const navigate = useNavigate();
-
+    useEffect(() => {
+        fetch(`https://bismillah-enterprise-server.onrender.com/products`)
+            .then(res => res.json())
+            .then(data => {
+                setAllProducts(data);
+            })
+    }, [])
+    useEffect(() => {
+        fetch(`https://bismillah-enterprise-server.onrender.com/products`)
+            .then(res => res.json())
+            .then(data => {
+                setAllProducts(data);
+            })
+    }, [modal])
 
     const handleDelete = (id) => {
         Swal.fire({
@@ -26,7 +40,7 @@ const ProductsManipulation = () => {
                 fetch(`https://bismillah-enterprise-server.onrender.com/products/${id}`, {
                     method: 'DELETE'
                 }).then(res => res.json())
-                navigate(location.pathname);
+                setModal(false);
                 Swal.fire({
                     title: "Deleted!",
                     text: "Product Deleted Successfully.",
@@ -73,6 +87,10 @@ const ProductsManipulation = () => {
                         if (productdata.acknowledged) {
                             setModal(false);
                             navigate(location.pathname)
+                            product_name_ref.current.value = '';
+                            product_quantity_ref.current.value = '';
+                            product_buy_price_ref.current.value = '';
+                            product_sell_price_ref.current.value = '';
                             Swal.fire({
                                 position: 'center',
                                 icon: 'success',
@@ -91,12 +109,23 @@ const ProductsManipulation = () => {
     const product_quantity_ref = useRef();
     const product_buy_price_ref = useRef();
     const product_sell_price_ref = useRef();
+
+
+    const handleSearch = (text) => {
+        const filterProducts = loadedProducts.filter(product => ((product.product_name).toLowerCase()).includes(text.toLowerCase()) || product.product_sell_price <= parseInt(text));
+        setAllProducts(filterProducts);
+    }
+    const handleClearSerch = () => {
+        search_ref.current.value = '';
+        setAllProducts(loadedProducts);
+    }
+    const search_ref = useRef();
     return (
         <div>
             {/* modal */}
             <div className={`${!modal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
                 <div className='flex justify-end -top-[10px] -right-[10px] relative'>
-                    <MdOutlineCancel onClick={() => { !setRevenueModal(!revenueModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+                    <MdOutlineCancel onClick={() => { !setModal(!modal) }} className='text-pink-200 text-3xl cursor-pointer bg-black rounded-full'></MdOutlineCancel>
                 </div>
                 <div className='mb-4'>
                     <h1 className='text-lg font-semibold text-pink-300 text-center mb-2'>Product Details</h1>
@@ -168,10 +197,24 @@ const ProductsManipulation = () => {
                 </Link>
             </div>
             <h2 className="text-2xl text-pink-300 font-semibold text-center">Shop Products</h2>
+            <div className='flex justify-center mt-3'>
+                <div className='flex items-center justify-center border-2 border-pink-300 w-[50%] pl-2 pr-1 py-1 rounded-2xl'>
+                    <div className='flex-1'>
+                        <input
+                            type="text"
+                            onChange={(e) => { handleSearch(e.target.value) }}
+                            ref={search_ref}
+                            className="w-full p-1 outline-none text-pink-300"
+                            placeholder='Enter Your Search Keywords'
+                        />
+                    </div>
+                    <MdOutlineCancel onClick={handleClearSerch} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+                </div>
+            </div>
             <div className='flex items-center justify-center gap-5 mt-5'>
                 <Link onClick={() => { setModal(true) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Add A New Product</Link>
             </div>
-            <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
+            <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg pb-10">
                 <table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
                     <thead>
                         <tr className="text-pink-300">

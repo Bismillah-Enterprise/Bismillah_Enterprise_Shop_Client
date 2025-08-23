@@ -40,7 +40,7 @@ const Navbar = () => {
 		fetch(`https://bismillah-enterprise-server.onrender.com/shop_code`)
 			.then(res => res.json())
 			.then(theShopCode => {
-				if (typedShopCode === theShopCode[0]?.shop_code) {
+				if (typedShopCode === theShopCode?.shop_code) {
 					inputRef.current.value = '';
 					setModal(!modal);
 					googleSignIn()

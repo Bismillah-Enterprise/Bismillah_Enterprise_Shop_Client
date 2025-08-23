@@ -115,6 +115,12 @@ const router = createBrowserRouter([
 
 			},
 			{
+				path: '/products',
+				element: <ProductsManipulation></ProductsManipulation>,
+				loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/products`),
+
+			},
+			{
 				path: '/admin',
 				element: <AdminRoute><AdminMain></AdminMain></AdminRoute>,
 				children: [

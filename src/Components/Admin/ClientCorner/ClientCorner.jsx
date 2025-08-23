@@ -35,7 +35,7 @@ const ClientCorner = () => {
         });
     }
     const handleSearch = (text) => {
-        const filterClient = loadClient.filter(client => ((client.name).toLowerCase()).includes(text.toLowerCase()));
+        const filterClient = loadClient.filter(client => ((client.name).toLowerCase()).includes(text.toLowerCase()) || (client.mobile_no).includes(text));
         setAllClient(filterClient);
     }
     const handleClearSerch = () => {
@@ -54,7 +54,7 @@ const ClientCorner = () => {
             </div>
             <h2 className="text-2xl text-pink-300 font-semibold text-center">Client Corner</h2>
             <div className='flex justify-center mt-3'>
-                <div className='flex items-center justify-center border-2 border-pink-300 w-[50%] pl-2 pr-1 py-1 rounded-2xl'>
+                <div className='flex items-center justify-center border-2 border-pink-300 w-full md:w-[50%] pl-2 pr-1 py-1 rounded-2xl'>
                     <div className='flex-1'>
                         <input
                             type="text"
@@ -67,27 +67,27 @@ const ClientCorner = () => {
                     <MdOutlineCancel onClick={handleClearSerch} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
                 </div>
             </div>
-            <div className='flex items-center justify-center gap-5 mt-5'>
-                <Link to={location.pathname.includes('admin') ? `/admin/new_client` : `/new_client`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client</Link>
-                <Link to={location.pathname.includes('admin') ? `/admin/new_client_new_voucher` : `/new_client_new_voucher`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Create A New Client With New Voucher</Link>
+            <div className='flex flex-wrap items-center justify-center gap-5 mt-5 mb-5'>
+                <Link to={location.pathname.includes('admin') ? `/admin/new_client` : `/new_client`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs md:text-lg font-semibold'>+ Create A New Client</Link>
+                <Link to={location.pathname.includes('admin') ? `/admin/new_client_new_voucher` : `/new_client_new_voucher`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs md:text-lg font-semibold'>+ Create A New Client With New Voucher</Link>
             </div>
             {
                 allClient?.map((client, index) =>
                     <div key={client._id}>
                         <div className='grid grid-cols-2 gap-5 items-center justify-between border-b-2 border-pink-200 py-4'>
                             <div className='col-span-1 text-pink-300 flex items-center gap-5'>
-                                <div className='flex items-center justify-center text-lg font-bold text-pink-400 h-10 w-10 rounded-full border-2 border-r-pink-400 p-5'>{index + 1}</div>
+                                <div className='flex items-center justify-center text-xs md:text-lg font-bold text-pink-400 h-5 md:h-10 w-5 md:w-10 rounded-full border-2 border-r-pink-400 p-3 md:p-5'>{index + 1}</div>
                                 <div>
-                                    <h1 className={`font-semibold md:text-xl ${client.vouchers.filter(voucher => voucher.payment_status === 'Unpaid').length > 0 ? 'text-red-500' : ''}`}>{client.name}</h1>
-                                    <div className='flex items-center gap-3 flex-col lg:flex-row'>
-                                        <h1 className='font-semibold md:text-md'>{client.on_behalf}</h1>
-                                        <h1 className='font-semibold md:text-md'>{client.mobile_no}</h1>
+                                    <h1 className={`font-semibold text-xs md:text-xl ${client.vouchers.filter(voucher => voucher.payment_status === 'Unpaid').length > 0 ? 'text-red-500' : ''}`}>{client.name}</h1>
+                                    <div className='flex items-start md:items-center gap-3 flex-col lg:flex-row'>
+                                        <h1 className='font-semibold text-xs md:text-md'>{client.on_behalf}</h1>
+                                        <h1 className='font-semibold text-xs md:text-md'>{client.mobile_no}</h1>
                                     </div>
                                 </div>
                             </div>
                             <div className='flex justify-end lg:flex-row gap-4 col-span-1'>
-                                <Link to={location.pathname.includes('admin') ? `/admin/client_details/${client?._id}` : `/client_details/${client?._id}`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>View Details</Link>
-                                <button onClick={() => { handleDelete(client?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>Delete</button>
+                                <Link to={location.pathname.includes('admin') ? `/admin/client_details/${client?._id}` : `/client_details/${client?._id}`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold'>View Details</Link>
+                                <button onClick={() => { handleDelete(client?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold'>Delete</button>
                             </div>
                         </div>
                     </div>)

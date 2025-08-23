@@ -91,6 +91,16 @@ const AirTicketNewClientWithNewVoucher = () => {
         }
     }
     const handleCreateNewClient = () => {
+        if (String(ticket_price_ref.current.value) === '0' || String(ticket_price_ref.current.value) === '') {
+            Swal.fire({
+                position: 'center',
+                icon: 'warning',
+                title: 'Ticket Price Is Not Allowed As 0',
+                showConfirmButton: false,
+                timer: 2000,
+            })
+            return;
+        }
         const clientName = clientNameRef.current.value;
         const address = addressRef.current.value;
         const phoneNo = phoneNoRef.current.value;
