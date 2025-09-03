@@ -78,12 +78,20 @@ const AirTicketVoucher = () => {
           <title>Print</title>
           <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
           <style>
-            @page { size: A4; margin: 20mm; }
-            body { font-family: sans-serif; color: black; }
+            @page { size: A4 landscape; }
+            body { font-family: sans-serif; color: black; display: flex; justify-content: end; width: 100% }
+            .voucher-wrapper {
+            width: 48%;
+            height: 100%;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+            }
           </style>
         </head>
         <body>
-          ${content}
+            <div class="voucher-wrapper">
+                ${content}
+            </div>
         </body>
       </html>
     `);
@@ -363,11 +371,11 @@ const AirTicketVoucher = () => {
                     </table>
                 </div>
 
-                <div className='flex items-center justify-between mt-20'>
-                    <div className='border-t-2 pt-1 w-fit px-5'>
+                <div className='flex items-center justify-between mt-20 text-xs absolute bottom-0 w-1/2'>
+                    <div className='border-t-2 pt-1 w-fit px-5 ml-4'>
                         <h1>Buyer Sign</h1>
                     </div>
-                    <div className='border-t-2 pt-1 w-fit px-5'>
+                    <div className='border-t-2 pt-1 w-fit px-5 mr-8'>
                         <h1>Seller Sign</h1>
                     </div>
                 </div>
