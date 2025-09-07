@@ -10,7 +10,9 @@ const Home = () => {
 	const notice = useLoaderData();
 	const [current_User, isAdmin, isStaff, userHookLoading] = useCurrentUser();
 	const location = useLocation();
-	const [dateCheckLoading, setDateCheckLoading] = useState(false)
+	const [dateCheckLoading, setDateCheckLoading] = useState(false);
+	const [adminLoading, setAdminLoading] = useState(false);
+	const [logedinUser, setlogedinUser] = useState();
 	const now = new Date();
 	const Time = now.toLocaleTimeString('en-BD', {
 		hour: '2-digit',
@@ -25,6 +27,9 @@ const Home = () => {
 		month: 'long',
 	});
 	const today_only_date_number = parseInt(currentDate.split(' ')[1].split(',')[0]);
+	useEffect(() => {
+		fetch(`https://bismillah-enterprise-server.onrender.com/`)
+	})
 	useEffect(() => {
 		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
 			.then(bonusRes => bonusRes.json())

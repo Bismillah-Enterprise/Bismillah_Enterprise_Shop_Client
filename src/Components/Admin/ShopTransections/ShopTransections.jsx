@@ -9,6 +9,8 @@ const ShopTransections = () => {
 	const { _id, month_name, total_revenue_amount, total_expense_amount, hand_on_cash } = shop_transections[0];
 	const [revenueModal, setRevenueModal] = useState(false);
 	const [expenseModal, setExpenseModal] = useState(false);
+	const [transectionTypeValue, setTransectionTypeValue] = useState('');
+	const [isComment, setIsComment] = useState(false);
 	const navigate = useNavigate();
 	const location = useLocation();
 	const from = location?.state?.pathname;
@@ -126,6 +128,7 @@ const ShopTransections = () => {
 	const revenue_comment_ref = useRef();
 	const expense_transection_amount_ref = useRef();
 	const expense_comment_ref = useRef();
+	const transection_type_ref = useRef();
 
 	const handleClosingMonth = () => {
 		Swal.fire({
@@ -201,7 +204,7 @@ const ShopTransections = () => {
 	return (
 		<div className='relative'>
 			{/* modal */}
-			<div className={`${!revenueModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
+			<div className={`${!revenueModal ? 'hidden' : 'block'}  w-[450px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
 				<div className='flex justify-end -top-[10px] -right-[10px] relative'>
 					<MdOutlineCancel onClick={() => { setRevenueModal(!revenueModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
 				</div>
@@ -209,31 +212,44 @@ const ShopTransections = () => {
 					<h1 className='text-lg font-semibold text-pink-300 text-center mb-2'>Transection Details</h1>
 					<hr className='text-pink-300 w-full' />
 				</div>
-				<div className='text-pink-200 flex flex-col gap-5 p-8 pt-0 items-center h-full w-full'>
+				<div className='text-pink-200 flex flex-col gap-5 p-8 pt-0 items-start h-full w-full'>
 					<div className='mb-4'>
-						<div className='mt-2'>
-							<h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
-
-							<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-								<NumericFormat
-									getInputRef={revenue_transection_amount_ref}
-									className="outline-none w-full h-full"
-									placeholder="Enter Amount"
-									allowNegative={false}
-									decimalScale={2}
-									fixedDecimalScale={false}
-									thousandSeparator={false}
-								/>
+						<div className='mt-2 flex items-end gap-4 w-full'>
+							<div className='mt-2'>
+								{/* <h1 className='lg:text-lg font-semibold'>Transection Type: </h1> */}
+								<select onChange={(e) => {setTransectionTypeValue(e.target.value); if(e.target.value === 'Others'){setIsComment(true)} else{setIsComment(false)}}} ref={transection_type_ref} className='px-1 outline-none border p-1 rounded-md text-xs h-8' name="user_category_in_shop" id="user_category">
+									<option className='text-xs text-black bg-gray' value=""></option>
+									<option className='text-xs text-black bg-gray' value="Stationary">Stationary</option>
+									<option className='text-xs text-black bg-gray' value="Photocopy">Photocopy</option>
+									<option className='text-xs text-black bg-gray' value="Air Ticket">Air Ticket</option>
+									<option className='text-xs text-black bg-gray' value="Others">Other's</option>
+								</select>
+							</div>
+							<div className='w-full flex flex-col'>
+								<h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
+								<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
+									<NumericFormat
+										getInputRef={revenue_transection_amount_ref}
+										className="outline-none w-full h-full"
+										placeholder="Enter Amount"
+										allowNegative={false}
+										decimalScale={2}
+										fixedDecimalScale={false}
+										thousandSeparator={false}
+									/>
+								</div>
 							</div>
 						</div>
-						<div className='mt-5 flex items-center gap-5'>
+						<div className={`mt-5 ${isComment ? 'flex' : 'hidden'} items-center gap-5`}>
 							<h1 className='lg:text-lg font-semibold mb-2'>Comment</h1>
 							<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
 								<input ref={revenue_comment_ref} type="text" className='outline-none w-full' />
 							</div>
 						</div>
 					</div>
-					<button onClick={() => handleRevenueTransections('revenue')} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
+					<div className='flex items-center justify-center w-full'>
+						<button onClick={() => handleRevenueTransections('revenue')} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
+					</div>
 				</div>
 			</div>
 			<div className={`${!expenseModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
@@ -292,7 +308,7 @@ const ShopTransections = () => {
 				<h1 className='text-pink-200 text-lg lg:text-2xl text-center font-semibold'>Total Expense Amount: {total_expense_amount}</h1>
 				<h1 className='text-pink-200 text-lg lg:text-2xl text-center font-semibold'>Hand on Cash: {hand_on_cash}</h1>
 			</div>
-			<div className='mt-10 flex flex-col lg:flex-row items-center justify-center gap-5'>
+			<div className='mt-10 flex flex-col lg:flex-row items-center justify-between gap-5'>
 				<button onClick={() => setRevenueModal(!revenueModal)} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 lg:px-5 py-1 rounded-md text-md lg:text-lg lg:font-semibold">
 					Make a Revenue Transections
 				</button>
