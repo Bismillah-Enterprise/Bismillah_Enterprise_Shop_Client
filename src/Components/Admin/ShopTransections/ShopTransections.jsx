@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 
 const ShopTransections = () => {
 	const shop_transections = useLoaderData();
-	const { _id, month_name, total_revenue_amount, total_expense_amount, hand_on_cash } = shop_transections[0];
+	const { _id, month_name, total_revenue_amount, total_expense_amount, hand_on_cash, revenue_transections } = shop_transections[0];
 	const [revenueModal, setRevenueModal] = useState(false);
 	const [expenseModal, setExpenseModal] = useState(false);
 	const [transectionTypeValue, setTransectionTypeValue] = useState('');
@@ -29,12 +29,15 @@ const ShopTransections = () => {
 	const handleRevenueTransections = (transectionType) => {
 		const revenue_transection_amount = parseFloat(revenue_transection_amount_ref.current.value);
 		const transection_type = transectionType;
+		const transection_category = transection_type_ref.current.value;
+		if(transection_category === 'Photocopy') {
+		
+		}
 		const new_total_revenue_amount = parseFloat(total_revenue_amount + revenue_transection_amount);
 		const new_hand_on_cash = parseFloat(hand_on_cash + revenue_transection_amount);
 		const comment = revenue_comment_ref.current.value;
-		const transection_id = String(parseInt(revenue_transection_amount)) + String(transection_type) + String(new_total_revenue_amount) + String(new_hand_on_cash);
 
-		const transectionData = { transection_id, transection_date: currentDate, transection_amount: revenue_transection_amount, transection_type, transection_explaination: comment, total_revenue_amount: new_total_revenue_amount, hand_on_cash: new_hand_on_cash }
+		const transectionData = { transection_date: currentDate, transection_amount: revenue_transection_amount, transection_type, transection_category, transection_explaination: comment, total_revenue_amount: new_total_revenue_amount, hand_on_cash: new_hand_on_cash }
 		Swal.fire({
 			title: "Are you sure?",
 			text: `You Are Adding ${transection_type} ${revenue_transection_amount} Taka `,
@@ -45,7 +48,7 @@ const ShopTransections = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`, {
+				fetch(`http://localhost:5000/shop_transections`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -56,6 +59,7 @@ const ShopTransections = () => {
 					.then(transectionDataSubmit => {
 						if (transectionDataSubmit.acknowledged) {
 							revenue_transection_amount_ref.current.value = '';
+							revenue_comment_ref.current.value = '';
 							navigate(location.pathname)
 							Swal.fire({
 								position: 'center',

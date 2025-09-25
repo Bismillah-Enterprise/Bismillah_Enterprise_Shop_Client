@@ -76,7 +76,7 @@ const RevenueTransectionsDetials = () => {
                     <tbody>
                         <tr className='text-pink-300'>
                             <th>Date</th>
-                            <th>Transection Id</th>
+                            <th>Transection Category</th>
                             <th>Transection Explaination</th>
                             <th>Ammount</th>
                         </tr>
@@ -84,7 +84,7 @@ const RevenueTransectionsDetials = () => {
                             revenue_transections?.map(transection =>
                                 <tr className='text-pink-200'>
                                     <td>{transection.transection_date}</td>
-                                    <td>{transection.transection_id}</td>
+                                    <td>{transection.transection_category}</td>
                                     <td className='max-w-24 lg:max-w-auto text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{transection.transection_explaination}</td>
                                     <td>{transection.transection_amount}</td>
                                 </tr>

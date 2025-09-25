@@ -13,6 +13,7 @@ const Home = () => {
 	const [dateCheckLoading, setDateCheckLoading] = useState(false);
 	const [adminLoading, setAdminLoading] = useState(false);
 	const [logedinUser, setlogedinUser] = useState();
+	const [loadedUser, setLoadedUser] = useState();
 	const now = new Date();
 	const Time = now.toLocaleTimeString('en-BD', {
 		hour: '2-digit',
@@ -55,6 +56,8 @@ const Home = () => {
 		fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${user?.uid}`)
 			.then(res => res.json())
 			.then(data => {
+				setLoadedUser(data);
+				console.log(data.status);
 				const { _id, today_date, name, hour_rate, last_month_due, withdrawal_amount, today_enter1_time, today_exit1_time, bonus, available_balance, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, total_bonus, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = data;
 				if (today_date !== todayOnlyDateIntFormat) {
 					const TodaySummary = {
@@ -87,19 +90,16 @@ const Home = () => {
 					})
 						.then(res => res.json())
 						.then(() => {
-							setDateCheckLoading(false);
 						});
 				}
 				else {
-					setDateCheckLoading(false)
 					return;
 				}
 			})
-
-
+		setDateCheckLoading(false);
 	}, [user])
 
-	if (userHookLoading && loading) {
+	if (dateCheckLoading) {
 		return (<div className='h-full rounded-2xl overflow-hidden'><Loading></Loading></div>);
 	}
 	else {
@@ -109,26 +109,26 @@ const Home = () => {
 					<p className='text-pink-200 text-lg'>{notice[0]?.notice}</p>
 				</Marquee>
 				{
-					user ? <div className="flex flex-wrap items-center justify-center gap-5 mb-10">
+					loadedUser?.status ? <div className="flex flex-wrap items-center justify-center gap-5 mb-10">
 
-						<Link to={!isStaff ? `/not_authorized` : `/staff/uid_query/${current_User?.uid}`} state={{ pathname: location.pathname }}>
+						<Link to={`/staff/uid_query/${loadedUser?.uid}`} state={{ pathname: location.pathname }}>
 							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
 								Attendence
 							</button>
 						</Link>
-						<Link to={!isStaff ? `/not_authorized` : `/client_corner`} state={{ pathname: location.pathname }}>
+						<Link to={`/client_corner`} state={{ pathname: location.pathname }}>
 							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
 								Client Corner
 							</button>
 						</Link>
-						<Link to={!isStaff ? `/not_authorized` : `/products`} state={{ pathname: location.pathname }}>
+						<Link to={`/products`} state={{ pathname: location.pathname }}>
 							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
 								Products
 							</button>
 						</Link>
 
 						{
-							isAdmin ?
+							loadedUser?.user_category === 'admin' ?
 								<Link to="/admin" state={{ pathname: "/" }}>
 									<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
 										Admin

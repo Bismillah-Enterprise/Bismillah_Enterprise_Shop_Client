@@ -5,15 +5,19 @@ import Loading from '../Shared/Loading/Loading';
 
 const Main = () => {
 	const [loading, setLoading] = useState(false);
-	useEffect(() => {
+	const [ping, setPing] = useState(false);
+	useEffect(() => {		
 		setLoading(true);
-		fetch('https://bismillah-enterprise-server.onrender.com/')
+		fetch('https://bismillah-enterprise-server.onrender.com/shop_code')
 			.then(res => res.json())
 			.then(() => {
 				setLoading(false);
 			})
-		setLoading(false);
-	}, [loading]);
+		setTimeout(() => {
+			setPing(!ping);
+		}, 840000);
+
+	}, [ping]);
 
 	if (loading) {
 		return (<div className='h-[100vh] overflow-hidden'><Loading></Loading></div>);

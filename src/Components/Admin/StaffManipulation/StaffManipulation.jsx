@@ -229,7 +229,7 @@ const StaffManipulation = () => {
 								<Link to={`/staff/uid_query/${staff?.uid}`} state={{ pathname: location.pathname }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>View User</Link>
 
 								{
-									user?.email === 'bismillah786e@gmail.com' ?
+									user?.email === 'toyburrahman48@gmail.com' ?
 										<div>
 											{
 												staff.user_category === 'admin' ?
