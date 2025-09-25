@@ -144,7 +144,7 @@ const StaffsMonthlyRecords = () => {
 							<th>Total Working Time</th>
 							<th>Bonus</th>
 							<th>Total Earn</th>
-							<th></th>
+							<th className={`${user_category === 'admin' ? 'block' : 'hidden'}`}></th>
 						</tr>
 						{
 							current_month_details?.map((day, index) =>
@@ -159,7 +159,7 @@ const StaffsMonthlyRecords = () => {
 									<td id="total_working_hour">{day.total_hour} Hours, {day.total_minute} Minutes</td>
 									<td id="total_working_hour">{day.today_bonus}</td>
 									<td id="total_earning">{day.total_earn} Taka</td>
-									<td onClick={() => { handleDeleteRecord(_id, day.current_date) }} className='text-pink-400 cursor-pointer underline' id="total_earning">Delete</td>
+									<td onClick={() => { handleDeleteRecord(_id, day.current_date) }} className={`${user_category === 'admin' ? 'block' : 'hidden'} text-pink-400 cursor-pointer underline`} id="total_earning">Delete</td>
 								</tr>
 							)
 						}
@@ -174,7 +174,7 @@ const StaffsMonthlyRecords = () => {
 							<td className='text-pink-300'>{total_working_hour} Hours, {total_working_minute} Minutes</td>
 							<td></td>
 							<td className='text-pink-300'>{total_income} Taka</td>
-							<td></td>
+							<td className={`${user_category === 'admin' ? 'block' : 'hidden'}`}></td>
 						</tr>
 					</tbody>
 				</table>
