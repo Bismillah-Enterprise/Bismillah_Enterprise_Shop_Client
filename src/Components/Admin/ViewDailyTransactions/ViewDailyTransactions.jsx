@@ -6,8 +6,8 @@ import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 import Loading from '../../Shared/Loading/Loading';
 
 const ViewDailyTransactions = () => {
-    const loadedTransactions = useLoaderData();
-    const [allTRX, setAllTRX] = useState(loadedTransactions?.summary);
+    const [loadedTransactions, setLoadedTransactions] = useState([]);
+    const [allTRX, setAllTRX] = useState([]);
     const [selectedStartDate, setSelectedStartDate] = useState("");
     const [selectedEndDate, setSelectedEndDate] = useState("");
     const [modal, setModal] = useState(false);
@@ -21,10 +21,8 @@ const ViewDailyTransactions = () => {
 
     useEffect(() => {
         fetch(`https://bismillah-enterprise-server.onrender.com/daily_transactions`).then(res => res.json()).then((data) => {
-            // setComputer(data?.computer_revenues);
-            // setStationary(data?.stationary_revenues);
-            // setPhotocopy(data?.photocopy_revenues);
-            // setOthers(data?.others_revenues);
+            setLoadedTransactions(data);
+            setAllTRX(data?.summary);
             setExpenses(data?.expenses?.reduce((sum, item) => sum + item.amount, 0));
             setAllEx(data?.expenses)
             setAllTRX(data?.summary);
@@ -165,12 +163,12 @@ const ViewDailyTransactions = () => {
                             timer: 1000
                         }).then(() => {
                             setLoading(false);
-                            navigate(0);
+                            setReload(!reload);
+                            // setAllTRX(filtered);
+                            setSelectedStartDate('');
+                            setSelectedEndDate('')
+                            // navigate(0);
                         })
-                        // setReload(!reload);
-                        // setAllTRX(filtered);
-                        // setSelectedStartDate('');
-                        // setSelectedEndDate('')
                     });
             }
         })
@@ -354,95 +352,97 @@ const ViewDailyTransactions = () => {
             </div>
 
 
-
-            <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg pb-10">
-                <table className="text-pink-200 sm:min-w-[80%]">
-                    <thead>
-                        <tr className="text-pink-300">
-                            <th className="p-2 border">Date</th>
-                            <th className="p-2 border">Computer</th>
-                            <th className="p-2 border">Stationary</th>
-                            <th className="p-2 border">Photocopy</th>
-                            <th className="p-2 border">Others</th>
-                            <th className="p-2 border">Expenses</th>
-                            <th className="p-2 border">Cash</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr className={`${(loadedTransactions?.computer_revenues === 0 && loadedTransactions?.stationary_revenues === 0 && loadedTransactions?.photocopy_revenues === 0 && loadedTransactions?.others_revenues === 0 && loadedTransactions?.expenses?.reduce((sum, item) => sum + item?.amount, 0) === 0) ? 'hidden' : ''}`}>
-                            <td className="p-2 border flex gap-5 items-center justify-center"><span className='text-green-500'>{loadedTransactions?.date}</span> <span onClick={handleClose} className={`disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-1 py-1 rounded-md text-xs font-semibold`}>
-                                Close
-                            </span></td>
-                            <td className="p-2 border text-green-500">{loadedTransactions?.computer_revenues}</td>
-                            <td className="p-2 border text-green-500">{loadedTransactions?.stationary_revenues}</td>
-                            <td className="p-2 border text-green-500">{loadedTransactions?.photocopy_revenues}</td>
-                            <td onClick={() => { document.getElementById('modal_date').innerText = loadedTransactions?.date; setDetails(loadedTransactions?.others_revenues); setModal(!modal); }} className="p-2 border cursor-pointer text-green-500 underline">{loadedTransactions?.others_revenues?.reduce((sum, item) => sum + item?.amount, 0)}</td>
-                            <td onClick={() => { document.getElementById('modal_date').innerText = loadedTransactions?.date; setDetails(loadedTransactions?.expenses); setModal(!modal); }} className="p-2 border cursor-pointer text-red-500 underline">{loadedTransactions?.expenses?.reduce((sum, item) => sum + item?.amount, 0)}</td>
-                            <td className={`p-2 border font-bold ${todayCash < 0 ? 'text-red-500' : 'text-green-500'}`}>{todayCash}</td>
-                        </tr>
-                        {allTRX?.sort((a, b) => new Date(b.date) - new Date(a.date)).map((item, index) => {
-
-                            const others =
-                                (item?.others_revenues?.amounts || []).reduce((sum, i) => sum + i, 0);
-
-                            const expenses =
-                                (item?.expenses?.amounts || []).reduce((sum, i) => sum + i, 0);
-
-                            const cash =
-                                (item?.computer_revenues || 0) +
-                                (item?.stationary_revenues || 0) +
-                                (item?.photocopy_revenues || 0) +
-                                others -
-                                expenses;
-
-                            const getExpensesData = item?.expenses || [];
-
-                            const expensesWithDescription = getExpensesData.amounts.map((amount, index) => ({
-                                amount: amount,
-                                comment: getExpensesData.descriptions[index]
-                            }));
-                            const getOthersData = item?.others_revenues || [];
-
-                            const othersWithDescription = getOthersData.amounts.map((amount, index) => ({
-                                amount: amount,
-                                comment: getOthersData.descriptions[index]
-                            }));
-
-                            return (
-                                <tr key={index}>
-                                    <td className="p-2 border">{item?.date}</td>
-
-                                    <td className="p-2 border">{item?.computer_revenues}</td>
-
-                                    <td className="p-2 border">{item?.stationary_revenues}</td>
-
-                                    <td className="p-2 border">{item?.photocopy_revenues}</td>
-
-                                    <td onClick={() => { document.getElementById('modal_date').innerText = item?.date; setDetails(othersWithDescription); setModal(!modal); }} className="p-2 border cursor-pointer underline">{others}</td>
-
-                                    <td onClick={() => { document.getElementById('modal_date').innerText = item?.date; setDetails(expensesWithDescription); setModal(!modal); }} className="p-2 border cursor-pointer underline">{expenses}</td>
-
-                                    <td className={`p-2 border font-bold ${cash < 0 ? "text-red-500" : "text-green-500"}`}>
-                                        {cash}
-                                    </td>
+            {
+                loading ? <div className='my-10 w-full flex items-center justify-center'><div className='w-[80%] rounded-2xl overflow-hidden'><Loading></Loading></div></div> :
+                    <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg pb-10">
+                        <table className="text-pink-200 sm:min-w-[80%]">
+                            <thead>
+                                <tr className="text-pink-300">
+                                    <th className="p-2 border">Date</th>
+                                    <th className="p-2 border">Computer</th>
+                                    <th className="p-2 border">Stationary</th>
+                                    <th className="p-2 border">Photocopy</th>
+                                    <th className="p-2 border">Others</th>
+                                    <th className="p-2 border">Expenses</th>
+                                    <th className="p-2 border">Cash</th>
                                 </tr>
-                            );
-                        })}
+                            </thead>
+                            <tbody>
+                                <tr className={`${(loadedTransactions?.computer_revenues === 0 && loadedTransactions?.stationary_revenues === 0 && loadedTransactions?.photocopy_revenues === 0 && loadedTransactions?.others_revenues === 0 && loadedTransactions?.expenses?.reduce((sum, item) => sum + item?.amount, 0) === 0) ? 'hidden' : ''}`}>
+                                    <td className="p-2 border flex gap-5 items-center justify-center"><span className='text-green-500'>{loadedTransactions?.date}</span> <span onClick={handleClose} className={`disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-1 py-1 rounded-md text-xs font-semibold`}>
+                                        Close
+                                    </span></td>
+                                    <td className="p-2 border text-green-500">{loadedTransactions?.computer_revenues}</td>
+                                    <td className="p-2 border text-green-500">{loadedTransactions?.stationary_revenues}</td>
+                                    <td className="p-2 border text-green-500">{loadedTransactions?.photocopy_revenues}</td>
+                                    <td onClick={() => { document.getElementById('modal_date').innerText = loadedTransactions?.date; setDetails(loadedTransactions?.others_revenues); setModal(!modal); }} className="p-2 border cursor-pointer text-green-500 underline">{loadedTransactions?.others_revenues?.reduce((sum, item) => sum + item?.amount, 0)}</td>
+                                    <td onClick={() => { document.getElementById('modal_date').innerText = loadedTransactions?.date; setDetails(loadedTransactions?.expenses); setModal(!modal); }} className="p-2 border cursor-pointer text-red-500 underline">{loadedTransactions?.expenses?.reduce((sum, item) => sum + item?.amount, 0)}</td>
+                                    <td className={`p-2 border font-bold ${todayCash < 0 ? 'text-red-500' : 'text-green-500'}`}>{todayCash}</td>
+                                </tr>
+                                {allTRX?.sort((a, b) => new Date(b.date) - new Date(a.date)).map((item, index) => {
 
-                    </tbody>
-                    <thead>
-                        <tr className="text-pink-300">
-                            <th className="p-2 border">Total</th>
-                            <th className="p-2 border">{totalComputer}</th>
-                            <th className="p-2 border">{totalStationary}</th>
-                            <th className="p-2 border">{totalPhotocopy}</th>
-                            <th className="p-2 border">{totalOthers}</th>
-                            <th className="p-2 border">{totalExpenses}</th>
-                            <th className={`p-2 border font-bold ${totalCash < 0 ? 'text-red-500' : 'text-green-500'}`}>{totalCash}</th>
-                        </tr>
-                    </thead>
-                </table>
-            </div>
+                                    const others =
+                                        (item?.others_revenues?.amounts || []).reduce((sum, i) => sum + i, 0);
+
+                                    const expenses =
+                                        (item?.expenses?.amounts || []).reduce((sum, i) => sum + i, 0);
+
+                                    const cash =
+                                        (item?.computer_revenues || 0) +
+                                        (item?.stationary_revenues || 0) +
+                                        (item?.photocopy_revenues || 0) +
+                                        others -
+                                        expenses;
+
+                                    const getExpensesData = item?.expenses || [];
+
+                                    const expensesWithDescription = getExpensesData.amounts.map((amount, index) => ({
+                                        amount: amount,
+                                        comment: getExpensesData.descriptions[index]
+                                    }));
+                                    const getOthersData = item?.others_revenues || [];
+
+                                    const othersWithDescription = getOthersData.amounts.map((amount, index) => ({
+                                        amount: amount,
+                                        comment: getOthersData.descriptions[index]
+                                    }));
+
+                                    return (
+                                        <tr key={index}>
+                                            <td className="p-2 border">{item?.date}</td>
+
+                                            <td className="p-2 border">{item?.computer_revenues}</td>
+
+                                            <td className="p-2 border">{item?.stationary_revenues}</td>
+
+                                            <td className="p-2 border">{item?.photocopy_revenues}</td>
+
+                                            <td onClick={() => { document.getElementById('modal_date').innerText = item?.date; setDetails(othersWithDescription); setModal(!modal); }} className="p-2 border cursor-pointer underline">{others}</td>
+
+                                            <td onClick={() => { document.getElementById('modal_date').innerText = item?.date; setDetails(expensesWithDescription); setModal(!modal); }} className="p-2 border cursor-pointer underline">{expenses}</td>
+
+                                            <td className={`p-2 border font-bold ${cash < 0 ? "text-red-500" : "text-green-500"}`}>
+                                                {cash}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+
+                            </tbody>
+                            <thead>
+                                <tr className="text-pink-300">
+                                    <th className="p-2 border">Total</th>
+                                    <th className="p-2 border">{totalComputer}</th>
+                                    <th className="p-2 border">{totalStationary}</th>
+                                    <th className="p-2 border">{totalPhotocopy}</th>
+                                    <th className="p-2 border">{totalOthers}</th>
+                                    <th className="p-2 border">{totalExpenses}</th>
+                                    <th className={`p-2 border font-bold ${totalCash < 0 ? 'text-red-500' : 'text-green-500'}`}>{totalCash}</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+            }
             <div className='flex items-center justify-center gap-5'>
                 <button onClick={() => { handleDelete(selectedStartDate || organizedData[organizedData.length - 1]?.date, selectedEndDate || organizedData[0]?.date) }} className={` text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-sm lg:text-lg font-semibold`}>
                     Delete Data
