@@ -45,6 +45,8 @@ import AirTicketClientDetails from '../Admin/AirTicketClientDetails/AirTicketCli
 import AirTicketClientTransections from '../Admin/AirTicketClientTransections/AirTicketClientTransections';
 import AirTicketNewVoucher from '../Admin/AirTicketNewVoucher/AirTicketNewVoucher';
 import AirTicketVoucher from '../Admin/AirTicketVoucher/AirTicketVoucher';
+import DailyTransactions from '../DailyTransactions/DailyTransactions';
+import ViewDailyTransactions from '../Admin/ViewDailyTransactions/ViewDailyTransactions';
 
 const router = createBrowserRouter([
 	{
@@ -88,6 +90,10 @@ const router = createBrowserRouter([
 			{
 				path: '/new_client',
 				element: <CreateNewClient></CreateNewClient>,
+			},
+			{
+				path: '/daily_transactions',
+				element: <DailyTransactions></DailyTransactions>,
 			},
 			{
 				path: '/new_client_new_voucher',
@@ -137,6 +143,11 @@ const router = createBrowserRouter([
 						path: '/admin/shop_transections',
 						element: <AdminRoute><ShopTransections></ShopTransections></AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`)
+					},
+					{
+						path: '/admin/daily_transactions',
+						element: <AdminRoute><ViewDailyTransactions></ViewDailyTransactions></AdminRoute>,
+						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/daily_transactions`)
 					},
 					{
 						path: '/admin/revenue_transections_details',

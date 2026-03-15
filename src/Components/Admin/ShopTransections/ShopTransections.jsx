@@ -48,7 +48,7 @@ const ShopTransections = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/shop_transections`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'

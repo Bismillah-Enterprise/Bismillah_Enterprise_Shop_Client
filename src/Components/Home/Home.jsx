@@ -57,7 +57,6 @@ const Home = () => {
 			.then(res => res.json())
 			.then(data => {
 				setLoadedUser(data);
-				console.log(data.status);
 				const { _id, today_date, name, hour_rate, last_month_due, withdrawal_amount, today_enter1_time, today_exit1_time, bonus, available_balance, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, total_bonus, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = data;
 				if (today_date !== todayOnlyDateIntFormat) {
 					const TodaySummary = {
@@ -124,6 +123,11 @@ const Home = () => {
 						<Link to={`/products`} state={{ pathname: location.pathname }}>
 							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
 								Products
+							</button>
+						</Link>
+						<Link to={`/daily_transactions`} state={{ pathname: location.pathname }}>
+							<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
+								Daily Transactions
 							</button>
 						</Link>
 

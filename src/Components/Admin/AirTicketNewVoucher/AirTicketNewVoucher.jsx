@@ -134,7 +134,7 @@ const AirTicketNewVoucher = () => {
         const newSlNo = voucherSl + 1;
         const discountAmount = parseFloat(discount_amount_ref.current.value || '0');
         const ticketPrice = parseFloat(ticket_price_ref.current.value || '0');
-        const dueAmount = parseFloat(due);
+        const dueAmount = parseFloat(due) || 0;
         const voucher = {
             date: `${currentDate}, ${Time}`,
             voucher_no: newSlNo,

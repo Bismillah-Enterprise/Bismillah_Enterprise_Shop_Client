@@ -213,6 +213,46 @@ th {
   display: none;
 }
 
+.custom-date {
+  font-size: 14px;
+  color: #ffbf00;
+  background-color: transparent;
+  height: 100%;
+  width: 100%;
+}
+
+/* Hide calendar icon (Chrome / Edge / Safari) */
+.custom-date::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  color: #FFBF00;
+  background-color: #FFBF00;
+  background: url('https://img.freepik.com/free-photo/construction-site-sunset_23-2152006125.jpg?semt=ais_hybrid&w=740&q=80');
+  border-radius: 50%;
+  width: 108px;
+  height: 108px;
+  cursor: pointer;
+}
+
+.loan-date {
+  font-size: 14px;
+  color: #ffbf00;
+  background-color: transparent;
+  height: 100%;
+  width: 100%;
+}
+
+/* Hide calendar icon (Chrome / Edge / Safari) */
+.loan-date::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  color: #FFBF00;
+  background-color: #FFBF00;
+  /* background: url('https://www.citypng.com/public/uploads/preview/calendar-date-vector-flat-icon-png-7017516949739211umvfiwzkw.png'); */
+  border-radius: 50%;
+  width: 100%;
+  height: 100px;
+  cursor: pointer;
+}
+
 
 /* Media query for mobile responsive */
 
