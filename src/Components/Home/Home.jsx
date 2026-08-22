@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link, useLoaderData, useLocation } from 'react-router-dom';
+import { Link, useLoaderData, useLocation, useNavigation } from 'react-router-dom';
 import { AuthContext } from '../Providers/AuthProvider';
 import Loading from '../Shared/Loading/Loading';
 import useCurrentUser from '../Hooks/useCurrentUser';
@@ -14,17 +14,34 @@ import {
 	FaUserClock,
 	FaReceipt
 } from 'react-icons/fa';
+import { useEffectEvent } from 'react';
 
 const Home = () => {
+
+	const navigation = useNavigation();
 	const { user, loading, setLoading } = useContext(AuthContext);
-	const notice = useLoaderData();
-	const [current_User, isAdmin, isStaff, userHookLoading] = useCurrentUser();
+
+	const [notice, setNotice] = useState('');
+
+	const [
+		current_User,
+		isAdmin,
+		isStaff,
+		userHookLoading
+	] = useCurrentUser();
+
 	const location = useLocation();
+
 	const [dateCheckLoading, setDateCheckLoading] = useState(false);
 	const [adminLoading, setAdminLoading] = useState(false);
 	const [logedinUser, setlogedinUser] = useState();
 	const [loadedUser, setLoadedUser] = useState();
+
 	const [now, setNow] = useState(new Date());
+
+	useEffect(() => {
+		fetch('https://bismillah-enterprise-server.onrender.com/notice_panel').then(res => res.json()).then(data => setNotice(data));
+	})
 
 	useEffect(() => {
 		const timer = setInterval(() => {
@@ -58,73 +75,154 @@ const Home = () => {
 		);
 
 	useEffect(() => {
+
 		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
 			.then(bonusRes => bonusRes.json())
 			.then(bonusData => {
-				if (bonusData.date !== currentDate) {
-					fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
-						method: 'PUT',
-						headers: { 'content-type': 'application/json' },
-						body: JSON.stringify({ entry_type: 'new day', date: currentDate }),
-					}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
-						if (firstEntryData.acknowledged) {
 
+				if (bonusData.date !== currentDate) {
+
+					fetch(
+						`https://bismillah-enterprise-server.onrender.com/staff_bonus`,
+						{
+							method: 'PUT',
+							headers: {
+								'content-type': 'application/json'
+							},
+							body: JSON.stringify({
+								entry_type: 'new day',
+								date: currentDate
+							}),
 						}
-					})
+					)
+						.then(firstEntryRes => firstEntryRes.json())
+						.then(firstEntryData => {
+
+							if (firstEntryData.acknowledged) {
+							}
+
+						});
+
 				}
-			})
-	}, [])
+
+			});
+
+	}, []);
+
+
 	useEffect(() => {
+
 		setDateCheckLoading(true);
+
 		const todayFullDate = new Date();
-		const todayOnlyDate = todayFullDate.toLocaleDateString('en-BD', { day: 'numeric' });
-		const todayOnlyDateIntFormat = parseInt(todayOnlyDate);
-		fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${user?.uid}`)
+
+		const todayOnlyDate =
+			todayFullDate.toLocaleDateString(
+				'en-BD',
+				{ day: 'numeric' }
+			);
+
+		const todayOnlyDateIntFormat =
+			parseInt(todayOnlyDate);
+
+		fetch(
+			`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${user?.uid}`
+		)
 			.then(res => res.json())
 			.then(data => {
+
 				setLoadedUser(data);
-				const { _id, today_date, name, hour_rate, last_month_due, withdrawal_amount, today_enter1_time, today_exit1_time, bonus, available_balance, today_enter2_time, today_exit2_time, uid, user_category, total_working_hour, total_income, total_working_minute, additional_movement_status, total_bonus, additional_enter_time, additional_exit_time, additional_movement_hour, additional_movement_minute } = data;
+
+				const {
+					_id,
+					today_date,
+					name,
+					hour_rate,
+					last_month_due,
+					withdrawal_amount,
+					today_enter1_time,
+					today_exit1_time,
+					today_enter2_time,
+					today_exit2_time,
+					uid,
+					user_category,
+					total_working_hour,
+					total_income,
+					total_working_minute,
+					additional_movement_status,
+					total_bonus,
+					additional_enter_time,
+					additional_exit_time,
+					additional_movement_hour,
+					additional_movement_minute,
+					available_balance
+				} = data;
+
 				if (today_date !== todayOnlyDateIntFormat) {
+
 					const TodaySummary = {
+
 						currentDate,
 						currentDayName,
+
 						today_enter1_time: "",
 						today_exit1_time: "",
 						today_enter2_time: "",
 						today_exit2_time: "",
+
 						total_hour: 0,
 						total_minute: 0,
 						total_earn: 0,
+
 						total_working_hour,
 						total_working_minute,
 						total_income,
+
 						available_balance,
+
 						additional_movement_hour,
 						additional_movement_minute,
+
 						today_bonus: 0,
 						total_bonus,
-						today_date: todayOnlyDateIntFormat
+
+						today_date:
+							todayOnlyDateIntFormat
 					};
-					// Save to database
-					fetch(`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`, {
-						method: 'PUT',
-						headers: {
-							'content-type': 'application/json'
-						},
-						body: JSON.stringify(TodaySummary)
-					})
+
+					fetch(
+						`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`,
+						{
+							method: 'PUT',
+							headers: {
+								'content-type': 'application/json'
+							},
+							body: JSON.stringify(
+								TodaySummary
+							)
+						}
+					)
 						.then(res => res.json())
 						.then(() => {
 						});
+
 				}
 				else {
 					return;
 				}
-			})
-		setDateCheckLoading(false);
-	}, [user])
 
-	if (dateCheckLoading) {
+			});
+
+		setDateCheckLoading(false);
+
+	}, [user]);
+
+
+	// =========================================================
+	// LOADING
+	// =========================================================
+
+	if (dateCheckLoading || navigation.state === "loading") {
 
 		return (
 			<div className="h-full rounded-3xl overflow-hidden">

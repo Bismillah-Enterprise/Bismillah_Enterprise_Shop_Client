@@ -53,7 +53,7 @@ const router = createBrowserRouter([
 			{
 				path: '/',
 				element: <Home></Home>,
-				loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/notice_panel`)
+				// loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/notice_panel`)
 			},
 			{
 				path: '/staff/uid_query/:uid',
