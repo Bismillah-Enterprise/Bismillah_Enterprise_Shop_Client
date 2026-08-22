@@ -3,6 +3,7 @@ import { NumberFormatBase, NumericFormat } from 'react-number-format';
 import { data, Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
+import AirTicketVoucherHeading from '../../Shared/AirTicketVoucherHeading/AirTicketVoucherHeading';
 
 const AirTicketNewVoucher = () => {
     const client = useLoaderData();
@@ -223,219 +224,299 @@ const AirTicketNewVoucher = () => {
         })
     };
     return (
-        <div>
-            <div className='print:hidden'>
-                <div>
-                    <div className='flex items-center justify-start'>
-                        <Link to={from}>
-                            <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                                Back
-                            </button>
-                        </Link>
+        <div className="relative min-h-full text-slate-200">
+            <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+                <div className="absolute -left-40 top-10 h-96 w-96 rounded-full bg-emerald-500/[0.06] blur-[120px]" />
+                <div className="absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-cyan-500/[0.05] blur-[130px]" />
+                <div className="absolute bottom-0 left-1/3 h-96 w-96 rounded-full bg-violet-500/[0.04] blur-[140px]" />
+            </div>
+            <div>
+                <div className='print:hidden'>
+                    <div>
+                        <div className='flex items-center justify-start'>
+                            <Link to={from}>
+                                <button className="hidden md:block text-slate-200 cursor-pointer rounded-xl border border-emerald-400/15 bg-gradient-to-r from-emerald-400/10 to-cyan-400/[0.04] shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)] shadow-emerald-400/10 px-5 py-1 text-md lg:text-lg font-semibold">
+                                    Back
+                                </button>
+                            </Link>
+                        </div>
+                        <div className='flex items-center justify-center nunito'>
+                            <h1 className="nunito text-2xl text-center font-bold px-5 text-emerald-300">
+                                Voucher - {voucherSl + 1}
+                            </h1>
+                        </div>
+                        <div className='flex items-center justify-center'>
+                            <div className='text-lg font-semibold grid grid-cols-2 text-slate-200 min-w-[380px] sm:min-w-[70%]'>
+                                <div className=''>
+                                    <h1>Name: {client.name}</h1>
+                                    <h1>Mobile No: {client.mobile_no}</h1>
+                                    <h1>Date of Birth: {client.date_of_birth}</h1>
+                                    <h1>Address: {client.address}</h1>
+                                </div>
+                                <div className='flex justify-end'>
+                                    <div>
+                                        <h1>Date: {currentDate}</h1>
+                                        <h1>Passport No: {client.passport_no}</h1>
+                                        <h1>Date of Expiry: {client.date_of_expiry}</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className='flex items-center justify-center nunito'>
-                        <h1 className="nunito text-2xl text-center font-bold px-5 text-pink-300">
-                            Voucher - {voucherSl + 1}
-                        </h1>
+                    <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
+                        <table className="text-slate-200 min-w-[380px] sm:min-w-[100%]">
+                            <thead>
+                                <tr className="text-emerald-300">
+                                    <th className="border p-2">Destination</th>
+                                    <th className="border p-2">Flight Date</th>
+                                    <th className="border p-2">Ticket Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td className="border p-2">
+                                        <input
+                                            type="text"
+                                            onChange={(e) => { setDestination(e.target.value) }}
+                                            getInputRef={destination_ref}
+                                            className="w-full p-1 outline-none"
+                                        />
+                                    </td>
+                                    <td className="border p-2">
+                                        <input
+                                            type="text"
+                                            onChange={(e) => { setFlightDate(e.target.value) }}
+                                            getInputRef={flight_date_ref}
+                                            className="w-full p-1 outline-none"
+                                        />
+                                    </td>
+                                    <td className="border p-2">
+                                        <NumericFormat
+                                            value={ticketPrice}
+                                            getInputRef={ticket_price_ref}
+                                            onChange={handleDiscountPaidChange}
+                                            className="outline-none w-full h-full text-center"
+                                            placeholder="Enter Price"
+                                            allowNegative={false}
+                                            decimalScale={2}
+                                            fixedDecimalScale={false}
+                                            thousandSeparator={false}
+                                        />
+                                    </td>
+                                </tr>
+                                <tr className="text-right font-semibold">
+                                    <td className="p-2 border"></td>
+                                    <td className="p-2 border">Discount</td>
+                                    <td className="p-2 border text-right">
+                                        <NumericFormat
+                                            value={discount}
+                                            getInputRef={discount_amount_ref}
+                                            onChange={handleDiscountPaidChange}
+                                            className='outline-none w-full h-full text-center'
+                                            placeholder='Enter discount'
+                                            allowNegative={false}
+                                            decimalScale={2}
+                                            fixedDecimalScale={false}
+                                            thousandSeparator={false}
+                                        />
+                                    </td>
+                                </tr>
+                                <tr className="text-right font-semibold">
+                                    <td className="p-2 border"></td>
+                                    <td className="p-2 border">Paid Amount</td>
+                                    <td className="p-2 border text-right">
+                                        <NumericFormat
+                                            value={paid}
+                                            getInputRef={paid_amount_ref}
+                                            onChange={handleDiscountPaidChange}
+                                            className='outline-none w-full h-full text-center'
+                                            placeholder='Enter amount'
+                                            allowNegative={false}
+                                            decimalScale={2}
+                                            fixedDecimalScale={false}
+                                            thousandSeparator={false}
+                                        />
+                                    </td>
+                                </tr>
+
+                                <tr className="text-right font-semibold">
+                                    <td ref={status_ref} className="p-2 border text-center">{status}</td>
+                                    <td className="p-2 border">Due Amount</td>
+                                    <td className="p-2 border text-right">
+                                        {due}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div className='flex items-center justify-center'>
-                        <div className='text-lg font-semibold grid grid-cols-2 text-pink-200 min-w-[380px] sm:min-w-[70%]'>
-                            <div className=''>
+                    <div className='flex items-center justify-center gap-5 mt-5'>
+                        {/* <button onClick={addProduct} className="text-slate-200 cursor-pointer rounded-xl border border-emerald-400/15 bg-gradient-to-r from-emerald-400/10 to-cyan-400/[0.04] shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)] shadow-emerald-400/10 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                        + Add Product
+                    </button> */}
+                        <button onClick={handleSubmit} className="text-slate-200 cursor-pointer rounded-xl border border-emerald-400/15 bg-gradient-to-r from-emerald-400/10 to-cyan-400/[0.04] shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)] shadow-emerald-400/10 px-5 py-1 text-md lg:text-lg font-semibold">
+                            Create Voucher
+                        </button>
+                        <button onClick={handlePrint} className="text-slate-200 cursor-pointer rounded-xl border border-emerald-400/15 bg-gradient-to-r from-emerald-400/10 to-cyan-400/[0.04] shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)] shadow-emerald-400/10 px-5 py-1 text-md lg:text-lg font-semibold">
+                            Print
+                        </button>
+                    </div>
+                </div>
+                <div
+                    ref={voucherPrintRef}
+                    className="nunito w-[550px] hidden"
+                >
+                    <AirTicketVoucherHeading />
+
+                    <div className="flex items-center justify-center">
+
+                        <div className="text-sm font-semibold grid grid-cols-2 text-black w-full">
+
+                            <div>
                                 <h1>Name: {client.name}</h1>
                                 <h1>Mobile No: {client.mobile_no}</h1>
                                 <h1>Date of Birth: {client.date_of_birth}</h1>
                                 <h1>Address: {client.address}</h1>
                             </div>
-                            <div className='flex justify-end'>
+
+                            <div className="flex justify-end">
+
                                 <div>
                                     <h1>Date: {currentDate}</h1>
                                     <h1>Passport No: {client.passport_no}</h1>
                                     <h1>Date of Expiry: {client.date_of_expiry}</h1>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="text-pink-200 min-w-[380px] sm:min-w-[100%]">
-                        <thead>
-                            <tr className="text-pink-300">
-                                <th className="border p-2">Destination</th>
-                                <th className="border p-2">Flight Date</th>
-                                <th className="border p-2">Ticket Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td className="border p-2">
-                                    <input
-                                        type="text"
-                                        onChange={(e) => { setDestination(e.target.value) }}
-                                        getInputRef={destination_ref}
-                                        className="w-full p-1 outline-none"
-                                    />
-                                </td>
-                                <td className="border p-2">
-                                    <input
-                                        type="text"
-                                        onChange={(e) => { setFlightDate(e.target.value) }}
-                                        getInputRef={flight_date_ref}
-                                        className="w-full p-1 outline-none"
-                                    />
-                                </td>
-                                <td className="border p-2">
-                                    <NumericFormat
-                                        value={ticketPrice}
-                                        getInputRef={ticket_price_ref}
-                                        onChange={handleDiscountPaidChange}
-                                        className="outline-none w-full h-full text-center"
-                                        placeholder="Enter Price"
-                                        allowNegative={false}
-                                        decimalScale={2}
-                                        fixedDecimalScale={false}
-                                        thousandSeparator={false}
-                                    />
-                                </td>
-                            </tr>
-                            <tr className="text-right font-semibold">
-                                <td className="p-2 border"></td>
-                                <td className="p-2 border">Discount</td>
-                                <td className="p-2 border text-right">
-                                    <NumericFormat
-                                        value={discount}
-                                        getInputRef={discount_amount_ref}
-                                        onChange={handleDiscountPaidChange}
-                                        className='outline-none w-full h-full text-center'
-                                        placeholder='Enter discount'
-                                        allowNegative={false}
-                                        decimalScale={2}
-                                        fixedDecimalScale={false}
-                                        thousandSeparator={false}
-                                    />
-                                </td>
-                            </tr>
-                            <tr className="text-right font-semibold">
-                                <td className="p-2 border"></td>
-                                <td className="p-2 border">Paid Amount</td>
-                                <td className="p-2 border text-right">
-                                    <NumericFormat
-                                        value={paid}
-                                        getInputRef={paid_amount_ref}
-                                        onChange={handleDiscountPaidChange}
-                                        className='outline-none w-full h-full text-center'
-                                        placeholder='Enter amount'
-                                        allowNegative={false}
-                                        decimalScale={2}
-                                        fixedDecimalScale={false}
-                                        thousandSeparator={false}
-                                    />
-                                </td>
-                            </tr>
 
-                            <tr className="text-right font-semibold">
-                                <td ref={status_ref} className="p-2 border text-center">{status}</td>
-                                <td className="p-2 border">Due Amount</td>
-                                <td className="p-2 border text-right">
-                                    {due}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div className='flex items-center justify-center gap-5 mt-5'>
-                    {/* <button onClick={addProduct} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                        + Add Product
-                    </button> */}
-                    <button onClick={handleSubmit} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                        Create Voucher
-                    </button>
-                    <button onClick={handlePrint} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                        Print
-                    </button>
-                </div>
-            </div>
-            <div ref={voucherPrintRef} className='nunito w-[550px] hidden'>
-                <VoucherHeading></VoucherHeading>
-                <div className='flex items-center justify-center'>
-                    <div className='text-sm font-semibold grid grid-cols-2 text-black w-full'>
-                        <div className=''>
-                            <h1>Name: {client.name}</h1>
-                            <h1>Mobile No: {client.mobile_no}</h1>
-                            <h1>Date of Birth: {client.date_of_birth}</h1>
-                            <h1>Address: {client.address}</h1>
+                            </div>
+
                         </div>
-                        <div className='flex justify-end'>
+
+                    </div>
+
+                    <div className="flex items-center justify-center nunito">
+
+                        <h1 className="nunito text-xl text-center font-bold px-5 text-black">
+                            Voucher - {voucherSl + 1}
+                        </h1>
+
+                    </div>
+
+                    <div className="flex items-center justify-center mt-1 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-md">
+
+                        <div className="absolute w-full flex items-center justify-center">
+
                             <div>
-                                <h1>Date: {currentDate}</h1>
-                                <h1>Passport No: {client.passport_no}</h1>
-                                <h1>Date of Expiry: {client.date_of_expiry}</h1>
+                                <h1 className="text-7xl font-bold opacity-20">
+                                    {status}
+                                </h1>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <div className='flex items-center justify-center nunito'>
-                    <h1 className="nunito text-xl text-center font-bold px-5 text-black">
-                        Voucher - {voucherSl + 1}
-                    </h1>
-                </div>
-                <div className="flex items-center justify-center mt-1 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-md">
-                    <div className='absolute w-full flex items-center justify-center'>
-                        <div className=''>
-                            <h1 className='text-7xl font-bold opacity-20'>{status}</h1>
-                        </div>
-                    </div>
-                    <table className="text-black w-full">
-                        <thead>
-                            <tr className="text-black">
-                                <th className="border p-2">Destination</th>
-                                <th className="border p-2">Flight Date</th>
-                                <th className="border p-2">Ticket Price</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td className="border p-2 text-center">
-                                    {destination}
-                                </td>
-                                <td className="border p-2 text-center">
-                                    {flightDate}
-                                </td>
-                                <td className="border p-2 text-center">
-                                    {ticketPrice}
-                                </td>
-                            </tr>
-                            <tr className="text-right font-semibold">
-                                <td className="p-2 border"></td>
-                                <td className="p-2 border">Discount</td>
-                                <td className="p-2 border text-center">
-                                    {discount}
-                                </td>
-                            </tr>
-                            <tr className="text-right font-semibold">
-                                <td className="p-2 border"></td>
-                                <td className="p-2 border">Paid Amount</td>
-                                <td className="p-2 border text-center">
-                                    {paid}
-                                </td>
-                            </tr>
 
-                            <tr className="text-right font-semibold">
-                                <td ref={status_ref} className="p-2 border text-center">{status}</td>
-                                <td className="p-2 border">Due Amount</td>
-                                <td className="p-2 border text-center">
-                                    {due}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div className='flex items-center justify-between mt-20 text-xs absolute bottom-0 w-1/2'>
-                    <div className='border-t-2 pt-1 w-fit px-5 ml-4'>
-                        <h1>Buyer Sign</h1>
+                        </div>
+
+                        <table className="text-black w-full border-collapse">
+
+                            <thead>
+
+                                <tr className="text-black">
+
+                                    <th className="border border-black p-2">
+                                        Destination
+                                    </th>
+
+                                    <th className="border border-black p-2">
+                                        Flight Date
+                                    </th>
+
+                                    <th className="border border-black p-2">
+                                        Ticket Price
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                <tr>
+
+                                    <td className="border border-black p-2 text-center">
+                                        {destination}
+                                    </td>
+
+                                    <td className="border border-black p-2 text-center">
+                                        {flightDate}
+                                    </td>
+
+                                    <td className="border border-black p-2 text-center">
+                                        {ticketPrice}
+                                    </td>
+
+                                </tr>
+
+                                <tr className="text-right font-semibold">
+
+                                    <td className="p-2 border border-black" />
+
+                                    <td className="p-2 border border-black">
+                                        Discount
+                                    </td>
+
+                                    <td className="p-2 border border-black text-center">
+                                        {discount}
+                                    </td>
+
+                                </tr>
+
+                                <tr className="text-right font-semibold">
+
+                                    <td className="p-2 border border-black" />
+
+                                    <td className="p-2 border border-black">
+                                        Paid Amount
+                                    </td>
+
+                                    <td className="p-2 border border-black text-center">
+                                        {paid}
+                                    </td>
+
+                                </tr>
+
+                                <tr className="text-right font-semibold">
+
+                                    <td
+                                        ref={status_ref}
+                                        className="p-2 border border-black text-center"
+                                    >
+                                        {status}
+                                    </td>
+
+                                    <td className="p-2 border border-black">
+                                        Due Amount
+                                    </td>
+
+                                    <td className="p-2 border border-black text-center">
+                                        {due}
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
                     </div>
-                    <div className='border-t-2 pt-1 w-fit px-5 mr-8'>
-                        <h1>Seller Sign</h1>
+
+                    <div className="flex items-center justify-between mt-20 text-xs absolute bottom-0 w-1/2">
+
+                        <div className="border-t-2 border-black pt-1 w-fit px-5 ml-4">
+                            <h1>Buyer Sign</h1>
+                        </div>
+
+                        <div className="border-t-2 border-black pt-1 w-fit px-5 mr-8">
+                            <h1>Seller Sign</h1>
+                        </div>
+
                     </div>
+
                 </div>
             </div>
         </div>

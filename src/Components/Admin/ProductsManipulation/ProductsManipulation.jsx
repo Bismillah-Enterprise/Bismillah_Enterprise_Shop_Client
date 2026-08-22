@@ -1,246 +1,441 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MdOutlineCancel } from 'react-icons/md';
+import { MdAdd, MdDeleteOutline, MdOutlineCancel, MdSearch } from 'react-icons/md';
 import { NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
+const API = 'https://bismillah-enterprise-server.onrender.com';
+
 const ProductsManipulation = () => {
     const loadedProducts = useLoaderData();
-    const [allProducts, setAllProducts] = useState(loadedProducts);
-    const location = useLocation();
-    const from = location?.state?.pathname;
+    const [allProducts, setAllProducts] = useState(loadedProducts || []);
     const [modal, setModal] = useState(false);
+    const [search, setSearch] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const location = useLocation();
     const navigate = useNavigate();
-    useEffect(() => {
-        fetch(`https://bismillah-enterprise-server.onrender.com/products`)
-            .then(res => res.json())
-            .then(data => {
-                setAllProducts(data);
-            })
-    }, [])
-    useEffect(() => {
-        fetch(`https://bismillah-enterprise-server.onrender.com/products`)
-            .then(res => res.json())
-            .then(data => {
-                setAllProducts(data);
-            })
-    }, [modal])
+    const from = location?.state?.pathname;
 
-    const handleDelete = (id) => {
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, Delete It!"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/products/${id}`, {
-                    method: 'DELETE'
-                }).then(res => res.json())
-                setModal(false);
-                Swal.fire({
-                    title: "Deleted!",
-                    text: "Product Deleted Successfully.",
-                    icon: "success"
-                }).then(() => {
-                    window.location.reload();
-                })
-            }
-        });
-    }
+    const productNameRef = useRef();
+    const quantityRef = useRef();
+    const buyPriceRef = useRef();
+    const sellPriceRef = useRef();
 
-    const handleAddProduct = () => {
-        const product_name = product_name_ref.current.value;
-        const product_quantity = parseFloat(product_quantity_ref.current.value);
-        const product_buy_price = parseFloat(product_buy_price_ref.current.value);
-        const product_sell_price = parseFloat(product_sell_price_ref.current.value);
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const res = await fetch(`${API}/products`);
+            const data = await res.json();
+            setAllProducts(data);
+        } catch {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed to load products',
+                background: '#0b1b18',
+                color: '#fff'
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const filteredProducts = allProducts.filter(product =>
+        product.product_name?.toLowerCase().includes(search.toLowerCase()) ||
+        String(product.product_sell_price).includes(search)
+    );
+
+    const closeModal = () => {
+        setModal(false);
+        if (productNameRef.current) productNameRef.current.value = '';
+        if (quantityRef.current) quantityRef.current.value = '';
+        if (buyPriceRef.current) buyPriceRef.current.value = '';
+        if (sellPriceRef.current) sellPriceRef.current.value = '';
+    };
+
+    const handleAddProduct = async () => {
+        const product_name = productNameRef.current?.value?.trim();
+        const product_quantity = parseFloat(quantityRef.current?.value);
+        const product_buy_price = parseFloat(buyPriceRef.current?.value);
+        const product_sell_price = parseFloat(sellPriceRef.current?.value);
+
+        if (
+            !product_name ||
+            isNaN(product_quantity) ||
+            isNaN(product_buy_price) ||
+            isNaN(product_sell_price)
+        ) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete Information',
+                text: 'Please fill in all product fields.',
+                background: '#0b1b18',
+                color: '#fff'
+            });
+            return;
+        }
+
+        if (product_sell_price < product_buy_price) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Price',
+                text: 'Sell price cannot be lower than buy price.',
+                background: '#0b1b18',
+                color: '#fff'
+            });
+            return;
+        }
 
         const product = {
             product_name,
             product_quantity,
             product_buy_price,
             product_sell_price
-        }
+        };
 
-        Swal.fire({
-            title: "Are you sure?",
-            text: `You Are Adding ${product_name} In The Shop`,
-            icon: "warning",
+        const result = await Swal.fire({
+            title: 'Add Product?',
+            text: `Add "${product_name}" to your shop?`,
+            icon: 'question',
             showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, I am Sure"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/products`, {
-                    method: 'POST',
-                    headers: {
-                        'content-type': 'application/json'
-                    },
-                    body: JSON.stringify(product)
-                })
-                    .then(res => res.json())
-                    .then(productdata => {
-                        if (productdata.acknowledged) {
-                            setModal(false);
-                            navigate(location.pathname)
-                            product_name_ref.current.value = '';
-                            product_quantity_ref.current.value = '';
-                            product_buy_price_ref.current.value = '';
-                            product_sell_price_ref.current.value = '';
-                            Swal.fire({
-                                position: 'center',
-                                icon: 'success',
-                                title: 'Product Added Successfully',
-                                showConfirmButton: false,
-                                timer: 1000,
-                            })
-                        }
-                    })
+            confirmButtonText: 'Add Product',
+            cancelButtonText: 'Cancel',
+            background: '#0b1b18',
+            color: '#fff',
+            confirmButtonColor: '#059669',
+            cancelButtonColor: '#334155'
+        });
+
+        if (!result.isConfirmed) return;
+
+        try {
+            const res = await fetch(`${API}/products`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify(product)
+            });
+
+            const data = await res.json();
+
+            if (data.acknowledged) {
+                closeModal();
+                await fetchProducts();
+
+                Swal.fire({
+                    position: 'center',
+                    icon: 'success',
+                    title: 'Product Added',
+                    showConfirmButton: false,
+                    timer: 1200,
+                    background: '#0b1b18',
+                    color: '#fff'
+                });
             }
+        } catch {
+            Swal.fire({
+                icon: 'error',
+                title: 'Something went wrong',
+                background: '#0b1b18',
+                color: '#fff'
+            });
+        }
+    };
 
-        })
-    }
+    const handleDelete = async id => {
+        const result = await Swal.fire({
+            title: 'Delete Product?',
+            text: "This action can't be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel',
+            background: '#0b1b18',
+            color: '#fff',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#334155'
+        });
 
-    const product_name_ref = useRef();
-    const product_quantity_ref = useRef();
-    const product_buy_price_ref = useRef();
-    const product_sell_price_ref = useRef();
+        if (!result.isConfirmed) return;
 
+        try {
+            const res = await fetch(`${API}/products/${id}`, {
+                method: 'DELETE'
+            });
 
-    const handleSearch = (text) => {
-        const filterProducts = loadedProducts.filter(product => ((product.product_name).toLowerCase()).includes(text.toLowerCase()) || product.product_sell_price <= parseInt(text));
-        setAllProducts(filterProducts);
-    }
-    const handleClearSerch = () => {
-        search_ref.current.value = '';
-        setAllProducts(loadedProducts);
-    }
-    const search_ref = useRef();
+            const data = await res.json();
+
+            if (data.acknowledged || data.deletedCount) {
+                setAllProducts(prev => prev.filter(product => product._id !== id));
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Product Deleted',
+                    showConfirmButton: false,
+                    timer: 1100,
+                    background: '#0b1b18',
+                    color: '#fff'
+                });
+            }
+        } catch {
+            Swal.fire({
+                icon: 'error',
+                title: 'Delete Failed',
+                background: '#0b1b18',
+                color: '#fff'
+            });
+        }
+    };
+
     return (
-        <div>
-            {/* modal */}
-            <div className={`${!modal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
-                <div className='flex justify-end -top-[10px] -right-[10px] relative'>
-                    <MdOutlineCancel onClick={() => { !setModal(!modal) }} className='text-pink-200 text-3xl cursor-pointer bg-black rounded-full'></MdOutlineCancel>
-                </div>
-                <div className='mb-4'>
-                    <h1 className='text-lg font-semibold text-pink-300 text-center mb-2'>Product Details</h1>
-                    <hr className='text-pink-300 w-full' />
-                </div>
-                <div className='text-pink-200 flex flex-col gap-5 px-4 pt-0 pb-5 items-center h-full w-full'>
-                    <div className='mb-4 w-full'>
-                        <div className='mt-2'>
-                            <h1 className='lg:text-lg font-semibold mb-2'>Product Name</h1>
-                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-                                <input ref={product_name_ref} type="text" className='outline-none w-full' />
-                            </div>
-                        </div>
-                        <div className='mt-2'>
-                            <h1 className='lg:text-lg font-semibold mb-2'>Quantity</h1>
+        <div className="min-h-full py-5 sm:py-7 text-white">
+            {/* Header */}
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-7">
+                <div className="flex items-center gap-3">
+                    <Link
+                        to={from || '/admin'}
+                        className="hidden md:flex items-center px-4 py-2 rounded-xl
+                        border border-emerald-400/20 bg-white/[0.03]
+                        hover:bg-emerald-400/10 hover:border-emerald-400/40
+                        text-slate-300 hover:text-emerald-300 transition-all"
+                    >
+                        ← Back
+                    </Link>
 
-                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-                                <NumericFormat
-                                    getInputRef={product_quantity_ref}
-                                    className="outline-none w-full h-full"
-                                    placeholder="Enter Quantity"
-                                    allowNegative={false}
-                                    decimalScale={2}
-                                    fixedDecimalScale={false}
-                                    thousandSeparator={false}
-                                />
-                            </div>
-                        </div>
-                        <div className='mt-2'>
-                            <h1 className='lg:text-lg font-semibold mb-2'>Product Buy Price</h1>
-
-                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-                                <NumericFormat
-                                    getInputRef={product_buy_price_ref}
-                                    className="outline-none w-full h-full"
-                                    placeholder="Enter Amount"
-                                    allowNegative={false}
-                                    decimalScale={2}
-                                    fixedDecimalScale={false}
-                                    thousandSeparator={false}
-                                />
-                            </div>
-                        </div>
-                        <div className='mt-2'>
-                            <h1 className='lg:text-lg font-semibold mb-2'>Product Sell Price</h1>
-
-                            <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300 w-full'>
-                                <NumericFormat
-                                    getInputRef={product_sell_price_ref}
-                                    className="outline-none w-full h-full"
-                                    placeholder="Enter Amount"
-                                    allowNegative={false}
-                                    decimalScale={2}
-                                    fixedDecimalScale={false}
-                                    thousandSeparator={false}
-                                />
-                            </div>
-                        </div>
+                    <div>
+                        <p className="text-xs uppercase tracking-[0.25em] text-emerald-400/70">
+                            Inventory
+                        </p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                            Shop Products
+                        </h1>
                     </div>
-                    <button onClick={() => handleAddProduct()} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
+                </div>
+
+                <button
+                    onClick={() => setModal(true)}
+                    className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
+                    bg-gradient-to-r from-emerald-500 to-cyan-500
+                    hover:from-emerald-400 hover:to-cyan-400
+                    text-white font-semibold shadow-lg shadow-emerald-500/20
+                    transition-all duration-300 hover:-translate-y-0.5"
+                >
+                    <MdAdd className="text-xl" />
+                    Add Product
+                </button>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+                <div className="rounded-2xl border border-emerald-400/10 bg-white/[0.035] p-4">
+                    <p className="text-xs text-slate-400">Total Products</p>
+                    <p className="text-2xl font-bold text-emerald-300 mt-1">
+                        {allProducts.length}
+                    </p>
+                </div>
+
+                <div className="rounded-2xl border border-cyan-400/10 bg-white/[0.035] p-4">
+                    <p className="text-xs text-slate-400">Visible Products</p>
+                    <p className="text-2xl font-bold text-cyan-300 mt-1">
+                        {filteredProducts.length}
+                    </p>
+                </div>
+
+                <div className="hidden lg:block rounded-2xl border border-violet-400/10 bg-white/[0.035] p-4">
+                    <p className="text-xs text-slate-400">Inventory Quantity</p>
+                    <p className="text-2xl font-bold text-violet-300 mt-1">
+                        {allProducts.reduce(
+                            (sum, product) => sum + Number(product.product_quantity || 0),
+                            0
+                        )}
+                    </p>
                 </div>
             </div>
-            {/* End Modal */}
-            <div className='flex items-center justify-start'>
-                <Link to={from}>
-                    <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                        Back
-                    </button>
-                </Link>
+
+            {/* Search */}
+            <div className="flex items-center max-w-xl mb-6 px-4 py-2 rounded-2xl
+                border border-emerald-400/20 bg-white/[0.035]
+                focus-within:border-emerald-400/50 focus-within:shadow-lg
+                focus-within:shadow-emerald-500/10 transition-all"
+            >
+                <MdSearch className="text-emerald-300 text-2xl mr-2" />
+
+                <input
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="flex-1 bg-transparent outline-none text-white placeholder:text-slate-500 py-1"
+                    placeholder="Search product name or sell price..."
+                />
+
+                {search && (
+                    <MdOutlineCancel
+                        onClick={() => setSearch('')}
+                        className="text-slate-400 hover:text-white text-xl cursor-pointer"
+                    />
+                )}
             </div>
-            <h2 className="text-2xl text-pink-300 font-semibold text-center">Shop Products</h2>
-            <div className='flex justify-center mt-3'>
-                <div className='flex items-center justify-center border-2 border-pink-300 w-[50%] pl-2 pr-1 py-1 rounded-2xl'>
-                    <div className='flex-1'>
-                        <input
-                            type="text"
-                            onChange={(e) => { handleSearch(e.target.value) }}
-                            ref={search_ref}
-                            className="w-full p-1 outline-none text-pink-300"
-                            placeholder='Enter Your Search Keywords'
-                        />
-                    </div>
-                    <MdOutlineCancel onClick={handleClearSerch} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
-                </div>
-            </div>
-            <div className='flex items-center justify-center gap-5 mt-5'>
-                <Link onClick={() => { setModal(true) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold'>+ Add A New Product</Link>
-            </div>
-            <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg pb-10">
-                <table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
-                    <thead>
-                        <tr className="text-pink-300">
-                            <th className="p-2 border">SL</th>
-                            <th className="p-2 border">Product Name</th>
-                            <th className="p-2 border">Quantity</th>
-                            <th className="p-2 border">Buy Rate</th>
-                            <th className="p-2 border">Sell Rate</th>
-                            <th className="p-2 border"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {allProducts?.map((product, index) => (
-                            <tr key={index}>
-                                <td className="p-2 border">{index + 1}</td>
-                                <td className="p-2 border">{product.product_name}</td>
-                                <td className="p-2 border">{product.product_quantity}</td>
-                                <td className="p-2 border">{product.product_buy_price}</td>
-                                <td className="p-2 border">{product.product_sell_price}</td>
-                                <td onClick={() => { handleDelete(product._id) }} className="p-2 border text-pink-300 underline cursor-pointer">Delete</td>
+
+            {/* Table */}
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025]
+                overflow-hidden shadow-2xl shadow-black/20"
+            >
+                <div className="overflow-x-auto scrollbar-hide p-5">
+                    <table className="w-full min-w-[700px]">
+                        <thead>
+                            <tr className="bg-emerald-400/[0.06] border-b border-white/10">
+                                {['SL', 'Product Name', 'Quantity', 'Buy Rate', 'Sell Rate', 'Action'].map(
+                                    heading => (
+                                        <th
+                                            key={heading}
+                                            className="px-4 py-4 text-left text-xs uppercase tracking-wider text-emerald-300/80 font-semibold"
+                                        >
+                                            {heading}
+                                        </th>
+                                    )
+                                )}
                             </tr>
-                        ))}
+                        </thead>
 
-                    </tbody>
-                </table>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="6" className="py-14 text-center text-slate-400">
+                                        Loading products...
+                                    </td>
+                                </tr>
+                            ) : filteredProducts.length === 0 ? (
+                                <tr>
+                                    <td colSpan="6" className="py-14 text-center">
+                                        <p className="text-slate-400">No products found.</p>
+                                    </td>
+                                </tr>
+                            ) : (
+                                filteredProducts.map((product, index) => (
+                                    <tr
+                                        key={product._id || index}
+                                        className="border-b border-white/[0.06] last:border-0
+                                        hover:bg-emerald-400/[0.035] transition-colors"
+                                    >
+                                        <td className="px-4 py-4 text-slate-500">
+                                            {index + 1}
+                                        </td>
+
+                                        <td className="px-4 py-4 font-medium text-white">
+                                            {product.product_name}
+                                        </td>
+
+                                        <td className="px-4 py-4 text-slate-300">
+                                            {product.product_quantity}
+                                        </td>
+
+                                        <td className="px-4 py-4 text-cyan-300">
+                                            ৳ {product.product_buy_price}
+                                        </td>
+
+                                        <td className="px-4 py-4 text-emerald-300 font-medium">
+                                            ৳ {product.product_sell_price}
+                                        </td>
+
+                                        <td className="px-4 py-4">
+                                            <button
+                                                onClick={() => handleDelete(product._id)}
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5
+                                                rounded-lg border border-red-400/20
+                                                bg-red-400/5 text-red-300
+                                                hover:bg-red-400/10 hover:border-red-400/40
+                                                transition-all"
+                                            >
+                                                <MdDeleteOutline />
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            {/* Modal */}
+            {modal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <div
+                        onClick={closeModal}
+                        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+                    />
+
+                    <div className="relative w-full max-w-md rounded-3xl border border-emerald-400/20
+                        bg-[#0b1b18] shadow-2xl shadow-emerald-500/10 overflow-hidden"
+                    >
+                        <div className="h-1 bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-400" />
+
+                        <div className="flex items-center justify-between p-5 border-b border-white/10">
+                            <div>
+                                <p className="text-xs uppercase tracking-widest text-emerald-400/70">
+                                    Inventory
+                                </p>
+                                <h2 className="text-xl font-bold">Add New Product</h2>
+                            </div>
+
+                            <button
+                                onClick={closeModal}
+                                className="p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
+                            >
+                                <MdOutlineCancel className="text-2xl" />
+                            </button>
+                        </div>
+
+                        <div className="p-5 space-y-4">
+                            <div>
+                                <label className="text-sm text-slate-400">Product Name</label>
+                                <input
+                                    ref={productNameRef}
+                                    className="w-full mt-1 px-4 py-2.5 rounded-xl bg-white/[0.04]
+                                    border border-white/10 outline-none
+                                    focus:border-emerald-400/50 transition"
+                                    placeholder="Enter product name"
+                                />
+                            </div>
+
+                            {[
+                                ['Quantity', quantityRef, 'Enter quantity'],
+                                ['Buy Price', buyPriceRef, 'Enter buy price'],
+                                ['Sell Price', sellPriceRef, 'Enter sell price']
+                            ].map(([label, ref, placeholder]) => (
+                                <div key={label}>
+                                    <label className="text-sm text-slate-400">{label}</label>
+                                    <div className="mt-1 px-4 py-2.5 rounded-xl bg-white/[0.04]
+                                        border border-white/10 focus-within:border-emerald-400/50"
+                                    >
+                                        <NumericFormat
+                                            getInputRef={ref}
+                                            className="w-full bg-transparent outline-none"
+                                            placeholder={placeholder}
+                                            allowNegative={false}
+                                            decimalScale={2}
+                                            thousandSeparator={false}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+
+                            <button
+                                onClick={handleAddProduct}
+                                className="w-full mt-2 py-2.5 rounded-xl font-semibold
+                                bg-gradient-to-r from-emerald-500 to-cyan-500
+                                hover:from-emerald-400 hover:to-cyan-400
+                                shadow-lg shadow-emerald-500/20 transition-all"
+                            >
+                                Add Product
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

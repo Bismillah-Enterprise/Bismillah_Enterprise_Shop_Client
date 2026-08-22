@@ -1,428 +1,1471 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { NumberFormatBase } from 'react-number-format';
-import { data, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import Loading from '../Shared/Loading/Loading';
-import { MdOutlineCancel } from 'react-icons/md';
+import {
+    MdOutlineCancel,
+    MdTrendingUp,
+    MdTrendingDown,
+    MdAccountBalanceWallet
+} from 'react-icons/md';
 import { PuffLoader } from 'react-spinners';
+import useCurrentUser from '../Hooks/useCurrentUser';
+
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 const DailyTransactions = () => {
     const [tab, setTab] = useState('revenue');
     const [reload, setReload] = useState(false);
+
     const [computer, setComputer] = useState(0);
     const [stationary, setStationary] = useState(0);
     const [photocopy, setPhotocopy] = useState(0);
     const [others, setOthers] = useState(0);
+    const [expenses, setExpenses] = useState(0);
+
     const [rvAmount, setRvAmount] = useState('');
     const [exAmount, setExAmount] = useState('');
-    const [expenses, setExpenses] = useState(0);
-    const [modal, setModal] = useState(false);
+
     const [loading, setLoading] = useState(false);
-    const [allData, setAllData] = useState([]);
+
+    const [allData, setAllData] = useState({});
     const [details, setDetails] = useState([]);
+    const [modal, setModal] = useState(false);
     const [modalLoading, setModalLoading] = useState(false);
-    const [rvCategory, setRvCategory] = useState('');
     const [deleteItem, setDeleteItem] = useState('');
 
-    const now = new Date();
-    const currentDate = now.toLocaleDateString('en-BD', {
-        day: 'numeric',
-        year: 'numeric',
-        month: 'long',
-    });
+    const [allTRX, setAllTRX] = useState([]);
+
+    const [rvCategory, setRvCategory] = useState('');
+
+    const [current_User] = useCurrentUser();
+
+    /* =====================================================
+       REFS
+    ===================================================== */
+
+    const revenueCategoryRef = useRef(null);
+    const revenueCommentRef = useRef(null);
+    const expenseCommentRef = useRef(null);
+
+    /* =====================================================
+       DATE
+    ===================================================== */
+
+    const getCurrentDate = () => {
+        const now = new Date();
+
+        return now.toLocaleDateString('en-BD', {
+            day: 'numeric',
+            year: 'numeric',
+            month: 'long',
+        });
+    };
+
+    const currentDate = getCurrentDate();
+
+    /* =====================================================
+       LOAD DAILY TRANSACTIONS
+    ===================================================== */
 
     useEffect(() => {
-        fetch(`https://bismillah-enterprise-server.onrender.com/daily_transactions`).then(res => res.json()).then((data) => {
-            setComputer(data?.computer_revenues);
-            setStationary(data?.stationary_revenues);
-            setPhotocopy(data?.photocopy_revenues);
-            setOthers(data?.others_revenues?.reduce((sum, item) => sum + item.amount, 0));
-            setExpenses(data?.expenses?.reduce((sum, item) => sum + item.amount, 0));
-            setAllData(data);
-        })
-    }, [reload])
+        const loadDailyTransactions = async () => {
+            try {
+                const response = await fetch(`${API}/daily_transactions`);
 
+                if (!response.ok) {
+                    throw new Error('Failed to load daily transactions.');
+                }
+
+                const data = await response.json();
+
+                const computerRevenue = Number(data?.computer_revenues) || 0;
+                const stationaryRevenue = Number(data?.stationary_revenues) || 0;
+                const photocopyRevenue = Number(data?.photocopy_revenues) || 0;
+
+                const othersRevenue =
+                    Array.isArray(data?.others_revenues)
+                        ? data.others_revenues.reduce(
+                            (sum, item) => sum + (Number(item?.amount) || 0),
+                            0
+                        )
+                        : 0;
+
+                const totalExpenses =
+                    Array.isArray(data?.expenses)
+                        ? data.expenses.reduce(
+                            (sum, item) => sum + (Number(item?.amount) || 0),
+                            0
+                        )
+                        : 0;
+
+                setComputer(computerRevenue);
+                setStationary(stationaryRevenue);
+                setPhotocopy(photocopyRevenue);
+                setOthers(othersRevenue);
+                setExpenses(totalExpenses);
+
+                setAllData(data || {});
+                setAllTRX(Array.isArray(data?.summary) ? data.summary : []);
+            } catch (error) {
+                console.error('Daily transaction loading error:', error);
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Could not load transactions',
+                    text: error.message,
+                    background: '#0b1b18',
+                    color: '#fff',
+                });
+            }
+        };
+
+        loadDailyTransactions();
+    }, [reload]);
+
+    /* =====================================================
+       HELPERS
+    ===================================================== */
+
+    const resetRevenueForm = () => {
+        setRvAmount('');
+        setRvCategory('');
+
+        if (revenueCategoryRef.current) {
+            revenueCategoryRef.current.value = '';
+        }
+
+        if (revenueCommentRef.current) {
+            revenueCommentRef.current.value = '';
+        }
+    };
+
+    const resetExpenseForm = () => {
+        setExAmount('');
+
+        if (expenseCommentRef.current) {
+            expenseCommentRef.current.value = '';
+        }
+    };
+
+    const showSuccess = (title = 'Transaction Added Successfully') => {
+        Swal.fire({
+            position: 'center',
+            icon: 'success',
+            title,
+            showConfirmButton: false,
+            timer: 1100,
+            background: '#0b1b18',
+            color: '#fff',
+        });
+    };
+
+    const showError = (title, text = '') => {
+        Swal.fire({
+            icon: 'error',
+            title,
+            text,
+            background: '#0b1b18',
+            color: '#fff',
+        });
+    };
+
+    /* =====================================================
+       REVENUE TRANSACTION
+    ===================================================== */
 
     const handleRevenueTransections = async () => {
-        setLoading(true)
-        const revenue_amount = rvAmount;
-        const revenue_category = revenueCategoryRef.current.value;
-        const revenue_comment = revenueCommentRef.current.value;
+        const revenueAmount = Number(rvAmount);
 
-        if (!revenue_amount || !revenue_category || (rvCategory === 'Others' && !revenue_comment)) {
+        const revenueCategory =
+            revenueCategoryRef.current?.value || rvCategory || '';
+
+        const revenueComment =
+            revenueCommentRef.current?.value?.trim() || '';
+
+        /* Validation */
+
+        if (!revenueAmount || revenueAmount <= 0) {
             Swal.fire({
-                position: "center",
-                icon: "warning",
-                title: "You Missd a Field",
-                showConfirmButton: false,
-                timer: 1000
-            })
-            setLoading(false)
+                icon: 'warning',
+                title: 'Invalid Amount',
+                text: 'Please enter a valid revenue amount.',
+                background: '#0b1b18',
+                color: '#fff',
+            });
+
             return;
-        } else {
-            fetch(`https://bismillah-enterprise-server.onrender.com/daily_transactions`).then(res => res.json()).then((data) => {
-                const gottedDate = data?.date;
-                if (gottedDate !== currentDate) {
-                    if (computer === 0 && stationary === 0 && photocopy === 0 && others === 0 && expenses === 0) {
-                        const trData = { date: currentDate, amount: revenue_amount * 1, category: revenue_category, comment: revenue_comment }
-                        fetch(`https://bismillah-enterprise-server.onrender.com/daily_revenue_transactions`, {
-                            method: 'PATCH',
-                            headers: {
-                                'content-type': 'application/json'
-                            },
-                            body: JSON.stringify(trData)
-                        }).then(res => res.json()).then(data => {
-                            Swal.fire({
-                                position: "center",
-                                icon: "success",
-                                title: "Transaction Added SuccessFully",
-                                showConfirmButton: false,
-                                timer: 1000
-                            })
-                            setRvAmount('');
-                            revenueCategoryRef.current.value = '';
-                            revenueCommentRef.current.value = '';
-                            setLoading(false)
-                            setReload(!reload);
-                        })
-                    } else {
-                        const transaction_summary = { update_info: { update_date: currentDate, amount: revenue_amount * 1, category: revenue_category, comment: revenue_comment }, category: revenue_category, date: gottedDate, computer_revenues: data?.computer_revenues, stationary_revenues: data?.stationary_revenues, photocopy_revenues: data?.photocopy_revenues, others_revenues: { amounts: data?.others_revenues?.map(item => item.amount) || [], descriptions: data?.others_revenues?.map(item => item.comment) || [] }, expenses: { amounts: data?.expenses?.map(item => item.amount) || [], descriptions: data?.expenses?.map(item => item.comment) || [] } }
-                        fetch(`https://bismillah-enterprise-server.onrender.com/reset_daily_transactions`, {
-                            method: 'PATCH',
-                            headers: {
-                                'content-type': 'application/json'
-                            },
-                            body: JSON.stringify(transaction_summary)
-                        }).then(res => res.json()).then(data => {
-                            Swal.fire({
-                                position: "center",
-                                icon: "success",
-                                title: "Transaction Added SuccessFully",
-                                showConfirmButton: false,
-                                timer: 1000
-                            })
-                            setRvAmount('');
-                            revenueCategoryRef.current.value = '';
-                            revenueCommentRef.current.value = '';
-                            setLoading(false)
-                            setReload(!reload);
-                        })
-                    }
-
-                } else {
-                    const trData = { date: currentDate, amount: revenue_amount * 1, category: revenue_category, comment: revenue_comment }
-                    fetch(`https://bismillah-enterprise-server.onrender.com/daily_revenue_transactions`, {
-                        method: 'PATCH',
-                        headers: {
-                            'content-type': 'application/json'
-                        },
-                        body: JSON.stringify(trData)
-                    }).then(res => res.json()).then(data => {
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "Transaction Added SuccessFully",
-                            showConfirmButton: false,
-                            timer: 1000
-                        })
-                        setRvAmount('');
-                        revenueCategoryRef.current.value = '';
-                        revenueCommentRef.current.value = '';
-                        setLoading(false)
-                        setReload(!reload);
-                    })
-                }
-            })
-
         }
-    }
-    const handleExpenseTransections = async () => {
-        setLoading(true)
-        const expense_amount = exAmount;
-        const expense_comment = expenseCommentRef.current.value;
-        if (!expense_amount || !expense_comment) {
+
+        if (!revenueCategory) {
             Swal.fire({
-                position: "center",
-                icon: "warning",
-                title: "You Missd a Field",
-                showConfirmButton: false,
-                timer: 1000
-            })
-            setLoading(false)
+                icon: 'warning',
+                title: 'Select Category',
+                text: 'Please select a revenue category.',
+                background: '#0b1b18',
+                color: '#fff',
+            });
+
             return;
-        } else {
-            fetch(`https://bismillah-enterprise-server.onrender.com/daily_transactions`).then(res => res.json()).then((data) => {
-                const gottedDate = data?.date;
-                if (gottedDate !== currentDate) {
-                    if (computer === 0 && stationary === 0 && photocopy === 0 && others === 0 && expenses === 0) {
-                        const trData = { date: currentDate, amount: expense_amount * 1, comment: expense_comment }
-                        fetch(`https://bismillah-enterprise-server.onrender.com/daily_expense_transactions`, {
-                            method: 'PATCH',
-                            headers: {
-                                'content-type': 'application/json'
-                            },
-                            body: JSON.stringify(trData)
-                        }).then(res => res.json()).then(data => {
-                            Swal.fire({
-                                position: "center",
-                                icon: "success",
-                                title: "Transaction Added SuccessFully",
-                                showConfirmButton: false,
-                                timer: 1000
-                            })
-                            setExAmount('');
-                            expenseCommentRef.current.value = '';
-                            setLoading(false)
-                            setReload(!reload);
-                        })
-                    } else {
-                        const expense_summary = { update_info: { update_date: currentDate, amount: expense_amount * 1, comment: expense_comment }, category: 'Expense', date: gottedDate, computer_revenues: data?.computer_revenues, stationary_revenues: data?.stationary_revenues, photocopy_revenues: data?.photocopy_revenues, others_revenues: { amounts: data?.others_revenues?.map(item => item.amount) || [], descriptions: data?.others_revenues?.map(item => item.comment) || [] }, expenses: { amounts: data?.expenses?.map(item => item.amount) || [], descriptions: data?.expenses?.map(item => item.comment) || [] } }
-                        fetch(`https://bismillah-enterprise-server.onrender.com/reset_daily_transactions`, {
-                            method: 'PATCH',
-                            headers: {
-                                'content-type': 'application/json'
-                            },
-                            body: JSON.stringify(expense_summary)
-                        }).then(res => res.json()).then(data => {
-                            Swal.fire({
-                                position: "center",
-                                icon: "success",
-                                title: "Transaction Added SuccessFully",
-                                showConfirmButton: false,
-                                timer: 1000
-                            })
-                            setExAmount('');
-                            expenseCommentRef.current.value = '';
-                            setLoading(false)
-                            setReload(!reload);
-                        })
-                    }
-
-                } else {
-                    const trData = { date: currentDate, amount: expense_amount * 1, comment: expense_comment }
-                    fetch(`https://bismillah-enterprise-server.onrender.com/daily_expense_transactions`, {
-                        method: 'PATCH',
-                        headers: {
-                            'content-type': 'application/json'
-                        },
-                        body: JSON.stringify(trData)
-                    }).then(res => res.json()).then(data => {
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "Transaction Added SuccessFully",
-                            showConfirmButton: false,
-                            timer: 1000
-                        })
-                        setExAmount('');
-                        expenseCommentRef.current.value = '';
-                        setLoading(false)
-                        setReload(!reload);
-                    })
-                }
-            })
         }
-    }
-    const handleDelete = (index, item) => {
-        setModalLoading(true)
-        const oldEx = [...allData?.expenses];
-        const oldOthers = [...allData?.others_revenues];
-        item === 'expenses' ? oldEx.splice(index, 1) : oldOthers.splice(index, 1);
-        const updateData = { category: item, update: item === 'expenses' ? oldEx : oldOthers }
-        console.log(updateData);
-        Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
-        }).then((result) => {
 
-            if (result.isConfirmed) {
+        if (revenueCategory === 'Others' && !revenueComment) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Description Required',
+                text: 'Please enter a description for Others revenue.',
+                background: '#0b1b18',
+                color: '#fff',
+            });
 
-                fetch('https://bismillah-enterprise-server.onrender.com/update_expenses', {
-                    method: "PATCH",
-                    headers: {
-                        'content-type': 'application/json'
-                    },
-                    body: JSON.stringify(updateData)
-                })
-                    .then(res => res.json())
-                    .then(() => {
+            return;
+        }
 
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "Deleted Successfully",
-                            showConfirmButton: false,
-                            timer: 1000
-                        });
+        setLoading(true);
 
-                        setModalLoading(false);
-                        setReload(!reload);
-                        setDetails(item === 'expenses' ? oldEx : oldOthers);
-                    });
-            } else {
-                setModalLoading(false);
+        try {
+            const response = await fetch(`${API}/daily_transactions`);
+
+            if (!response.ok) {
+                throw new Error('Could not load current transaction data.');
             }
-        });
-    }
 
-    const revenueCategoryRef = useRef();
-    const expenseCommentRef = useRef();
-    const revenueCommentRef = useRef();
-    return (
-        <div className='h-full relative'>
-            < div className={`${!modal ? 'hidden' : 'block'} h-fit w-full lg:w-[500px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50`
-            }>
+            const data = await response.json();
+
+            const gotDate = data?.date;
+
+            const existingComputer =
+                Number(data?.computer_revenues) || 0;
+
+            const existingStationary =
+                Number(data?.stationary_revenues) || 0;
+
+            const existingPhotocopy =
+                Number(data?.photocopy_revenues) || 0;
+
+            const existingOthers =
+                Array.isArray(data?.others_revenues)
+                    ? data.others_revenues
+                    : [];
+
+            const existingExpenses =
+                Array.isArray(data?.expenses)
+                    ? data.expenses
+                    : [];
+
+            /* =================================================
+               SAME DAY
+            ================================================= */
+
+            if (gotDate === currentDate) {
+                const transactionData = {
+                    date: currentDate,
+                    amount: revenueAmount,
+                    category: revenueCategory,
+                    comment: revenueComment,
+                };
+
+                const transactionResponse = await fetch(
+                    `${API}/daily_revenue_transactions`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify(transactionData),
+                    }
+                );
+
+                if (!transactionResponse.ok) {
+                    throw new Error('Revenue transaction failed.');
+                }
+
+                const result = await transactionResponse.json();
+
+                if (!result?.acknowledged) {
+                    throw new Error(
+                        'Server did not acknowledge the transaction.'
+                    );
+                }
+
+                resetRevenueForm();
+                setReload(prev => !prev);
+
+                showSuccess('Revenue Added Successfully');
+
+                return;
+            }
+
+            /* =================================================
+               NEW DAY + NO PREVIOUS TRANSACTION
+            ================================================= */
+
+            const noPreviousTransaction =
+                existingComputer === 0 &&
+                existingStationary === 0 &&
+                existingPhotocopy === 0 &&
+                existingOthers.length === 0 &&
+                existingExpenses.length === 0;
+
+            if (noPreviousTransaction) {
+                const transactionData = {
+                    date: currentDate,
+                    amount: revenueAmount,
+                    category: revenueCategory,
+                    comment: revenueComment,
+                };
+
+                const transactionResponse = await fetch(
+                    `${API}/daily_revenue_transactions`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify(transactionData),
+                    }
+                );
+
+                if (!transactionResponse.ok) {
+                    throw new Error('Revenue transaction failed.');
+                }
+
+                const result = await transactionResponse.json();
+
+                if (!result?.acknowledged) {
+                    throw new Error(
+                        'Server did not acknowledge the transaction.'
+                    );
+                }
+
+                resetRevenueForm();
+                setReload(prev => !prev);
+
+                showSuccess('Revenue Added Successfully');
+
+                return;
+            }
+
+            /* =================================================
+               NEW DAY + PREVIOUS DAY HAS TRANSACTIONS
+
+               IMPORTANT:
+               Backend expects arrays directly.
+            ================================================= */
+
+            const transactionSummary = {
+                update_info: {
+                    update_date: currentDate,
+                    amount: revenueAmount,
+                    category: revenueCategory,
+                    comment: revenueComment,
+                },
+
+                category: revenueCategory,
+
+                date: gotDate,
+
+                computer_revenues: existingComputer,
+
+                stationary_revenues: existingStationary,
+
+                photocopy_revenues: existingPhotocopy,
+
+                others_revenues: existingOthers,
+
+                expenses: existingExpenses,
+            };
+
+            const resetResponse = await fetch(
+                `${API}/reset_daily_transactions`,
                 {
-                    modalLoading ? <div className='h-full w-full flex items-center justify-center rounded-2xl overflow-hidden'><Loading></Loading></div> :
-                        <div className='pb-5'>
-                            <div className='flex justify-end -top-[10px] -right-[10px] relative'>
-                                <MdOutlineCancel onClick={() => { !setModal(!modal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+                    method: 'PATCH',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify(transactionSummary),
+                }
+            );
+
+            if (!resetResponse.ok) {
+                throw new Error('Could not reset daily transactions.');
+            }
+
+            const resetResult = await resetResponse.json();
+
+            if (!resetResult?.acknowledged) {
+                throw new Error(
+                    'Server did not acknowledge the daily reset.'
+                );
+            }
+
+            resetRevenueForm();
+            setReload(prev => !prev);
+
+            showSuccess('New Day Revenue Added Successfully');
+        } catch (error) {
+            console.error(error);
+
+            showError(
+                'Revenue Transaction Failed',
+                error.message
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /* =====================================================
+       EXPENSE TRANSACTION
+    ===================================================== */
+
+    const handleExpenseTransections = async () => {
+        const expenseAmount = Number(exAmount);
+
+        const expenseComment =
+            expenseCommentRef.current?.value?.trim() || '';
+
+        if (!expenseAmount || expenseAmount <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Invalid Amount',
+                text: 'Please enter a valid expense amount.',
+                background: '#0b1b18',
+                color: '#fff',
+            });
+
+            return;
+        }
+
+        if (!expenseComment) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Description Required',
+                text: 'Please enter what this expense is for.',
+                background: '#0b1b18',
+                color: '#fff',
+            });
+
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const response = await fetch(
+                `${API}/daily_transactions`
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    'Could not load current transaction data.'
+                );
+            }
+
+            const data = await response.json();
+
+            const gotDate = data?.date;
+
+            const existingComputer =
+                Number(data?.computer_revenues) || 0;
+
+            const existingStationary =
+                Number(data?.stationary_revenues) || 0;
+
+            const existingPhotocopy =
+                Number(data?.photocopy_revenues) || 0;
+
+            const existingOthers =
+                Array.isArray(data?.others_revenues)
+                    ? data.others_revenues
+                    : [];
+
+            const existingExpenses =
+                Array.isArray(data?.expenses)
+                    ? data.expenses
+                    : [];
+
+            /* =================================================
+               SAME DAY
+            ================================================= */
+
+            if (gotDate === currentDate) {
+                const transactionData = {
+                    date: currentDate,
+                    amount: expenseAmount,
+                    comment: expenseComment,
+                };
+
+                const transactionResponse = await fetch(
+                    `${API}/daily_expense_transactions`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify(transactionData),
+                    }
+                );
+
+                if (!transactionResponse.ok) {
+                    throw new Error(
+                        'Expense transaction failed.'
+                    );
+                }
+
+                const result =
+                    await transactionResponse.json();
+
+                if (!result?.acknowledged) {
+                    throw new Error(
+                        'Server did not acknowledge the transaction.'
+                    );
+                }
+
+                resetExpenseForm();
+                setReload(prev => !prev);
+
+                showSuccess('Expense Added Successfully');
+
+                return;
+            }
+
+            /* =================================================
+               NEW DAY + NO PREVIOUS TRANSACTION
+            ================================================= */
+
+            const noPreviousTransaction =
+                existingComputer === 0 &&
+                existingStationary === 0 &&
+                existingPhotocopy === 0 &&
+                existingOthers.length === 0 &&
+                existingExpenses.length === 0;
+
+            if (noPreviousTransaction) {
+                const transactionData = {
+                    date: currentDate,
+                    amount: expenseAmount,
+                    comment: expenseComment,
+                };
+
+                const transactionResponse = await fetch(
+                    `${API}/daily_expense_transactions`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'content-type': 'application/json',
+                        },
+                        body: JSON.stringify(transactionData),
+                    }
+                );
+
+                if (!transactionResponse.ok) {
+                    throw new Error(
+                        'Expense transaction failed.'
+                    );
+                }
+
+                const result =
+                    await transactionResponse.json();
+
+                if (!result?.acknowledged) {
+                    throw new Error(
+                        'Server did not acknowledge the transaction.'
+                    );
+                }
+
+                resetExpenseForm();
+                setReload(prev => !prev);
+
+                showSuccess('Expense Added Successfully');
+
+                return;
+            }
+
+            /* =================================================
+               NEW DAY + PREVIOUS DAY HAS TRANSACTIONS
+
+               IMPORTANT:
+               Send arrays because backend stores them directly.
+            ================================================= */
+
+            const expenseSummary = {
+                update_info: {
+                    update_date: currentDate,
+                    amount: expenseAmount,
+                    comment: expenseComment,
+                },
+
+                category: 'Expense',
+
+                date: gotDate,
+
+                computer_revenues: existingComputer,
+
+                stationary_revenues: existingStationary,
+
+                photocopy_revenues: existingPhotocopy,
+
+                others_revenues: existingOthers,
+
+                expenses: existingExpenses,
+            };
+
+            const resetResponse = await fetch(
+                `${API}/reset_daily_transactions`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify(expenseSummary),
+                }
+            );
+
+            if (!resetResponse.ok) {
+                throw new Error(
+                    'Could not reset daily transactions.'
+                );
+            }
+
+            const resetResult =
+                await resetResponse.json();
+
+            if (!resetResult?.acknowledged) {
+                throw new Error(
+                    'Server did not acknowledge the daily reset.'
+                );
+            }
+
+            resetExpenseForm();
+            setReload(prev => !prev);
+
+            showSuccess(
+                'New Day Expense Added Successfully'
+            );
+        } catch (error) {
+            console.error(error);
+
+            showError(
+                'Expense Transaction Failed',
+                error.message
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    /* =====================================================
+       DELETE DETAILS
+    ===================================================== */
+
+    const handleDelete = async (index, item) => {
+        setModalLoading(true);
+
+        const oldExpenses = Array.isArray(allData?.expenses)
+            ? [...allData.expenses]
+            : [];
+
+        const oldOthers = Array.isArray(
+            allData?.others_revenues
+        )
+            ? [...allData.others_revenues]
+            : [];
+
+        if (item === 'expenses') {
+            oldExpenses.splice(index, 1);
+        } else {
+            oldOthers.splice(index, 1);
+        }
+
+        const updateData = {
+            category: item,
+            update:
+                item === 'expenses'
+                    ? oldExpenses
+                    : oldOthers,
+        };
+
+        const result = await Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#334155',
+            confirmButtonText: 'Yes, delete it!',
+            background: '#0b1b18',
+            color: '#fff',
+        });
+
+        if (!result.isConfirmed) {
+            setModalLoading(false);
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${API}/update_expenses`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'content-type': 'application/json',
+                    },
+                    body: JSON.stringify(updateData),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error(
+                    'Could not delete transaction.'
+                );
+            }
+
+            await response.json();
+
+            Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Deleted Successfully',
+                showConfirmButton: false,
+                timer: 1000,
+                background: '#0b1b18',
+                color: '#fff',
+            });
+
+            setDetails(
+                item === 'expenses'
+                    ? oldExpenses
+                    : oldOthers
+            );
+
+            setReload(prev => !prev);
+        } catch (error) {
+            console.error(error);
+
+            showError(
+                'Delete Failed',
+                error.message
+            );
+        } finally {
+            setModalLoading(false);
+        }
+    };
+
+    /* =====================================================
+       TOTALS
+    ===================================================== */
+
+    const totalComputer =
+        (allTRX?.reduce(
+            (sum, item) =>
+                sum + (Number(item?.computer_revenues) || 0),
+            0
+        ) || 0) + computer;
+
+    const totalStationary =
+        (allTRX?.reduce(
+            (sum, item) =>
+                sum + (Number(item?.stationary_revenues) || 0),
+            0
+        ) || 0) + stationary;
+
+    const totalPhotocopy =
+        (allTRX?.reduce(
+            (sum, item) =>
+                sum + (Number(item?.photocopy_revenues) || 0),
+            0
+        ) || 0) + photocopy;
+
+    const totalOthers =
+        (allTRX?.reduce((sum, item) => {
+            if (!Array.isArray(item?.others_revenues)) {
+                return sum;
+            }
+
+            return (
+                sum +
+                item.others_revenues.reduce(
+                    (innerSum, revenue) =>
+                        innerSum +
+                        (Number(revenue?.amount) || 0),
+                    0
+                )
+            );
+        }, 0) || 0) + others;
+
+    const totalExpenses =
+        (allTRX?.reduce((sum, item) => {
+            if (!Array.isArray(item?.expenses)) {
+                return sum;
+            }
+
+            return (
+                sum +
+                item.expenses.reduce(
+                    (innerSum, expense) =>
+                        innerSum +
+                        (Number(expense?.amount) || 0),
+                    0
+                )
+            );
+        }, 0) || 0) + expenses;
+
+    const totalRevenue =
+        computer +
+        stationary +
+        photocopy +
+        others;
+
+    const totalCash =
+        totalRevenue - expenses;
+
+    return (
+        <div className="min-h-full relative pt-5 pb-12 text-slate-200">
+
+            {/* Ambient background */}
+
+            <div className="pointer-events-none fixed -top-40 -left-40 w-[450px] h-[450px] rounded-full bg-emerald-500/10 blur-[130px]" />
+
+            <div className="pointer-events-none fixed top-[30%] -right-40 w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[140px]" />
+
+            <div className="pointer-events-none fixed -bottom-52 left-[35%] w-[450px] h-[450px] rounded-full bg-violet-500/10 blur-[150px]" />
+
+
+            {/* =================================================
+			    DETAILS MODAL
+			================================================= */}
+
+            {modal && (
+                <div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+
+                    <div className="w-full max-w-xl rounded-3xl border border-cyan-400/20 bg-[#0b1c18]/95 shadow-2xl shadow-cyan-500/10">
+
+                        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+
+                            <div>
+                                <p className="text-xs uppercase tracking-[0.25em] text-cyan-400">
+                                    Transaction Details
+                                </p>
+
+                                <h2 className="text-xl font-bold text-white mt-1">
+                                    {deleteItem === 'expenses'
+                                        ? 'Expense Details'
+                                        : 'Other Revenue Details'}
+                                </h2>
                             </div>
-                            <div className='h-[300px] overflow-scroll scrollbar-hide text-pink-200 flex flex-col gap-5 p-5 items-center w-full'>
-                                <h1 className='text-xl font-semibold text-center'>{currentDate}</h1>
-                                <h1 className='text-lg font-semibold text-center'>{deleteItem}</h1>
-                                <table className="text-pink-200 sm:min-w-[80%]">
+
+                            <button
+                                onClick={() => setModal(false)}
+                                className="rounded-xl p-2 hover:bg-white/5"
+                            >
+                                <MdOutlineCancel className="text-2xl text-slate-400 hover:text-red-400" />
+                            </button>
+
+                        </div>
+
+
+                        <div className="max-h-[420px] overflow-y-auto p-5 scrollbar-hide">
+
+                            {modalLoading ? (
+                                <div className="h-60 flex items-center justify-center">
+                                    <Loading />
+                                </div>
+                            ) : (
+                                <table className="w-full text-sm">
+
                                     <thead>
-                                        <tr className="text-pink-300">
-                                            <th className="p-2 border">Sl</th>
-                                            <th className="p-2 border">Description</th>
-                                            <th className="p-2 border">Amount</th>
-                                            <th className="p-2 border"></th>
+                                        <tr className="border-b border-white/10 text-slate-500">
+                                            <th className="text-left py-3">#</th>
+                                            <th className="text-left py-3">
+                                                Description
+                                            </th>
+                                            <th className="text-right py-3">
+                                                Amount
+                                            </th>
+                                            <th />
                                         </tr>
                                     </thead>
+
                                     <tbody>
+
                                         {details?.map((item, index) => (
-                                            <tr key={index}>
-                                                <td className="p-2 border">{index + 1}</td>
-                                                <td className="p-2 border">{item?.comment}</td>
-                                                <td className="p-2 border">{item?.amount}</td>
-                                                <td onClick={() => { handleDelete(index, deleteItem) }} className="p-2 border cursor-pointer">-</td>
+                                            <tr
+                                                key={index}
+                                                className="border-b border-white/5"
+                                            >
+
+                                                <td className="py-3 text-slate-500">
+                                                    {index + 1}
+                                                </td>
+
+                                                <td className="py-3 text-white">
+                                                    {item?.comment || '—'}
+                                                </td>
+
+                                                <td
+                                                    className={`py-3 text-right font-semibold ${deleteItem === 'expenses'
+                                                        ? 'text-red-400'
+                                                        : 'text-emerald-400'
+                                                        }`}
+                                                >
+                                                    {Number(item?.amount) || 0}
+                                                </td>
+
+                                                <td className="text-right">
+
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDelete(
+                                                                index,
+                                                                deleteItem
+                                                            )
+                                                        }
+                                                        className="w-8 h-8 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white transition-all"
+                                                    >
+                                                        −
+                                                    </button>
+
+                                                </td>
+
                                             </tr>
                                         ))}
 
                                     </tbody>
-                                    <thead>
-                                        <tr className="text-pink-300">
-                                            <th className="p-2 border"></th>
-                                            <th className="p-2 border">Total</th>
-                                            <th className="p-2 border">{details?.reduce((sum, item) => sum + item.amount, 0)}</th>
-                                            <th className="p-2 border"></th>
+
+                                    <tfoot>
+
+                                        <tr>
+
+                                            <td />
+
+                                            <td className="py-4 font-bold text-white">
+                                                Total
+                                            </td>
+
+                                            <td className="py-4 text-right font-black text-cyan-300">
+
+                                                {details?.reduce(
+                                                    (sum, item) =>
+                                                        sum +
+                                                        (Number(item?.amount) || 0),
+                                                    0
+                                                )}
+
+                                            </td>
+
+                                            <td />
+
                                         </tr>
-                                    </thead>
+
+                                    </tfoot>
+
                                 </table>
-                            </div>
-                        </div>
-                }
+                            )}
 
-            </div >
-            <h1 className='text-xl md:text-3xl font-bold text-center text-pink-200'>Daily Transactions</h1>
-            <div className='flex items-center gap-10 justify-center mt-8'>
-                <Link to={'/'} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
-                    Back
-                </Link>
-                <button onClick={() => { setTab('revenue') }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
-                    Revenues
-                </button>
-                <button onClick={() => { setTab('expense') }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-2 md:px-5 py-1 rounded-md text-xs lg:text-lg font-semibold">
-                    Expenses
-                </button>
-            </div>
+                        </div>
 
-            <div className={`${tab === 'revenue' ? '' : 'hidden'} text-pink-200 mt-5 md:mt-[100px] w-full flex flex-col items-center justify-center px-5`}>
-                <h1 className='text-center mt-3 font-semibold text-lg md:text-2xl mb-2'>Date: {currentDate}</h1>
-                <h1 className='text-center font-semibold text-md md:text-xl mb-5'>Computer: <span className='text-green-500'>{computer} Taka</span> , Stationary: <span className='text-green-500'>{stationary} Taka</span>, Photocopy: <span className='text-green-500'>{photocopy} Taka</span>, Others: <span onClick={() => { setDetails(allData?.others_revenues); setDeleteItem('others_revenues'); setModal(!modal) }} className='text-green-500 cursor-pointer underline'>{others} Taka</span></h1>
-                <div className='max-w-full min-w-full md:min-w-[400px] h-fit border-2 rounded-2xl'>
-                    <h1 className='text-center mt-3 font-semibold text-lg md:text-2xl'>Revenues</h1>
-                    <div className={`${loading ? 'flex' : 'hidden'} w-full h-full items-center justify-center`}>
-                        <PuffLoader color='#fccee8' />
-                    </div>
-                    <div className={`text-pink-200 ${loading ? 'hidden' : 'flex'} flex-col gap-5 p-8 pt-0 items-start h-full w-full`}>
-                        <div className='mb-4 w-full'>
-                            <div className='mt-2'>
-                                <h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
-                                <div className='px-3 border-2 rounded-xl h-12 shadow-2xl shadow-pink-300 w-full'>
-                                    <NumberFormatBase
-                                        value={rvAmount}
-                                        onValueChange={(values) => {
-                                            setRvAmount(values.value);
-                                        }}
-                                        className='outline-none w-full h-full'
-                                        placeholder='Enter amount'
-                                        thousandSeparator={true}
-                                        allowNegative={false}
-                                        isNumericString={true}
-                                    />
-                                </div>
-                            </div>
-                            <div className='mt-2'>
-                                <h1 className='lg:text-lg font-semibold mb-2'>Category</h1>
-                                <div className=' border-2 rounded-xl h-12 shadow-2xl shadow-pink-300 w-full flex'>
-                                    <select onChange={(e) => { setRvCategory(e.target.value) }} ref={revenueCategoryRef} name="staff_category" id="staff_category" className='outline-none w-full bg-[#3A454A] rounded-xl px-3'>
-                                        <option value=""></option>
-                                        <option value="Computer" className=''>Computer</option>
-                                        <option value="Stationary">Stationary</option>
-                                        <option value="Photocopy">Photocopy</option>
-                                        <option value="Others">Others</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className={`${rvCategory === 'Others' ? 'mt-2' : 'hidden'}`}>
-                                <h1 className='lg:text-lg font-semibold mb-2'>Comment</h1>
-                                <div className='px-3 border-2 rounded-xl h-12 shadow-2xl shadow-pink-300 w-full flex'>
-                                    <input ref={revenueCommentRef} type="text" className='outline-none w-full' />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='w-full flex items-center justify-center'>
-                            <button onClick={() => handleRevenueTransections()} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md md:text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
-                        </div>
                     </div>
                 </div>
-            </div>
-            <div className={`${tab === 'expense' ? '' : 'hidden'} text-pink-200 mt-5 md:mt-[100px] w-full flex flex-col items-center justify-center px-5`}>
-                <h1 className='text-center mt-3 font-semibold text-lg md:text-2xl mb-2'>Date: {currentDate}</h1>
-                <h1 className='text-center font-semibold md:text-xl mb-5'>Total Expense: <span onClick={() => { setDetails(allData?.expenses); setDeleteItem('expenses'); setModal(!modal) }} className='text-red-500 cursor-pointer underline'>{expenses} Taka</span></h1>
-                <div className='max-w-full min-w-full md:min-w-[400px] h-fit border-2 rounded-2xl'>
-                    <h1 className='text-center mt-3 font-semibold text-lg md:text-2xl'>Expenses</h1>
-                    <div className={`${loading ? 'flex' : 'hidden'} w-full h-full items-center justify-center`}>
-                        <PuffLoader color='#fccee8' />
+            )}
+
+
+            <div className="max-w-6xl mx-auto">
+
+                {/* =================================================
+				    HEADER
+				================================================= */}
+
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 mb-8">
+
+                    <div>
+
+                        <p className="text-xs uppercase tracking-[0.3em] text-emerald-400">
+                            Finance Control
+                        </p>
+
+                        <h1 className="text-3xl md:text-4xl font-black text-white mt-1">
+                            Daily Transactions
+                        </h1>
+
+                        <p className="text-slate-500 mt-2">
+                            Track today's revenue, expenses and available cash.
+                        </p>
+
                     </div>
-                    <div className={`text-pink-200 ${loading ? 'hidden' : 'flex'} flex-col gap-5 p-8 pt-0 items-start h-full w-full`}>
-                        <div className='mb-4 w-full'>
-                            <div className='mt-2'>
-                                <h1 className='lg:text-lg font-semibold mb-2'>Transection Amount</h1>
-                                <div className='px-3 border-2 rounded-xl h-12 shadow-2xl shadow-pink-300 w-full'>
-                                    <NumberFormatBase
-                                        value={exAmount}
-                                        onValueChange={(values) => {
-                                            setExAmount(values.value);
-                                        }}
-                                        className='outline-none w-full h-full'
-                                        placeholder='Enter amount'
-                                        thousandSeparator={true}
-                                        allowNegative={false}
-                                        isNumericString={true}
-                                    />
-                                </div>
-                            </div>
-                            <div className='mt-2'>
-                                <h1 className='lg:text-lg font-semibold mb-2'>Comment</h1>
-                                <div className='px-3 border-2 rounded-xl h-12 shadow-2xl shadow-pink-300 w-full flex'>
-                                    <input ref={expenseCommentRef} type="text" className='outline-none w-full' />
-                                </div>
-                            </div>
-                        </div>
-                        <div className='w-full flex items-center justify-center'>
-                            <button onClick={() => handleExpenseTransections()} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md md:text-lg font-semibold mb-5 lg:mb-0'>Submit</button>
-                        </div>
-                    </div>
+
+                    <Link
+                        to="/"
+                        className="w-fit px-5 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] hover:border-emerald-400/30 hover:text-emerald-300 transition-all"
+                    >
+                        Back
+                    </Link>
+
                 </div>
+
+
+                {/* =================================================
+				    CASH OVERVIEW
+				================================================= */}
+
+                <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                    <div className="rounded-2xl border border-emerald-400/15 bg-emerald-400/[0.04] p-5">
+
+                        <div className="flex items-center gap-3">
+
+                            <div className="w-11 h-11 rounded-xl bg-emerald-400/10 flex items-center justify-center">
+                                <MdTrendingUp className="text-2xl text-emerald-400" />
+                            </div>
+
+                            <div>
+
+                                <p className="text-xs text-slate-500 uppercase tracking-wider">
+                                    Revenue
+                                </p>
+
+                                <p className="text-2xl font-black text-emerald-300">
+                                    ৳ {totalRevenue.toLocaleString()}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div className="rounded-2xl border border-red-400/15 bg-red-400/[0.04] p-5">
+
+                        <div className="flex items-center gap-3">
+
+                            <div className="w-11 h-11 rounded-xl bg-red-400/10 flex items-center justify-center">
+                                <MdTrendingDown className="text-2xl text-red-400" />
+                            </div>
+
+                            <div>
+
+                                <p className="text-xs text-slate-500 uppercase tracking-wider">
+                                    Expenses
+                                </p>
+
+                                <p className="text-2xl font-black text-red-300">
+                                    ৳ {expenses.toLocaleString()}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div className="rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.04] p-5">
+
+                        <div className="flex items-center gap-3">
+
+                            <div className="w-11 h-11 rounded-xl bg-cyan-400/10 flex items-center justify-center">
+                                <MdAccountBalanceWallet className="text-2xl text-cyan-400" />
+                            </div>
+
+                            <div>
+
+                                <p className="text-xs text-slate-500 uppercase tracking-wider">
+                                    Balance
+                                </p>
+
+                                <p
+                                    className={`text-2xl font-black ${totalCash < 0
+                                        ? 'text-red-300'
+                                        : 'text-cyan-300'
+                                        }`}
+                                >
+                                    ৳ {totalCash.toLocaleString()}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {/* =================================================
+				    TABS
+				================================================= */}
+
+                <div className="flex p-1 rounded-2xl bg-white/[0.03] border border-white/10 mb-6 max-w-md">
+
+                    <button
+                        onClick={() => setTab('revenue')}
+                        className={`flex-1 py-3 rounded-xl font-bold transition-all ${tab === 'revenue'
+                            ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20'
+                            : 'text-slate-500 hover:text-white'
+                            }`}
+                    >
+                        Revenues
+                    </button>
+
+                    <button
+                        onClick={() => setTab('expense')}
+                        className={`flex-1 py-3 rounded-xl font-bold transition-all ${tab === 'expense'
+                            ? 'bg-red-500/15 text-red-300 border border-red-400/20'
+                            : 'text-slate-500 hover:text-white'
+                            }`}
+                    >
+                        Expenses
+                    </button>
+
+                </div>
+
+
+                {/* =================================================
+				    REVENUE
+				================================================= */}
+
+                {tab === 'revenue' && (
+
+                    <div className="rounded-3xl border border-emerald-400/15 bg-white/[0.025] overflow-hidden">
+
+                        <div className="p-6 border-b border-white/5">
+
+                            <p className="text-xs uppercase tracking-[0.25em] text-emerald-400">
+                                Revenue Entry
+                            </p>
+
+                            <h2 className="text-xl font-bold text-white mt-1">
+                                Add Daily Revenue
+                            </h2>
+
+                            <p className="text-sm text-slate-500 mt-2">
+                                {currentDate}
+                            </p>
+
+                        </div>
+
+
+                        <div className="p-6">
+
+                            {loading ? (
+
+                                <div className="h-64 flex items-center justify-center">
+                                    <PuffLoader color="#34d399" />
+                                </div>
+
+                            ) : (
+
+                                <div className="grid md:grid-cols-2 gap-5">
+
+                                    {/* Amount */}
+
+                                    <div>
+
+                                        <label className="text-sm text-slate-400">
+                                            Transaction Amount
+                                        </label>
+
+                                        <NumberFormatBase
+                                            value={rvAmount}
+                                            onValueChange={values =>
+                                                setRvAmount(values.value)
+                                            }
+                                            className="mt-2 w-full h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white outline-none focus:border-emerald-400/40"
+                                            placeholder="Enter amount"
+                                            thousandSeparator={true}
+                                            allowNegative={false}
+                                            isNumericString={true}
+                                        />
+
+                                    </div>
+
+
+                                    {/* Category */}
+
+                                    <div>
+
+                                        <label className="text-sm text-slate-400">
+                                            Category
+                                        </label>
+
+                                        <select
+                                            ref={revenueCategoryRef}
+                                            value={rvCategory}
+                                            onChange={e =>
+                                                setRvCategory(e.target.value)
+                                            }
+                                            className="mt-2 w-full h-12 rounded-xl bg-[#10231f] border border-white/10 px-4 text-white outline-none"
+                                        >
+
+                                            <option value="">
+                                                Select category
+                                            </option>
+
+                                            <option value="Computer">
+                                                Computer
+                                            </option>
+
+                                            <option value="Stationary">
+                                                Stationary
+                                            </option>
+
+                                            <option value="Photocopy">
+                                                Photocopy
+                                            </option>
+
+                                            <option value="Others">
+                                                Others
+                                            </option>
+
+                                        </select>
+
+                                    </div>
+
+
+                                    {/* Others comment */}
+
+                                    {rvCategory === 'Others' && (
+
+                                        <div className="md:col-span-2">
+
+                                            <label className="text-sm text-slate-400">
+                                                Description
+                                            </label>
+
+                                            <input
+                                                ref={revenueCommentRef}
+                                                type="text"
+                                                className="mt-2 w-full h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white outline-none focus:border-emerald-400/40"
+                                                placeholder="What is this revenue for?"
+                                            />
+
+                                        </div>
+
+                                    )}
+
+
+                                    {/* Submit */}
+
+                                    <div className="md:col-span-2 flex justify-end">
+
+                                        <button
+                                            onClick={handleRevenueTransections}
+                                            className="px-7 py-3 rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 hover:bg-emerald-500 hover:text-[#071311] font-bold transition-all"
+                                        >
+                                            Add Revenue
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+                    </div>
+
+                )}
+
+
+                {/* =================================================
+				    EXPENSE
+				================================================= */}
+
+                {tab === 'expense' && (
+
+                    <div className="rounded-3xl border border-red-400/15 bg-white/[0.025] overflow-hidden">
+
+                        <div className="p-6 border-b border-white/5">
+
+                            <p className="text-xs uppercase tracking-[0.25em] text-red-400">
+                                Expense Entry
+                            </p>
+
+                            <h2 className="text-xl font-bold text-white mt-1">
+                                Add Daily Expense
+                            </h2>
+
+                            <p className="text-sm text-slate-500 mt-2">
+                                {currentDate}
+                            </p>
+
+                        </div>
+
+
+                        <div className="p-6">
+
+                            {loading ? (
+
+                                <div className="h-64 flex items-center justify-center">
+                                    <PuffLoader color="#f87171" />
+                                </div>
+
+                            ) : (
+
+                                <div className="grid md:grid-cols-2 gap-5">
+
+                                    {/* Amount */}
+
+                                    <div>
+
+                                        <label className="text-sm text-slate-400">
+                                            Expense Amount
+                                        </label>
+
+                                        <NumberFormatBase
+                                            value={exAmount}
+                                            onValueChange={values =>
+                                                setExAmount(values.value)
+                                            }
+                                            className="mt-2 w-full h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white outline-none focus:border-red-400/40"
+                                            placeholder="Enter amount"
+                                            thousandSeparator={true}
+                                            allowNegative={false}
+                                            isNumericString={true}
+                                        />
+
+                                    </div>
+
+
+                                    {/* Comment */}
+
+                                    <div>
+
+                                        <label className="text-sm text-slate-400">
+                                            Description
+                                        </label>
+
+                                        <input
+                                            ref={expenseCommentRef}
+                                            type="text"
+                                            className="mt-2 w-full h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white outline-none focus:border-red-400/40"
+                                            placeholder="What is this expense for?"
+                                        />
+
+                                    </div>
+
+
+                                    {/* Submit */}
+
+                                    <div className="md:col-span-2 flex justify-end">
+
+                                        <button
+                                            onClick={handleExpenseTransections}
+                                            className="px-7 py-3 rounded-xl bg-red-500/15 border border-red-400/30 text-red-300 hover:bg-red-500 hover:text-white font-bold transition-all"
+                                        >
+                                            Add Expense
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+                    </div>
+
+                )}
+
+
+                {/* =================================================
+				    BREAKDOWN
+				================================================= */}
+
+                <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+
+                    {[
+                        [
+                            'Computer',
+                            computer,
+                            'text-emerald-300'
+                        ],
+                        [
+                            'Stationary',
+                            stationary,
+                            'text-cyan-300'
+                        ],
+                        [
+                            'Photocopy',
+                            photocopy,
+                            'text-violet-300'
+                        ],
+                        [
+                            'Others',
+                            others,
+                            'text-emerald-300'
+                        ]
+                    ].map(([label, value, color]) => (
+
+                        <div
+                            key={label}
+                            className="rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4"
+                        >
+
+                            <p className="text-xs text-slate-500">
+                                {label}
+                            </p>
+
+                            <p
+                                className={`text-xl font-black mt-1 ${color}`}
+                            >
+                                ৳ {Number(value).toLocaleString()}
+                            </p>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
+
+                {/* =================================================
+				    TOTAL SUMMARY
+				================================================= */}
+
+                <div className="mt-6 rounded-3xl border border-white/[0.07] bg-white/[0.025] p-5">
+
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+                        <div>
+
+                            <p className="text-xs uppercase tracking-[0.25em] text-slate-500">
+                                Overall Summary
+                            </p>
+
+                            <p className="text-white font-bold mt-1">
+                                Including previous closed days
+                            </p>
+
+                        </div>
+
+                        <div className="text-right">
+
+                            <p className="text-xs text-slate-500 uppercase">
+                                Total Cash Movement
+                            </p>
+
+                            <p
+                                className={`text-2xl font-black ${totalCash >= 0
+                                    ? 'text-cyan-300'
+                                    : 'text-red-300'
+                                    }`}
+                            >
+                                ৳ {totalCash.toLocaleString()}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
             </div>
+
         </div>
     );
 };

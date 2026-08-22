@@ -6,7 +6,7 @@ import useCurrentUser from '../Hooks/useCurrentUser';
 import Swal from 'sweetalert2'; // assuming you're using this
 import { PuffLoader } from 'react-spinners';
 import Clock from '../Clock/Clock';
-import { MdEdit } from 'react-icons/md';
+import { MdEdit, MdLocationOn, MdAccessTime, MdPayments, MdTrendingUp, MdCheckCircle, MdPendingActions, MdOutlineWorkHistory, MdArrowBack, MdHome, MdAdminPanelSettings, MdHistory, MdAccountBalanceWallet, MdDirectionsWalk } from 'react-icons/md';
 
 // Utility to calculate distance in meters
 function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
@@ -726,209 +726,164 @@ const Staffs = () => {
 
 	if (locationLoading || dateCheckLoading) {
 		return (
-			<div className="h-full rounded-2xl overflow-hidden">
+			<div className="min-h-full flex items-center justify-center rounded-3xl border border-emerald-400/10 bg-[#071311]/80">
 				<Loading />
 			</div>
 		);
 	}
+
+	const parseMinutesForUI = (timeStr) => {
+		if (!timeStr) return null;
+		const [time, modifier] = timeStr.split(' ');
+		if (!time || !modifier) return null;
+		let [hours, minutes] = time.split(':').map(Number);
+		if (modifier === 'PM' && hours !== 12) hours += 12;
+		if (modifier === 'AM' && hours === 12) hours = 0;
+		return hours * 60 + minutes;
+	};
+
+	const shiftMinutes = (enter, exit) => {
+		const e = parseMinutesForUI(enter);
+		const x = parseMinutesForUI(exit);
+		return e !== null && x !== null && x > e ? x - e : 0;
+	};
+
+	const todayWorkedMinutes = shiftMinutes(today_enter1_time, today_exit1_time) + shiftMinutes(today_enter2_time, today_exit2_time);
+	const todayWorkedHours = Math.floor(todayWorkedMinutes / 60);
+	const todayWorkedRemainder = todayWorkedMinutes % 60;
+	const todayEarnedUI = Number(((todayWorkedMinutes / 60) * (hour_rate || 0)).toFixed(2));
+	const dailyTargetMinutes = 8 * 60;
+	const progress = Math.min(100, Math.round((todayWorkedMinutes / dailyTargetMinutes) * 100));
+	const locationReady = Number(distance) <= Number(currentLocation?.shop_range || Infinity) && Number(accuracy) <= 100;
+	const actionButton = (label, icon, disabled, onClick, tone = 'emerald') => {
+		const toneMap = {
+			emerald: 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200 shadow-emerald-500/10 hover:bg-emerald-400/20',
+			cyan: 'border-cyan-400/30 bg-cyan-400/10 text-cyan-200 shadow-cyan-500/10 hover:bg-cyan-400/20',
+			violet: 'border-violet-400/30 bg-violet-400/10 text-violet-200 shadow-violet-500/10 hover:bg-violet-400/20',
+		};
+		return (
+			<button disabled={disabled} onClick={onClick} className={`group relative flex h-24 w-24 flex-col items-center justify-center rounded-full border backdrop-blur-xl shadow-xl transition-all duration-300 hover:-translate-y-1 hover:scale-105 disabled:cursor-not-allowed disabled:border-white/10 disabled:bg-white/5 disabled:text-slate-500 disabled:shadow-none ${toneMap[tone]}`}>
+				<span className="mb-1 text-xl transition-transform duration-300 group-hover:scale-110">{icon}</span>
+				<span className="text-sm font-semibold">{label}</span>
+			</button>
+		);
+	};
+	const navButton = (children, icon) => (
+		<div className="group flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2 text-sm font-semibold text-slate-200 shadow-lg shadow-black/10 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-400/25 hover:bg-emerald-400/[0.07] hover:text-emerald-200">
+			<span className="text-emerald-300/80">{icon}</span>{children}
+		</div>
+	);
+
 	return (
-		<div className="">
-			<div>
-				<div className="flex items-center justify-center gap-5 mb-5">
-					{user ?
-						<div className='flex items-center justify-center gap-5 flex-wrap mt-5'>
-							<Link to={'/'} state={{ from: location }}>
-								<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-									Home
-								</button>
-							</Link>
-							<Link to={`/monthly_records/${uid}`} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-								See Your Montly Records
-							</Link>
-							<Link to={`/transections_history/${uid}`} state={{ pathname: location.pathname }} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-								Transections History
-							</Link>
-							<Link to={`/income_history/${uid}`} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-								Income History
-							</Link>
-						</div>
-						: ''
-					}
-				</div>
-				{
-					user?.uid !== uid || user_category === 'admin' ?
-						<div className='flex items-center justify-center gap-5 mb-10'>
-							<Link to={'/admin'} state={{ from: '/' }}>
-								<button className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-									Admin
-								</button>
-							</Link>
-							<Link to={from || '/admin/staff_manipulation'} state={{ from: location.pathname }}>
-								<button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-									Back
-								</button>
-							</Link>
-						</div> : ''
-				}
+		<div className="relative min-h-full overflow-hidden md:pb-12 text-white">
+			{/* Premium ambient layer — same palette as Main.jsx */}
+			<div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+				<div className="absolute -left-32 -top-32 h-[420px] w-[420px] rounded-full bg-emerald-500/10 blur-[130px]" />
+				<div className="absolute right-[-180px] top-[25%] h-[480px] w-[480px] rounded-full bg-cyan-500/10 blur-[150px]" />
+				<div className="absolute bottom-[-220px] left-[35%] h-[520px] w-[520px] rounded-full bg-violet-500/10 blur-[160px]" />
+			</div>
 
-				<h1 className='text-pink-200 text-md lg:text-xl text-center mb-2 font-semibold'>Your Location From Shop</h1>
-				{
-					!isAllowed && locationLoading ? <div className='flex justify-center'><PuffLoader color='#fccee8' size={40} /></div> :
-						<div className='flex items-center justify-center gap-5 text-pink-200 text-md lg:text-xl'>
-							<h1>Accuracy: {accuracy} meters</h1>
-							<h1>Distance: {distance} meters</h1>
-						</div>
-				}
-				<div>
-					<Clock></Clock>
-				</div>
-				<div>
-					<h1 className="text-lg lg:text-2xl text-center text-pink-200 mt-5 font-semibold">
-						{name} - Hour Rate: {hour_rate}
-					</h1>
+			<div className="mx-auto max-w-7xl space-y-6 pt-4 lg:pt-7">
+				{/* Navigation */}
+				<div className="flex flex-wrap items-center justify-center gap-2.5">
+					{user && <Link to="/" state={{ from: location }}>{navButton('Home', <MdHome />)}</Link>}
+					{user && <Link to={`/monthly_records/${uid}`}>{navButton('Monthly Records', <MdOutlineWorkHistory />)}</Link>}
+					{user && <Link to={`/transections_history/${uid}`} state={{ pathname: location.pathname }}>{navButton('Transactions', <MdHistory />)}</Link>}
+					{user && <Link to={`/income_history/${uid}`}>{navButton('Income History', <MdPayments />)}</Link>}
+					{(user?.uid !== uid || user_category === 'admin') && <Link to="/admin" state={{ from: '/' }}>{navButton('Admin', <MdAdminPanelSettings />)}</Link>}
+					{(user?.uid !== uid || user_category === 'admin') && <Link to={from || '/admin/staff_manipulation'} state={{ from: location.pathname }} className="hidden sm:block">{navButton('Back', <MdArrowBack />)}</Link>}
 				</div>
 
-				{
-					!accuracy && !distance && !staff ? <div className='flex justify-center mt-10'><PuffLoader color='#fccee8' size={40} /></div> :
+				{/* Profile / live status */}
+				<section className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-2xl sm:p-7">
+					<div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
+					<div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 						<div>
-							<div className="flex items-center gap-5 lg:gap-10 justify-center mt-10 flex-wrap">
-								<button
-									disabled={!isAllowed || currentDayName === 'Friday' || !!today_enter1_time || additional_movement_status}
-									onClick={() => handleTodayTime('today_enter1_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
-								>
-									Enter 1
-								</button>
-								<button
-									disabled={!isAllowed || currentDayName === 'Friday' || !!today_exit1_time || today_enter1_time === '' || additional_movement_status}
-									onClick={() => handleTodayTime('today_exit1_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
-								>
-									Exit 1
-								</button>
-								<button
-									disabled={!isAllowed || currentDayName === 'Friday' || !!today_enter2_time || today_exit1_time === '' || additional_movement_status}
-									onClick={() => handleTodayTime('today_enter2_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
-								>
-									Enter 2
-								</button>
-								<button
-									disabled={!isAllowed || currentDayName === 'Friday' || !!today_exit2_time || today_enter2_time === '' || additional_movement_status}
-									onClick={() => handleTodayTime('today_exit2_time', _id)}
-									className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
-								>
-									Exit 2
-								</button>
+							<div className="mb-2 flex flex-wrap items-center gap-2">
+								<span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Staff Workspace</span>
+								{isAdmin && <span className="rounded-full border border-violet-400/20 bg-violet-400/10 px-3 py-1 text-xs font-semibold text-violet-300">ADMIN</span>}
 							</div>
-							<div className='mt-10'>
-								<div className={`${additional_movement_status ? 'hidden' : 'flex'} items-center justify-center`}>
-									<button onClick={() => { handleAdditionalMovementRequest(name, uid) }} disabled={!accuracy || !distance || locationLoading || today_enter1_time === ''} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">Request For Additional Movement</button>
-								</div>
-								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center gap-5 lg:gap-10 justify-center flex-wrap`}>
-
-									<button
-										disabled={!isAllowed || !!additional_exit_time}
-										onClick={() => handleAdditionalTime('additional_exit_time', _id)}
-										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
-									>
-										Exit
-									</button>
-									<button
-										disabled={!isAllowed || !!additional_enter_time || additional_exit_time === ''}
-										onClick={() => handleAdditionalTime('additional_enter_time', _id)}
-										className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 rounded-full h-[70px] lg:h-24 w-[70px] lg:w-24 shadow-md shadow-pink-200 border-none text-pink-200 text-md lg:text-lg cursor-pointer hover:shadow-lg"
-									>
-										Enter
-									</button>
-								</div>
-								<div className={`${additional_movement_status ? 'flex' : 'hidden'} items-center sm:justify-center mt-8 lg:mt-10 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg`}>
-									<table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
-										<tbody>
-											<tr>
-												<th>Date</th>
-												<th>Day Name</th>
-												<th>Exit</th>
-												<th>Enter</th>
-											</tr>
-											<tr>
-												<td id="today_date">{currentDate}</td>
-												<td id="today_day_name">{currentDayName}</td>
-												<td id="exit2_time">{additional_exit_time}</td>
-												<td id="enter2_time">{additional_enter_time}</td>
-											</tr>
-										</tbody>
-									</table>
-								</div>
-							</div>
+							<h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{name}</h1>
+							<p className="mt-1 text-sm text-slate-400">Today · {currentDayName}, {currentDate}</p>
 						</div>
+						<div className="flex items-center gap-3 rounded-2xl border border-cyan-400/15 bg-cyan-400/[0.05] px-4 py-3">
+							<div className="rounded-xl bg-cyan-400/10 p-2.5 text-cyan-300"><MdAccessTime size={23} /></div>
+							<div><p className="text-xs text-slate-500">Hourly Rate</p><p className="text-xl font-bold text-cyan-200">৳ {Number(hour_rate || 0).toFixed(2)}</p></div>
+						</div>
+					</div>
+				</section>
 
-				}
-				<div className="flex items-center justify-center mt-8 lg:mt-10 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-					<table className="text-pink-200 min-w-[380px] sm:min-w-[70%]">
-						<tbody>
-							<tr>
-								<th>Date</th>
-								<th>Day Name</th>
-								<th>Enter 1</th>
-								<th>Exit 1</th>
-								<th>Enter 2</th>
-								<th>Exit 2</th>
-							</tr>
-							<tr>
-								<td id="today_date">{currentDate}</td>
-								<td id="today_day_name">{currentDayName}</td>
-								<td id="enter1_time">
-									<div className='flex items-center justify-between gap-0'>
-										<div className='max-w-[100px] overflow-hidden'>
-											<input ref={enter1ref} autoFocus={true} className={`${editEnter1Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_enter1_time} type="text" />
-										</div>
-										<h1 className={`flex-1 ${editEnter1Time ? 'hidden' : 'block'}`}>{today_enter1_time}</h1>
-										<MdEdit onClick={() => { handleEditTime('today_enter1_time') }} className={`text-end cursor-pointer ${user_category !== 'admin' && user?.uid === uid ? 'hidden' : 'block'}`} />
-									</div>
-								</td>
-								<td id="exit1_time">
-									<div className='flex items-center justify-between gap-0'>
-										<div className='max-w-[100px] overflow-hidden'>
-											<input ref={exit1ref} className={`${editExit1Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_exit1_time} type="text" />
-										</div>
-										<h1 className={`flex-1 ${editExit1Time ? 'hidden' : 'block'}`}>{today_exit1_time}</h1>
-										<MdEdit onClick={() => { handleEditTime('today_exit1_time') }} className={`text-end cursor-pointer ${user_category !== 'admin' && user?.uid === uid ? 'hidden' : 'block'}`} />
-									</div>
-								</td>
-								<td id="enter2_time">
-									<div className='flex items-center justify-between gap-0'>
-										<div className='max-w-[100px] overflow-hidden'>
-											<input ref={enter2ref} className={`${editEnter2Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_enter2_time} type="text" />
-										</div>
-										<h1 className={`flex-1 ${editEnter2Time ? 'hidden' : 'block'}`}>{today_enter2_time}</h1>
-										<MdEdit onClick={() => { handleEditTime('today_enter2_time') }} className={`text-end cursor-pointer ${user_category !== 'admin' && user?.uid === uid ? 'hidden' : 'block'}`} />
-									</div>
-								</td>
-								<td id="exit2_time">
-									<div className='flex items-center justify-between gap-0'>
-										<div className='max-w-[100px] overflow-hidden'>
-											<input ref={exit2ref} className={`${editExit2Time ? 'block' : 'hidden'} flex-1 w-full outline-none`} defaultValue={today_exit2_time} type="text" />
-										</div>
-										<h1 className={`flex-1 ${editExit2Time ? 'hidden' : 'block'}`}>{today_exit2_time}</h1>
-										<MdEdit onClick={() => { handleEditTime('today_exit2_time') }} className={`text-end cursor-pointer ${user_category !== 'admin' && user?.uid === uid ? 'hidden' : 'block'}`} />
-									</div>
-								</td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-				<div className='flex flex-col gap-10 items-center justify-center mt-5 mb-10'>
-					<button onClick={() => { handleChangeTime(_id) }} disabled={!isEnableEdit} className={`${isAdmin ? 'block' : 'hidden'} disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold`}>
-						Submit Edited Time
-					</button>
-					<button onClick={() => { handleSubmitWorkTime(uid) }} disabled={!workSubmitButton} className="disabled:cursor-not-allowed disabled:bg-gray-400 disabled:opacity-60 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-						Submit Your Work Time
-					</button>
+				{/* Location + clock */}
+				<section className="grid gap-4 lg:grid-cols-[1fr_auto]">
+					<div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl backdrop-blur-xl">
+						<div className="mb-4 flex items-center justify-between gap-3">
+							<div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Attendance Security</p><h2 className="mt-1 text-lg font-bold text-slate-100">Your Location From Shop</h2></div>
+							<div className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${locationReady ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300' : 'border-amber-400/25 bg-amber-400/10 text-amber-300'}`}><span className={`h-2 w-2 rounded-full ${locationReady ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />{locationReady ? 'Location Verified' : 'Location Restricted'}</div>
+						</div>
+						<div className="grid gap-3 sm:grid-cols-2">
+							<div className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.04] p-4"><div className="flex items-center gap-2 text-emerald-300"><MdLocationOn size={20} /><span className="text-xs uppercase tracking-wider text-slate-500">Accuracy</span></div><p className="mt-2 text-2xl font-bold">{accuracy || '--'} <span className="text-sm font-medium text-slate-500">m</span></p></div>
+							<div className="rounded-2xl border border-cyan-400/10 bg-cyan-400/[0.04] p-4"><div className="flex items-center gap-2 text-cyan-300"><MdDirectionsWalk size={20} /><span className="text-xs uppercase tracking-wider text-slate-500">Distance</span></div><p className="mt-2 text-2xl font-bold">{distance || '--'} <span className="text-sm font-medium text-slate-500">m</span></p></div>
+						</div>
+					</div>
+					<div className="flex min-h-[190px] items-center justify-center rounded-3xl border border-violet-400/10 bg-violet-400/[0.035] px-5 shadow-xl backdrop-blur-xl"><Clock /></div>
+				</section>
+
+				{/* Today's overview */}
+				<section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+					{[
+						['Worked Today', `${todayWorkedHours}h ${todayWorkedRemainder}m`, <MdAccessTime />, 'emerald'],
+						['Today Earned', `৳ ${todayEarnedUI.toFixed(2)}`, <MdPayments />, 'cyan'],
+						['Total Worked', `${total_working_hour || 0}h ${total_working_minute || 0}m`, <MdTrendingUp />, 'violet'],
+						['Available Balance', `৳ ${Number(available_balance || 0).toFixed(2)}`, <MdAccountBalanceWallet />, 'emerald']
+					].map(([label, value, icon, tone]) => <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 shadow-lg backdrop-blur-xl"><div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-xl ${tone === 'emerald' ? 'bg-emerald-400/10 text-emerald-300' : tone === 'cyan' ? 'bg-cyan-400/10 text-cyan-300' : 'bg-violet-400/10 text-violet-300'}`}>{icon}</div><p className="text-xs font-medium uppercase tracking-wider text-slate-500">{label}</p><p className="mt-1 text-xl font-bold text-slate-100">{value}</p></div>)}
+				</section>
+
+				{/* Progress */}
+				<section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl backdrop-blur-xl">
+					<div className="mb-3 flex items-center justify-between"><div><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Daily Progress</p><p className="mt-1 font-semibold text-slate-200">{progress}% of 8-hour target</p></div><span className="text-sm font-bold text-emerald-300">{todayWorkedHours}h {todayWorkedRemainder}m</span></div>
+					<div className="h-2.5 overflow-hidden rounded-full bg-white/5"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-400 transition-all duration-700" style={{ width: `${progress}%` }} /></div>
+				</section>
+
+				{/* Attendance actions */}
+				<section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl backdrop-blur-xl sm:p-7">
+					<div className="mb-6 text-center"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Today's Attendance</p><h2 className="mt-1 text-xl font-bold text-slate-100">Shift Control</h2><p className="mt-1 text-sm text-slate-500">Use the controls in sequence to record your working hours.</p></div>
+					<div className="flex flex-wrap items-center justify-center gap-5">
+						{actionButton('Enter 1', <MdCheckCircle />, !isAllowed || !!today_enter1_time || additional_movement_status, () => handleTodayTime('today_enter1_time', _id), 'emerald')}
+						{actionButton('Exit 1', <MdPendingActions />, !isAllowed || !!today_exit1_time || today_enter1_time === '' || additional_movement_status, () => handleTodayTime('today_exit1_time', _id), 'cyan')}
+						{actionButton('Enter 2', <MdCheckCircle />, !isAllowed || !!today_enter2_time || today_exit1_time === '' || additional_movement_status, () => handleTodayTime('today_enter2_time', _id), 'violet')}
+						{actionButton('Exit 2', <MdPendingActions />, !isAllowed || !!today_exit2_time || today_enter2_time === '' || additional_movement_status, () => handleTodayTime('today_exit2_time', _id), 'emerald')}
+					</div>
+
+					<div className="mt-8 flex flex-col items-center gap-3">
+						{!additional_movement_status && <button onClick={() => handleAdditionalMovementRequest(name, uid)} disabled={!accuracy || !distance || locationLoading || today_enter1_time === ''} className="flex items-center gap-2 rounded-xl border border-violet-400/20 bg-violet-400/10 px-5 py-2.5 text-sm font-semibold text-violet-200 shadow-lg shadow-violet-500/10 transition hover:bg-violet-400/20 disabled:cursor-not-allowed disabled:opacity-40"><MdDirectionsWalk /> Request For Additional Movement</button>}
+						{additional_movement_status && <div className="flex flex-wrap justify-center gap-5">{actionButton('Exit', <MdDirectionsWalk />, !isAllowed || !!additional_exit_time, () => handleAdditionalTime('additional_exit_time', _id), 'violet')}{actionButton('Enter', <MdDirectionsWalk />, !isAllowed || !!additional_enter_time || additional_exit_time === '', () => handleAdditionalTime('additional_enter_time', _id), 'cyan')}</div>}
+					</div>
+				</section>
+
+				{/* Today's timeline */}
+				<section className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] shadow-2xl backdrop-blur-xl">
+					<div className="border-b border-white/10 px-5 py-4"><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Attendance Timeline</p><h2 className="mt-1 text-lg font-bold">{currentDayName} · {currentDate}</h2></div>
+					<div className="overflow-x-auto p-5">
+						<table className="w-full min-w-[760px] text-left text-sm">
+							<thead className="bg-white/[0.025] text-xs uppercase tracking-wider text-slate-500"><tr>{['Date', 'Day', 'Enter 1', 'Exit 1', 'Enter 2', 'Exit 2'].map(h => <th key={h} className="px-5 py-4 font-semibold">{h}</th>)}</tr></thead>
+							<tbody><tr className="border-t border-white/10 text-slate-300">{[
+								currentDate, currentDayName, ['today_enter1_time', today_enter1_time, enter1ref, editEnter1Time], ['today_exit1_time', today_exit1_time, exit1ref, editExit1Time], ['today_enter2_time', today_enter2_time, enter2ref, editEnter2Time], ['today_exit2_time', today_exit2_time, exit2ref, editExit2Time]
+							].map((cell, i) => i < 2 ? <td key={i} className="px-5 py-5 font-medium">{cell}</td> : <td key={cell[0]} className="px-5 py-5"><div className="flex min-w-[100px] items-center gap-2">{cell[3] ? <input ref={cell[2]} defaultValue={cell[1]} type="text" className="w-full rounded-lg border border-emerald-400/20 bg-black/20 px-2 py-1 text-sm text-slate-100 outline-none" /> : <span className="font-semibold text-slate-200">{cell[1] || '—'}</span>}<MdEdit onClick={() => handleEditTime(cell[0])} className={`shrink-0 cursor-pointer text-slate-500 transition hover:text-emerald-300 ${user_category !== 'admin' && user?.uid === uid ? 'hidden' : 'block'} ${cell[3] ? 'text-emerald-300' : ''}`} /></div></td>)} </tr></tbody>
+						</table>
+					</div>
+				</section>
+
+				{/* Additional movement record */}
+				{additional_movement_status && <section className="overflow-hidden rounded-3xl border border-violet-400/15 bg-violet-400/[0.035] shadow-xl"><div className="border-b border-violet-400/10 px-5 py-4"><p className="text-xs uppercase tracking-[0.18em] text-violet-300/70">Additional Movement</p><h2 className="mt-1 font-bold">Active movement record</h2></div><div className="overflow-x-auto p-5"><table className="w-full min-w-[520px] text-sm"><thead className="text-xs uppercase tracking-wider text-slate-500"><tr>{['Date', 'Day', 'Exit', 'Enter'].map(h => <th key={h} className="px-5 py-4 text-left">{h}</th>)}</tr></thead><tbody><tr className="border-t border-white/10 text-slate-300"><td className="px-5 py-4">{currentDate}</td><td className="px-5 py-4">{currentDayName}</td><td className="px-5 py-4">{additional_exit_time || '—'}</td><td className="px-5 py-4">{additional_enter_time || '—'}</td></tr></tbody></table></div></section>}
+
+				{/* Footer actions */}
+				<div className="flex flex-wrap items-center justify-center gap-3 pb-6">
+					<button onClick={() => handleChangeTime(_id)} disabled={!isEnableEdit} className={`${isAdmin ? 'flex' : 'hidden'} items-center gap-2 rounded-xl border border-violet-400/25 bg-violet-400/10 px-5 py-2.5 text-sm font-semibold text-violet-200 transition hover:bg-violet-400/20 disabled:cursor-not-allowed disabled:opacity-30`}><MdEdit /> Submit Edited Time</button>
+					<button onClick={() => handleSubmitWorkTime(uid)} disabled={!workSubmitButton} className="flex items-center gap-2 rounded-xl border border-emerald-400/25 bg-emerald-400/10 px-5 py-2.5 text-sm font-semibold text-emerald-200 shadow-lg shadow-emerald-500/10 transition hover:bg-emerald-400/20 disabled:cursor-not-allowed disabled:opacity-30"><MdCheckCircle /> Submit Your Work Time</button>
 				</div>
 			</div>
 		</div>
-	);
+	)
 };
 
 export default Staffs;

@@ -3,54 +3,62 @@ import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom'
 
 const RevenueTransectionsDetials = () => {
     const shopTransections = useLoaderData();
-    const { revenue_transections, total_revenue_amount, month_name } = shopTransections[0];
+    const {
+        revenue_transections = [],
+        total_revenue_amount = 0,
+        month_name
+    } = shopTransections[0] || {};
+
     const location = useLocation();
     const from = location?.state?.pathname;
-    const navigate = useNavigate();
-
-
-    const revenueTransectionsPrintRef = useRef();
+    const printRef = useRef();
 
     const handlePrint = () => {
-        const printContents = revenueTransectionsPrintRef.current.innerHTML;
-        // Create a hidden iframe
+        const contents = printRef.current.innerHTML;
         const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
+
+        iframe.style.cssText =
+            'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
 
         document.body.appendChild(iframe);
 
         const doc = iframe.contentWindow.document;
 
-        // Optional: You can load Tailwind CSS from CDN inside iframe
         doc.open();
         doc.write(`
-      <html>
-        <head>
-          <title>Print</title>
-          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-          <style>
-            @page { size: A4; margin: 20mm; }
-            body { font-family: sans-serif; color: black; }
-          </style>
-        </head>
-        <body>
-          ${printContents}
-        </body>
-      </html>
-    `);
+            <html>
+                <head>
+                    <title>Revenue Transactions - ${month_name}</title>
+                    <style>
+                        @page { size: A4; margin: 18mm; }
+                        body {
+                            font-family: Arial, sans-serif;
+                            color: #111;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 25px;
+                        }
+                        th, td {
+                            border: 1px solid #222;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                        th { background: #f1f5f9; }
+                        .center { text-align: center; }
+                        .right { text-align: right; }
+                    </style>
+                </head>
+                <body>${contents}</body>
+            </html>
+        `);
         doc.close();
 
-        // Wait until iframe is ready then print
         iframe.onload = () => {
             iframe.contentWindow.focus();
             iframe.contentWindow.print();
 
-            // Optional: Cleanup after printing
             setTimeout(() => {
                 document.body.removeChild(iframe);
             }, 1000);
@@ -58,91 +66,117 @@ const RevenueTransectionsDetials = () => {
     };
 
     return (
-        <div className='pb-10'>
-            <div className='flex items-center justify-center mt-8 mb-8'>
-                <Link to={from}>
-                    <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                        Back
-                    </button>
+        <div className="min-h-full py-5 sm:py-8 text-white">
+            <div className="flex items-center justify-between mb-7">
+                <Link
+                    to={from || '/admin'}
+                    className="hidden md:block px-4 py-2 rounded-xl border border-white/10
+                    bg-white/[0.03] text-slate-300 hover:text-emerald-300
+                    hover:border-emerald-400/30 transition"
+                >
+                    ← Back
                 </Link>
-            </div>
-            <div className='flex items-center justify-center nunito'>
-                <h1 className="nunito text-lg lg:text-2xl text-center font-semibold px-5 py-2 border-2 rounded-lg text-pink-300">
-                    Revenue Transections Details of {month_name}
-                </h1>
-            </div>
-            <div className="flex items-center justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                <table className="nunito min-w-[380px] sm:min-w-[70%]">
-                    <tbody>
-                        <tr className='text-pink-300'>
-                            <th>Date</th>
-                            <th>Transection Category</th>
-                            <th>Transection Explaination</th>
-                            <th>Ammount</th>
-                        </tr>
-                        {
-                            revenue_transections?.map(transection =>
-                                <tr className='text-pink-200'>
-                                    <td>{transection.transection_date}</td>
-                                    <td>{transection.transection_category}</td>
-                                    <td className='max-w-24 lg:max-w-auto text-wrap overflow-scroll scrollbar-hide cursor-context-menu'>{transection.transection_explaination}</td>
-                                    <td>{transection.transection_amount}</td>
-                                </tr>
-                            )
-                        }
-                        <tr className='text-pink-300'>
-                            <th colSpan={3} className='p-2 border text-right'>Total Revenue Amount</th>
-                            <th>{total_revenue_amount}</th>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div className='flex items-center justify-center mt-5 mb-10'>
-                <button onClick={handlePrint} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                    Print
+
+                <button
+                    onClick={handlePrint}
+                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500
+                    font-semibold shadow-lg shadow-emerald-500/20 hover:-translate-y-0.5 transition"
+                >
+                    Print Report
                 </button>
             </div>
-            <div ref={revenueTransectionsPrintRef} className='nunito hidden'>
-                <div>
-                    <div className='text-center text-4xl font-bold'><h1>BISMILLAH ENTERPRISE</h1></div>
-                </div>
-                <div className='flex items-center justify-center my-3'>
-                    <img className='w-24 h-24' src='https://i.ibb.co/01Zf9m1/logo.png'></img>
-                </div>
-                <div className='flex items-center justify-center nunito'>
-                    <h1 className="nunito text-lg lg:text-2xl text-center font-semibold px-5 py-2 border-2 rounded-lg text-black">
-                        Revenue Transection Details of {month_name}
-                    </h1>
-                </div>
-                <div className="flex items-center justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="nunito min-w-[380px] sm:min-w-[380px]">
-                        <tbody>
-                            <tr className='text-black'>
-                                <th className='p-2 border'>Date</th>
-                                <th className='p-2 border'>Transection Id</th>
-                                <th className='p-2 border'>Transection Explaination</th>
-                                <th className='p-2 border'>Ammount</th>
+
+            <div className="mb-6">
+                <p className="text-xs uppercase tracking-[0.25em] text-emerald-400/70">
+                    Revenue
+                </p>
+                <h1 className="text-2xl sm:text-3xl font-bold">
+                    Revenue Transactions
+                </h1>
+                <p className="text-slate-400 mt-1">{month_name}</p>
+            </div>
+
+            <div className="rounded-2xl border border-white/10 bg-white/[0.025] overflow-hidden p-5">
+                <div className="overflow-x-auto scrollbar-hide">
+                    <table className="w-full min-w-[700px]">
+                        <thead>
+                            <tr className="bg-emerald-400/[0.06] border-b border-white/10">
+                                <th className="px-4 py-4 text-left text-emerald-300/80">Date</th>
+                                <th className="px-4 py-4 text-left text-emerald-300/80">Transaction ID</th>
+                                <th className="px-4 py-4 text-left text-emerald-300/80">Explanation</th>
+                                <th className="px-4 py-4 text-right text-emerald-300/80">Amount</th>
                             </tr>
-                            {
-                                revenue_transections?.map(transection =>
-                                    <tr className='text-black'>
-                                        <td className='p-2 border'>{transection.transection_date}</td>
-                                        <td className='p-2 border'>{transection.transection_id}</td>
-                                        <td className='max-w-24 lg:max-w-auto text-wrap cursor-context-menu p-2 border'>{transection.transection_explaination}</td>
-                                        <td className='p-2 border text-center'>{transection.transection_amount}</td>
-                                    </tr>
-                                )
-                            }
-                            <tr className='text-black'>
-                                <th colSpan={3} className='p-2 border text-right'>Total Revenue Amount</th>
-                                <th className='p-2 border'>{total_revenue_amount}</th>
+                        </thead>
+
+                        <tbody>
+                            {revenue_transections.map((transaction, index) => (
+                                <tr
+                                    key={transaction.transection_id || index}
+                                    className="border-b border-white/[0.06] hover:bg-emerald-400/[0.03]"
+                                >
+                                    <td className="px-4 py-4 text-slate-300">
+                                        {transaction.transection_date}
+                                    </td>
+                                    <td className="px-4 py-4 text-cyan-300">
+                                        {transaction.transection_id}
+                                    </td>
+                                    <td className="px-4 py-4 text-slate-300">
+                                        {transaction.transection_explaination || '—'}
+                                    </td>
+                                    <td className="px-4 py-4 text-right text-emerald-300 font-semibold">
+                                        ৳ {transaction.transection_amount}
+                                    </td>
+                                </tr>
+                            ))}
+
+                            <tr className="bg-emerald-400/[0.04]">
+                                <td colSpan="3" className="px-4 py-4 text-right font-bold text-white">
+                                    Total Revenue
+                                </td>
+                                <td className="px-4 py-4 text-right font-bold text-emerald-300">
+                                    ৳ {total_revenue_amount}
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
 
+            {/* Print content */}
+            <div ref={printRef} className="hidden">
+                <div style={{ textAlign: 'center' }}>
+                    <h1>BISMILLAH ENTERPRISE</h1>
+                    <p>Revenue Transaction Details — {month_name}</p>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Transaction ID</th>
+                            <th>Explanation</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {revenue_transections.map((transaction, index) => (
+                            <tr key={index}>
+                                <td>{transaction.transection_date}</td>
+                                <td>{transaction.transection_id}</td>
+                                <td>{transaction.transection_explaination || '—'}</td>
+                                <td>{transaction.transection_amount}</td>
+                            </tr>
+                        ))}
+
+                        <tr>
+                            <th colSpan="3" className="right">Total Revenue</th>
+                            <th>{total_revenue_amount}</th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     );
 };
 

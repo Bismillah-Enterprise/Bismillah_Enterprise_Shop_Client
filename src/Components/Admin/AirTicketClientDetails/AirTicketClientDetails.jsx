@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { MdOutlineCancel } from 'react-icons/md';
+import { MdOutlineCancel, MdEdit, MdFlightTakeoff, MdArrowBack, MdPerson, MdBadge, MdPhone, MdCalendarMonth } from 'react-icons/md';
 import { NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -74,62 +74,129 @@ const AirTicketClientDetails = () => {
     const passportNoRef = useRef();
     const dateOfExpiryRef = useRef();
     return (
-        <div>
-            <div className='flex items-center justify-start'>
+        <div className="relative min-h-full pb-10 text-slate-200">
+
+            {/* Ambient background */}
+            <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+                <div className="absolute -left-40 top-10 h-96 w-96 rounded-full bg-emerald-500/[0.06] blur-[130px]" />
+                <div className="absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-cyan-500/[0.05] blur-[140px]" />
+                <div className="absolute bottom-0 left-1/3 h-96 w-96 rounded-full bg-violet-500/[0.05] blur-[150px]" />
+            </div>
+
+            {/* Back */}
+            <div className="mb-6">
                 <Link to={location.pathname.includes('admin') ? '/admin/air_ticket_client_corner' : '/client_corner'}>
-                    <button className="hidden md:block text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
+                    <button className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:border-emerald-400/30 hover:bg-emerald-400/10 hover:text-emerald-300">
+                        <MdArrowBack />
                         Back
                     </button>
                 </Link>
             </div>
-            <div className='flex justify-center items-center mt-5'>
-                <div>
-                    <h1 className='font-semibold md:text-2xl text-pink-300 text-center'>{client.name}</h1>
-                    <h1 className='font-semibold md:text-sm text-pink-300 text-center'>{client.address}</h1>
-                    <h1 className='font-semibold md:text-md text-pink-300 text-center'>Destination: {client?.vouchers[0]?.destination},  Mobile No: {client.mobile_no}</h1>
-                    <h1 className='font-semibold md:text-md text-pink-300 text-center'>Passport No: {client?.passport_no},  Date of Expiry: {client.date_of_expiry}</h1>
-                    <h1 onClick={() => { setIsEdit(true) }} className='underline cursor-pointer text-xs text-pink-300 text-center'>Edit Client Data</h1>
+
+            {/* Client hero */}
+            <div className="relative overflow-hidden rounded-3xl border border-white/[0.07] bg-white/[0.025] p-5 md:p-8 backdrop-blur-xl shadow-2xl">
+
+                <div className="absolute -right-20 -top-20 h-48 w-48 rounded-full bg-emerald-400/[0.07] blur-3xl" />
+
+                <div className="relative flex flex-col items-center text-center">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-400/10 text-emerald-300">
+                        <MdPerson className="text-4xl" />
+                    </div>
+
+                    <h1 className="text-2xl md:text-3xl font-bold text-white">
+                        {client.name}
+                    </h1>
+
+                    <p className="mt-1 text-sm text-slate-500">
+                        {client.address}
+                    </p>
+
+                    <div className="mt-5 flex flex-wrap justify-center gap-2">
+                        <span className="rounded-xl border border-cyan-400/10 bg-cyan-400/5 px-3 py-2 text-xs text-cyan-300">
+                            Destination: {client?.vouchers[0]?.destination}
+                        </span>
+
+                        <span className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-slate-400">
+                            Mobile: {client.mobile_no}
+                        </span>
+
+                        <span className="rounded-xl border border-violet-400/10 bg-violet-400/5 px-3 py-2 text-xs text-violet-300">
+                            Passport: {client?.passport_no}
+                        </span>
+
+                        <span className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-slate-400">
+                            Expiry: {client.date_of_expiry}
+                        </span>
+                    </div>
+
+                    <button
+                        onClick={() => { setIsEdit(true) }}
+                        className="mt-5 flex items-center gap-2 text-xs font-semibold text-emerald-300 transition hover:text-emerald-200"
+                    >
+                        <MdEdit />
+                        Edit Client Information
+                    </button>
                 </div>
             </div>
-            <div className={`h-fit min-h-[200px] ${isEdit ? 'flex' : 'hidden'} lg:justify-center duration-300`}>
-                <div className="relative text-pink-200 shadow-lg shadow-pink-200 flex flex-col items-center justify-center mt-5 w-fit rounded-2xl p-5">
-                    <div className='flex justify-end -top-[10px] -right-[10px] absolute'>
-                        <MdOutlineCancel onClick={() => { setIsEdit(false) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
+
+            {/* Edit */}
+            <div className={`min-h-[200px] ${isEdit ? 'flex' : 'hidden'} justify-center duration-300`}>
+                <div className="relative mt-6 w-full max-w-3xl rounded-3xl border border-white/[0.08] bg-white/[0.035] p-5 md:p-7 shadow-2xl backdrop-blur-xl">
+
+                    <button
+                        onClick={() => { setIsEdit(false) }}
+                        className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-xl bg-red-400/5 text-slate-400 transition hover:bg-red-400/10 hover:text-red-300"
+                    >
+                        <MdOutlineCancel className="text-2xl" />
+                    </button>
+
+                    <div className="mb-6">
+                        <h1 className="text-lg font-bold text-white">
+                            Update Client Information
+                        </h1>
+                        <p className="mt-1 text-xs text-slate-500">
+                            Modify the information and submit your changes.
+                        </p>
                     </div>
-                    <h1 className='text-md font-semibold'>Enter Update Informations</h1>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-5 text-xs'>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
-                            <p>Client Name</p>
-                            <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full'>
-                                <input defaultValue={client.name} ref={clientNameRef} type="text" className='outline-none w-full' placeholder='Enter Client Name' />
+
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+
+                        {[
+                            ['Client Name', client.name, clientNameRef, 'text'],
+                            ['Client Date of Birth', client.date_of_birth, dateOfBirthRef, 'text'],
+                            ['Client Passport No', client.passport_no, passportNoRef, 'text'],
+                            ['Date of Expiry', client.date_of_expiry, dateOfExpiryRef, 'text'],
+                        ].map(([label, defaultValue, ref, type]) => (
+                            <div key={label}>
+                                <label className="mb-2 block text-xs font-medium text-slate-400">
+                                    {label}
+                                </label>
+
+                                <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 focus-within:border-emerald-400/30">
+                                    <input
+                                        defaultValue={defaultValue}
+                                        ref={ref}
+                                        type={type}
+                                        className="w-full bg-transparent text-sm text-slate-200 outline-none"
+                                        placeholder={`Enter ${label}`}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2 mt-4'>
-                            <p>Client Date of Birth</p>
-                            <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full'>
-                                <input defaultValue={client.date_of_birth} ref={dateOfBirthRef} type="text" className='outline-none w-full' placeholder='Enter Date Of Birth' />
-                            </div>
-                        </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
-                            <p>Client Passport No</p>
-                            <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full'>
-                                <input defaultValue={client.passport_no} ref={passportNoRef} type="text" className='outline-none w-full' placeholder='Enter Client Passport No' />
-                            </div>
-                        </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
-                            <p>Date of Expiry</p>
-                            <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full'>
-                                <input defaultValue={client.date_of_expiry} ref={dateOfExpiryRef} type="text" className='outline-none w-full' placeholder='Passport Date of Expiry' />
-                            </div>
-                        </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
-                            <p>Phone Number</p>
-                            <div className={`px-3 ${numberAlert ? 'border-red-500' : ''} border-2 rounded-xl h-6 shadow-2xl shadow-pink-300  w-full`}>
-                                {/* <input defaultValue={client.mobile_no} onChange={() => { handleClientInfoChange('clientNumber') }} ref={phoneNoRef} type="text" className='outline-none w-full' /> */}
+                        ))}
+
+                        <div>
+                            <label className="mb-2 block text-xs font-medium text-slate-400">
+                                Phone Number
+                            </label>
+
+                            <div className={`rounded-xl border bg-black/20 px-4 py-3 ${numberAlert
+                                ? 'border-red-400/50'
+                                : 'border-white/10 focus-within:border-emerald-400/30'
+                                }`}>
                                 <NumericFormat
                                     defaultValue={client.mobile_no}
                                     getInputRef={phoneNoRef}
-                                    className="outline-none w-full h-full"
+                                    className="h-full w-full bg-transparent text-sm text-slate-200 outline-none"
                                     placeholder="Enter Phone Number"
                                     format="0##########"
                                     allowEmptyFormatting={false}
@@ -141,48 +208,124 @@ const AirTicketClientDetails = () => {
                                 />
                             </div>
                         </div>
-                        <div className='text-pink-200 flex flex-col items-start w-full gap-2'>
-                            <p>Address</p>
-                            <div className='px-3 border-2 rounded-xl h-6 shadow-2xl shadow-pink-300 w-full'>
-                                <input defaultValue={client.address} ref={addressRef} type="text" className='outline-none w-full' placeholder='Enter Client Address' />
+
+                        <div>
+                            <label className="mb-2 block text-xs font-medium text-slate-400">
+                                Address
+                            </label>
+
+                            <div className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 focus-within:border-emerald-400/30">
+                                <input
+                                    defaultValue={client.address}
+                                    ref={addressRef}
+                                    type="text"
+                                    className="w-full bg-transparent text-sm text-slate-200 outline-none"
+                                    placeholder="Enter Client Address"
+                                />
                             </div>
                         </div>
                     </div>
-                    <button onClick={() => { handleEditClientData(client._id) }} className=' mt-3 text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-3 py-1 rounded-md text-xs font-semibold mb-5 lg:mb-0'>Submit Client Information</button>
+
+                    <div className="mt-6 flex justify-center">
+                        <button
+                            onClick={() => { handleEditClientData(client._id) }}
+                            className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-6 py-3 text-sm font-bold text-emerald-300 transition hover:bg-emerald-400/20"
+                        >
+                            Save Client Information
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div className='flex flex-col md:flex-row items-center justify-center mt-5 mb-2 gap-5'>
-                <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_new_voucher/${client?._id}` : `/new_voucher/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                    Create A New Voucher
+
+            {/* Actions */}
+            <div className="my-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+                <Link
+                    to={location.pathname.includes('admin') ? `/admin/air_ticket_new_voucher/${client?._id}` : `/new_voucher/${client?._id}`}
+                    state={{ pathname: location.pathname }}
+                    className="flex items-center justify-center rounded-2xl border border-emerald-400/20 bg-gradient-to-r from-emerald-400/10 to-cyan-400/5 px-5 py-3 text-sm font-bold text-emerald-300 transition hover:border-emerald-300/30 hover:bg-emerald-400/15"
+                >
+                    + Create A New Voucher
                 </Link>
-                <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_client_transections/${client?._id}` : `/client_transections/${client?._id}`} state={{ pathname: location.pathname }} className="text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                    See Client Transections
+
+                <Link
+                    to={location.pathname.includes('admin') ? `/admin/air_ticket_client_transections/${client?._id}` : `/client_transections/${client?._id}`}
+                    state={{ pathname: location.pathname }}
+                    className="flex items-center justify-center rounded-2xl border border-cyan-400/15 bg-cyan-400/5 px-5 py-3 text-sm font-bold text-cyan-300 transition hover:bg-cyan-400/10"
+                >
+                    See Client Transactions
                 </Link>
             </div>
-            <div>
-                <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                    <table className="text-pink-200 w-full md:min-w-[70%]">
-                        <tbody>
-                            <tr>
-                                <th>SL No</th>
-                                <th>Date</th>
-                                <th>Voucher No</th>
-                                <th>Paid Amount</th>
-                                <th>Due Amount</th>
-                                <th>Status</th>
-                                <th>View Details</th>
+
+            {/* Voucher table */}
+            <div className="overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] shadow-2xl backdrop-blur-xl">
+                <div className="border-b border-white/[0.07] px-5 py-4">
+                    <h2 className="font-semibold text-white">Voucher History</h2>
+                    <p className="mt-1 text-xs text-slate-500">
+                        All vouchers associated with this client
+                    </p>
+                </div>
+
+                <div className="overflow-x-auto scrollbar-hide p-5">
+                    <table className="w-full min-w-[800px] text-left text-sm">
+                        <thead>
+                            <tr className="border-b border-white/[0.07] bg-emerald-400/[0.035]">
+                                <th className="px-5 py-4 text-xs uppercase tracking-wider text-emerald-300">SL No</th>
+                                <th className="px-5 py-4 text-xs uppercase tracking-wider text-emerald-300">Date</th>
+                                <th className="px-5 py-4 text-xs uppercase tracking-wider text-emerald-300">Voucher No</th>
+                                <th className="px-5 py-4 text-xs uppercase tracking-wider text-emerald-300">Paid</th>
+                                <th className="px-5 py-4 text-xs uppercase tracking-wider text-emerald-300">Due</th>
+                                <th className="px-5 py-4 text-xs uppercase tracking-wider text-emerald-300">Status</th>
+                                <th className="px-5 py-4 text-xs uppercase tracking-wider text-emerald-300">Details</th>
                             </tr>
+                        </thead>
+
+                        <tbody>
                             {
                                 client.vouchers?.map((voucher, index) =>
-                                    <tr key={index}>
-                                        <td>{index + 1}</td>
-                                        <td>{voucher.date}</td>
-                                        <td>{voucher.voucher_no}</td>
-                                        <td>{voucher.paid_amount}</td>
-                                        <td>{voucher.due_amount}</td>
-                                        <td className={`${voucher.payment_status === 'Paid' ? 'text-green-500' : 'text-red-500'}`}>{voucher.payment_status}</td>
-                                        <td>
-                                            <Link to={location.pathname.includes('admin') ? `/admin/air_ticket_voucher/${client._id}/${voucher.voucher_no}` : `/voucher/${client._id}/${voucher.voucher_no}`} state={{ pathname: location?.pathname }} className='text-pink-300 hover:text-pink-400 underline'>View Details</Link>
+                                    <tr
+                                        key={index}
+                                        className="border-b border-white/[0.05] transition hover:bg-white/[0.025]"
+                                    >
+                                        <td className="px-5 py-4 text-slate-500">
+                                            {String(index + 1).padStart(2, '0')}
+                                        </td>
+
+                                        <td className="px-5 py-4 text-slate-300">
+                                            {voucher.date}
+                                        </td>
+
+                                        <td className="px-5 py-4">
+                                            <span className="rounded-lg border border-cyan-400/10 bg-cyan-400/5 px-3 py-1.5 text-cyan-300">
+                                                {voucher.voucher_no}
+                                            </span>
+                                        </td>
+
+                                        <td className="px-5 py-4 font-semibold text-emerald-300">
+                                            {voucher.paid_amount}
+                                        </td>
+
+                                        <td className="px-5 py-4 font-semibold text-orange-300">
+                                            {voucher.due_amount}
+                                        </td>
+
+                                        <td className="px-5 py-4">
+                                            <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${voucher.payment_status === 'Paid'
+                                                ? 'border-emerald-400/10 bg-emerald-400/10 text-emerald-300'
+                                                : 'border-red-400/10 bg-red-400/10 text-red-300'
+                                                }`}>
+                                                {voucher.payment_status}
+                                            </span>
+                                        </td>
+
+                                        <td className="px-5 py-4">
+                                            <Link
+                                                to={location.pathname.includes('admin') ? `/admin/air_ticket_voucher/${client._id}/${voucher.voucher_no}` : `/voucher/${client._id}/${voucher.voucher_no}`}
+                                                state={{ pathname: location?.pathname }}
+                                                className="font-semibold text-cyan-300 transition hover:text-cyan-200"
+                                            >
+                                                View Details →
+                                            </Link>
                                         </td>
                                     </tr>
                                 )

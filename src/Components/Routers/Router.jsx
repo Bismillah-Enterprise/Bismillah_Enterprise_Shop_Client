@@ -27,15 +27,12 @@ import ShopTransections from '../Admin/ShopTransections/ShopTransections';
 import RevenueTransectionsDetials from '../Admin/RevenueTransectionsDetails/RevenueTransectionsDetials';
 import ExpenseTransectionsDetails from '../Admin/ExpenseTransectionsDetails/ExpenseTransectionsDetails';
 import ShopTransectionsSummary from '../Admin/ShopTransectionsSummary/ShopTransectionsSummary';
-import SelfTransections from '../Admin/SelfTransections/SelfTransections';
 import ClientCorner from '../Admin/ClientCorner/ClientCorner';
 import ClientDetails from '../Admin/ClientDetails/ClientDetails';
 import Voucher from '../Admin/Voucher/Voucher';
 import CreateNewClient from '../Admin/CreateNewClient/CreateNewClient';
 import NewVoucher from '../Admin/NewVoucher/NewVoucher';
 import ClientTransections from '../Admin/ClientTransections/ClientTransections';
-import SelfRevenueTransectionsDetails from '../Admin/SelfRevenueTransectionsDetails/SelfRevenueTransectionsDetails';
-import SelfTransectionsSummary from '../Admin/SelfTransectionsSummary/SelfTransectionsSummary';
 import ProductsManipulation from '../Admin/ProductsManipulation/ProductsManipulation';
 import CreateNewClientWithVoucher from '../Admin/CreateNewClientWithVoucher/CreateNewClientWithVoucher';
 import AirTicketClient from '../Admin/AirTicketClilent/AirTicketClient';
@@ -84,45 +81,45 @@ const router = createBrowserRouter([
 			},
 			{
 				path: '/client_corner',
-				element: <ClientCorner></ClientCorner>,
+				element: <StaffRoute><ClientCorner></ClientCorner></StaffRoute>,
 				loader: () => fetch('https://bismillah-enterprise-server.onrender.com/client_corner'),
 			},
 			{
 				path: '/new_client',
-				element: <CreateNewClient></CreateNewClient>,
+				element: <StaffRoute><CreateNewClient></CreateNewClient></StaffRoute>,
 			},
 			{
 				path: '/daily_transactions',
-				element: <DailyTransactions></DailyTransactions>,
+				element: <StaffRoute><DailyTransactions></DailyTransactions></StaffRoute>,
 			},
 			{
 				path: '/new_client_new_voucher',
-				element: <CreateNewClientWithVoucher></CreateNewClientWithVoucher>,
+				element: <StaffRoute><CreateNewClientWithVoucher></CreateNewClientWithVoucher></StaffRoute>,
 			},
 			{
 				path: '/client_details/:id',
-				element: <ClientDetails></ClientDetails>,
+				element: <StaffRoute><ClientDetails></ClientDetails></StaffRoute>,
 				loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 			},
 			{
 				path: '/client_transections/:id',
-				element: <ClientTransections></ClientTransections>,
+				element: <StaffRoute><ClientTransections></ClientTransections></StaffRoute>,
 				loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 			},
 			{
 				path: '/new_voucher/:id',
-				element: <NewVoucher></NewVoucher>,
+				element: <StaffRoute><NewVoucher></NewVoucher></StaffRoute>,
 				loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 			},
 			{
 				path: '/voucher/:id/:voucher_no',
-				element: <Voucher></Voucher>,
+				element: <StaffRoute><Voucher></Voucher></StaffRoute>,
 				loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
 
 			},
 			{
 				path: '/products',
-				element: <ProductsManipulation></ProductsManipulation>,
+				element: <StaffRoute><ProductsManipulation></ProductsManipulation></StaffRoute>,
 				loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/products`),
 
 			},
@@ -155,29 +152,14 @@ const router = createBrowserRouter([
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`)
 					},
 					{
-						path: '/admin/self_revenue_transections_details',
-						element: <AdminRoute><SelfRevenueTransectionsDetails></SelfRevenueTransectionsDetails></AdminRoute>,
-						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/self_transections`)
-					},
-					{
 						path: '/admin/expense_transections_details',
 						element: <AdminRoute><ExpenseTransectionsDetails></ExpenseTransectionsDetails></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections`)
 					},
 					{
-						path: '/admin/self_expense_transections_details',
-						element: <AdminRoute><ExpenseTransectionsDetails></ExpenseTransectionsDetails></ AdminRoute>,
-						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/self_transections`)
-					},
-					{
 						path: '/admin/shop_transections_summary',
 						element: <AdminRoute><ShopTransectionsSummary></ShopTransectionsSummary></ AdminRoute>,
 						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/shop_transections_summary`)
-					},
-					{
-						path: '/admin/self_transections_summary',
-						element: <AdminRoute><SelfTransectionsSummary></SelfTransectionsSummary></ AdminRoute>,
-						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/self_transections_summary`)
 					},
 					{
 						path: '/admin/client_corner',
@@ -274,11 +256,6 @@ const router = createBrowserRouter([
 						path: '/admin/staff_transections',
 						element: <AdminRoute><StaffTransections></StaffTransections></ AdminRoute>,
 						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/staffs'),
-					},
-					{
-						path: '/admin/self_transections',
-						element: <AdminRoute><SelfTransections></SelfTransections></ AdminRoute>,
-						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/self_transections'),
 					},
 					{
 						path: '/admin/products_manipulation',

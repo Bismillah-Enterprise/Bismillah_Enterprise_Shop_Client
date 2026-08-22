@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
-import { MdOutlineCancel } from 'react-icons/md';
+import { MdOutlineCancel, MdPersonAdd, MdSwapHoriz, MdDeleteOutline } from 'react-icons/md';
 import { NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -8,69 +8,82 @@ import { AuthContext } from '../../Providers/AuthProvider';
 const UserRequest = () => {
 	const { user } = useContext(AuthContext);
 	const userRequest = useLoaderData();
+
 	const [allStaffs, setAllStaffs] = useState([]);
+	const [modal, setModal] = useState(false);
+	const [replaceModal, setReplaceModal] = useState(false);
+
+	const location = useLocation();
+	const navigate = useNavigate();
+
+	const [selectedUser, setSelectedUser] = useState(null);
+
 	useEffect(() => {
 		fetch(`https://bismillah-enterprise-server.onrender.com/staffs`)
 			.then(res => res.json())
-			.then(data => {
-				setAllStaffs(data);
-			})
-	}, [user])
-	const [modal, setModal] = useState(false);
-	const [replaceModal, setReplaceModal] = useState(false);
-	const location = useLocation();
-	const navigate = useNavigate();
-	const from = location.state?.pathname;
-	const now = new Date();
-	const Time = now.toLocaleTimeString('en-BD', {
-		hour: '2-digit',
-		minute: '2-digit',
-		hour12: true,
-	});
+			.then(data => setAllStaffs(data));
+	}, [user]);
 
-	const currentDayName = now.toLocaleDateString('en-BD', { weekday: 'long' });
+	const now = new Date();
+
 	const currentDate = now.toLocaleDateString('en-BD', {
 		day: 'numeric',
 		year: 'numeric',
 		month: 'long',
 	});
-	const todayDate = now.toLocaleDateString('en-BD', { day: 'numeric' });
+
+	const todayDate = now.toLocaleDateString('en-BD', {
+		day: 'numeric'
+	});
+
 	const todayDateIntFormat = parseInt(todayDate);
 
-	const handleApprove = (email, uid, id) => {
-		const user_email_field = document.getElementById('user_email');
-		const user_uid_field = document.getElementById('user_uid');
-		const user_old_id_field = document.getElementById('user_old_id')
-		user_email_field.value = email;
-		user_uid_field.value = uid;
-		user_old_id_field.value = id;
-		setModal(!modal);
-	}
+	const user_name_field = useRef();
+	const user_email_field = useRef();
+	const hour_rate_field = useRef();
+	const user_uid_field = useRef();
+	const user_category_field = useRef();
+	const user_old_id_field = useRef();
+
+	const handleApprove = (email, uid, id, name) => {
+		user_email_field.current.value = email;
+		user_uid_field.current.value = uid;
+		user_old_id_field.current.value = id;
+		user_name_field.current.value = name;
+
+		setSelectedUser({ email, uid, id, name });
+		setModal(true);
+	};
+
 	const handleReplace = (email, uid, id) => {
-		const user_email_field = document.getElementById('user_email');
-		const user_uid_field = document.getElementById('user_uid');
-		const user_old_id_field = document.getElementById('user_old_id')
-		user_email_field.value = email;
-		user_uid_field.value = uid;
-		user_old_id_field.value = id;
+		user_email_field.current.value = email;
+		user_uid_field.current.value = uid;
+		user_old_id_field.current.value = id;
+
+		setSelectedUser({ email, uid, id });
 		setReplaceModal(true);
-	}
+	};
+
 	const handleReplaceStaff = (old_id, staffName) => {
 		const email = user_email_field.current.value;
 		const uid = user_uid_field.current.value;
 		const id = user_old_id_field.current.value;
+
 		const userUpdatedData = {
 			email,
 			uid
 		};
+
 		Swal.fire({
-			title: "Are you sure?",
-			text: `You Are Replace This User to ${staffName}`,
+			title: "Replace User?",
+			text: `You are replacing this account with ${staffName}.`,
 			icon: "warning",
 			showCancelButton: true,
-			confirmButtonColor: "#3085d6",
-			cancelButtonColor: "#d33",
-			confirmButtonText: "Yes, I am Sure"
+			confirmButtonColor: "#10b981",
+			cancelButtonColor: "#ef4444",
+			background: "#0b1c18",
+			color: "#e2e8f0",
+			confirmButtonText: "Yes, Replace"
 		}).then((result) => {
 			if (result.isConfirmed) {
 				fetch(`https://bismillah-enterprise-server.onrender.com/replace_staff/${old_id}`, {
@@ -82,40 +95,43 @@ const UserRequest = () => {
 				})
 					.then(async res => {
 						if (!res.ok) {
-							// request failed (e.g. 404 or 500)
 							throw new Error("Server error or user not found");
 						}
 
-						// 🔐 Make sure response is not empty before calling .json()
 						const text = await res.text();
 						return text ? JSON.parse(text) : null;
 					})
 					.then(() => {
 						fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${id}`, {
 							method: 'DELETE'
-						})
-							.then(() => {
-								setReplaceModal(false);
-								navigate(location);
-								Swal.fire({
-									position: "center",
-									icon: "success",
-									title: "User Profile Replace Successfully",
-									showConfirmButton: false,
-									timer: 1500
-								});
+						}).then(() => {
+							setReplaceModal(false);
+
+							navigate(location.pathname);
+
+							Swal.fire({
+								position: "center",
+								icon: "success",
+								title: "User Replaced Successfully",
+								showConfirmButton: false,
+								timer: 1500,
+								background: "#0b1c18",
+								color: "#e2e8f0"
 							});
+						});
 					});
 			}
-		})
-	}
+		});
+	};
+
 	const handleSetNewUser = () => {
 		const user_category = user_category_field.current.value;
 		const name = user_name_field.current.value;
 		const email = user_email_field.current.value;
-		const hour_rate = parseFloat(hour_rate_field.current.value);
+		const hour_rate = parseFloat(hour_rate_field.current.value) || 0;
 		const uid = user_uid_field.current.value;
 		const id = user_old_id_field.current.value;
+
 		const userAllData = {
 			name,
 			email,
@@ -146,153 +162,324 @@ const UserRequest = () => {
 			uid
 		};
 
-		fetch('https://bismillah-enterprise-server.onrender.com/staff', {
-			method: 'POST',
-			headers: {
-				'content-type': 'application/json'
-			},
-			body: JSON.stringify(userAllData)
-		})
-			.then(async res => {
-				if (!res.ok) {
-					// request failed (e.g. 404 or 500)
-					throw new Error("Server error or user not found");
-				}
+		Swal.fire({
+			title: "Create User Profile?",
+			text: `Create ${name} as ${user_category}.`,
+			icon: "question",
+			showCancelButton: true,
+			confirmButtonColor: "#10b981",
+			cancelButtonColor: "#ef4444",
+			background: "#0b1c18",
+			color: "#e2e8f0",
+			confirmButtonText: "Create"
+		}).then(result => {
+			if (!result.isConfirmed) return;
 
-				// 🔐 Make sure response is not empty before calling .json()
-				const text = await res.text();
-				return text ? JSON.parse(text) : null;
+			fetch('https://bismillah-enterprise-server.onrender.com/staff', {
+				method: 'POST',
+				headers: {
+					'content-type': 'application/json'
+				},
+				body: JSON.stringify(userAllData)
 			})
-			.then(() => {
-				fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${id}`, {
-					method: 'DELETE'
-				})
-					.then(() => {
-						setModal(false);
-						navigate(location);
-						Swal.fire({
-							position: "center",
-							icon: "success",
-							title: "User Profile Created Successfully",
-							showConfirmButton: false,
-							timer: 1500
-						});
-					});
-			});
-	}
+				.then(async res => {
+					if (!res.ok) {
+						throw new Error("Server error or user not found");
+					}
 
-	const user_name_field = useRef();
-	const user_email_field = useRef();
-	const hour_rate_field = useRef();
-	const user_uid_field = useRef();
-	const user_category_field = useRef();
-	const user_old_id_field = useRef();
+					const text = await res.text();
+					return text ? JSON.parse(text) : null;
+				})
+				.then(() => {
+					return fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${id}`, {
+						method: 'DELETE'
+					});
+				})
+				.then(() => {
+					setModal(false);
+					navigate(location.pathname);
+
+					Swal.fire({
+						position: "center",
+						icon: "success",
+						title: "User Created Successfully",
+						showConfirmButton: false,
+						timer: 1500,
+						background: "#0b1c18",
+						color: "#e2e8f0"
+					});
+				})
+				.catch(error => {
+					Swal.fire({
+						icon: "error",
+						title: "Operation Failed",
+						text: error.message,
+						background: "#0b1c18",
+						color: "#e2e8f0"
+					});
+				});
+		});
+	};
+
 	const handleReject = (id) => {
 		Swal.fire({
-			title: "Are you sure?",
-			text: "You won't be able to revert this!",
+			title: "Reject Request?",
+			text: "This request will be permanently removed.",
 			icon: "warning",
 			showCancelButton: true,
-			confirmButtonColor: "#3085d6",
-			cancelButtonColor: "#d33",
-			confirmButtonText: "Yes, reject it!"
+			confirmButtonColor: "#ef4444",
+			cancelButtonColor: "#64748b",
+			background: "#0b1c18",
+			color: "#e2e8f0",
+			confirmButtonText: "Reject"
 		}).then((result) => {
 			if (result.isConfirmed) {
 				fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${id}`, {
 					method: 'DELETE'
-				}).then(res => res.json())
-				Swal.fire({
-					title: "Rejected!",
-					text: "This Person has been rejected.",
-					icon: "success"
-				}).then(() => {
-					window.location.reload();
 				})
+					.then(res => res.json())
+					.then(() => {
+						Swal.fire({
+							title: "Rejected",
+							text: "This request has been rejected.",
+							icon: "success",
+							background: "#0b1c18",
+							color: "#e2e8f0"
+						}).then(() => window.location.reload());
+					});
 			}
 		});
-	}
+	};
+
 	return (
-		<div className='w-full h-full lg:p-5 flex flex-col gap-5 text-pink-200'>
-			<div id='user_request_modal' className={`${!modal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
-				<div className='flex justify-end -top-[10px] -right-[10px] relative'>
-					<MdOutlineCancel onClick={() => { !setModal(!modal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
-				</div>
-				<div className='text-pink-200 flex flex-col gap-5 p-8 items-center h-full w-full'>
-					<div>
-						<input ref={user_email_field} id='user_email' type="text" className='outline-none hidden' />
-						<input ref={user_uid_field} id='user_uid' type="text" className='outline-none hidden' />
-						<input ref={user_old_id_field} id='user_old_id' type="text" className='outline-none hidden' />
-						<div>
-							<h1 className='lg:text-lg font-semibold mb-2'>User Name</h1>
-							<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
-								<input ref={user_name_field} id='user_name_in_shop' type="text" className='outline-none' />
+		<div className="min-h-full pb-12 text-slate-200">
+
+			{/* Ambient accents */}
+			<div className="pointer-events-none fixed -top-32 -left-32 w-80 h-80 bg-emerald-500/10 blur-[120px] rounded-full" />
+			<div className="pointer-events-none fixed top-1/3 -right-32 w-80 h-80 bg-cyan-500/10 blur-[120px] rounded-full" />
+
+			{/* Create user modal */}
+			{modal && (
+				<div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+					<div className="w-full max-w-md rounded-3xl border border-emerald-400/20 bg-[#0b1c18]/95 shadow-2xl shadow-emerald-500/10">
+
+						<div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+							<div>
+								<p className="text-xs uppercase tracking-[0.25em] text-emerald-400">
+									User Management
+								</p>
+								<h2 className="text-xl font-bold text-white mt-1">
+									Create User Profile
+								</h2>
 							</div>
+
+							<button
+								onClick={() => setModal(false)}
+								className="w-9 h-9 rounded-full bg-white/5 hover:bg-red-500/10 flex items-center justify-center"
+							>
+								<MdOutlineCancel className="text-2xl text-slate-400 hover:text-red-400" />
+							</button>
 						</div>
-						<div className='mt-5'>
-							<h1 className='lg:text-lg font-semibold mb-2'>Hour Rate</h1>
-							<div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-pink-300  w-full'>
+
+						<div className="p-6 space-y-5">
+							<input ref={user_email_field} type="hidden" />
+							<input ref={user_uid_field} type="hidden" />
+							<input ref={user_old_id_field} type="hidden" />
+
+							<div>
+								<label className="text-sm text-slate-400">User Name</label>
+								<input
+									ref={user_name_field}
+									type="text"
+									className="mt-2 w-full h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white outline-none focus:border-emerald-400/50"
+								/>
+							</div>
+
+							<div>
+								<label className="text-sm text-slate-400">Hour Rate</label>
 								<NumericFormat
 									getInputRef={hour_rate_field}
-									className='outline-none w-full h-full'
-									placeholder='Enter amount'
+									className="mt-2 w-full h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white outline-none focus:border-emerald-400/50"
+									placeholder="Enter amount"
 									allowNegative={false}
 									decimalScale={2}
-									fixedDecimalScale={false}
 									thousandSeparator={false}
 								/>
 							</div>
-						</div>
-						<div className='mt-5 flex items-center gap-5'>
-							<h1 className='lg:text-lg font-semibold'>User Category</h1>
-							<select ref={user_category_field} className='px-3 outline-none border p-1 rounded-md' name="user_category_in_shop" id="user_category">
-								<option className='text-xs text-black bg-gray' value="staff">Staff</option>
-								<option className='text-xs text-black bg-gray' value="admin">Admin</option>
-							</select>
+
+							<div>
+								<label className="text-sm text-slate-400">User Category</label>
+								<select
+									ref={user_category_field}
+									className="mt-2 w-full h-12 rounded-xl bg-[#10231f] border border-white/10 px-4 text-white outline-none"
+								>
+									<option value="staff">Staff</option>
+									<option value="admin">Admin</option>
+								</select>
+							</div>
+
+							<button
+								onClick={handleSetNewUser}
+								className="w-full h-12 rounded-xl bg-emerald-500/15 border border-emerald-400/30 text-emerald-300 hover:bg-emerald-500 hover:text-[#071311] font-bold transition-all"
+							>
+								Create Profile
+							</button>
 						</div>
 					</div>
-					<Link><button onClick={() => { handleSetNewUser() }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md text-lg font-semibold mb-5 lg:mb-0'>Submit</button></Link>
 				</div>
-			</div>
-			{/* replace modal */}
-			<div id='user_request_modal' className={`${!replaceModal ? 'hidden' : 'block'}  w-[350px] bg-black shadow-md shadow-pink-200 rounded-2xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}>
-				<div className='flex justify-end -top-[10px] -right-[10px] relative'>
-					<MdOutlineCancel onClick={() => { setReplaceModal(!replaceModal) }} className='text-pink-200 text-3xl cursor-pointer'></MdOutlineCancel>
-				</div>
-				<div className='mb-4'>
-					<h1 className='text-lg font-semibold text-pink-300 text-center mb-2'>Select Staff</h1>
-					<hr className='text-pink-300 w-full' />
-				</div>
-				<div className='text-pink-200 flex flex-col gap-5 px-4 pt-0 pb-5 items-center  max-h-[320px] overflow-auto scrollbar-hide w-full'>
-					{
-						allStaffs.map(staff => <div key={staff?._id} className='flex items-center justify-between w-full py-2 border-b-2 border-b-pink-400'>
-							<h1>{staff?.name}</h1>
-							<button onClick={() => handleReplaceStaff(staff?._id, staff?.name)} className='text-pink-200 cursor-pointer shadow-sm hover:shadow-md shadow-pink-300 px-3 py-1 rounded-md text-sm font-semibold mb-5 lg:mb-0'>Select</button>
-						</div>)
-					}
-				</div>
-			</div>
-			{/* end replace modal */}
-			<h1 className='font-semibold text-2xl text-pink-300'>User Requests</h1>
-			{
-				userRequest?.map(user =>
-					<div key={user._id}>
-						<div className='grid grid-cols-2 xl:grid-cols-3 gap-5 items-center border-b-2 border-pink-200 py-4'>
-							<div className='flex flex-col lg:flex-row items-start lg:items-center gap-2 lg:gap-5'>
-								<img src={user.photo} className='rounded-full w-10 lg:w-14 h-10 lg:h-14' alt="not uploaded" />
-								<h1>{user.display_name}</h1>
+			)}
+
+			{/* Replace modal */}
+			{replaceModal && (
+				<div className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-md flex items-center justify-center p-4">
+					<div className="w-full max-w-md rounded-3xl border border-cyan-400/20 bg-[#0b1c18]/95 shadow-2xl shadow-cyan-500/10">
+
+						<div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+							<div>
+								<p className="text-xs uppercase tracking-[0.25em] text-cyan-400">
+									Account Replacement
+								</p>
+								<h2 className="text-xl font-bold text-white mt-1">
+									Select Staff
+								</h2>
 							</div>
-							<div className='hidden xl:block overflow-hidden'>
-								<h1 className=''>{user.email}</h1>
-							</div>
-							<div className='flex flex-col items-end justify- md:flex-row md:justify-end gap-4'>
-								<button onClick={() => { handleApprove(user?.email, user?.uid, user?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-24'>Approve</button>
-								<button onClick={() => { handleReplace(user?.email, user?.uid, user?._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-24'>Replace</button>
-								<button onClick={() => { handleReject(user._id) }} className='text-pink-200 cursor-pointer shadow-md hover:shadow-lg shadow-pink-300 px-5 py-1 rounded-md  lg:text-lg font-semibold w-24'>Reject</button>
+
+							<button onClick={() => setReplaceModal(false)}>
+								<MdOutlineCancel className="text-2xl text-slate-400 hover:text-red-400" />
+							</button>
+						</div>
+
+						<div className="p-4 max-h-[400px] overflow-y-auto space-y-2 scrollbar-hide">
+							{allStaffs.map(staff => (
+								<div
+									key={staff?._id}
+									className="flex items-center justify-between p-4 rounded-2xl bg-white/[0.03] border border-white/5 hover:border-cyan-400/20 transition-all"
+								>
+									<div>
+										<p className="font-semibold text-white">{staff?.name}</p>
+										<p className="text-xs text-slate-500">{staff?.email}</p>
+									</div>
+
+									<button
+										onClick={() => handleReplaceStaff(staff?._id, staff?.name)}
+										className="px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-400/20 text-cyan-300 hover:bg-cyan-500 hover:text-[#071311] font-semibold transition-all"
+									>
+										Select
+									</button>
+								</div>
+							))}
+						</div>
+					</div>
+				</div>
+			)}
+
+			<div className="max-w-7xl mx-auto">
+
+				<div className="flex items-center justify-between gap-4 mb-8">
+					<div>
+						<p className="text-xs uppercase tracking-[0.3em] text-emerald-400">
+							Account Center
+						</p>
+						<h1 className="text-2xl md:text-3xl font-black text-white mt-1">
+							User Requests
+						</h1>
+						<p className="text-sm text-slate-500 mt-2">
+							Review and manage incoming account requests.
+						</p>
+					</div>
+
+					{location?.state?.pathname === '/' && (
+						<Link
+							to="/"
+							className="hidden md:block px-5 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] hover:border-emerald-400/30 hover:text-emerald-300 transition-all"
+						>
+							Back
+						</Link>
+					)}
+				</div>
+
+				<div className="mb-6 rounded-2xl border border-amber-400/10 bg-amber-400/[0.03] px-5 py-4 text-sm text-slate-400">
+					<span className="text-amber-400 font-semibold">Workflow:</span>{" "}
+					Approve to create a new profile, Replace to assign this account
+					to an existing staff profile, or Reject to remove the request.
+				</div>
+
+				<div className="space-y-3">
+					{userRequest?.length ? userRequest.map(user => (
+						<div
+							key={user._id}
+							className="group rounded-2xl border border-white/[0.07] bg-white/[0.025] hover:bg-white/[0.045] hover:border-emerald-400/20 p-4 md:p-5 transition-all duration-300"
+						>
+							<div className="grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-5 items-center">
+
+								<div className="flex items-center gap-4 min-w-0">
+									<div className="relative shrink-0">
+										<img
+											src={user?.photo}
+											className="w-12 h-12 md:w-14 md:h-14 rounded-2xl object-cover border border-emerald-400/20"
+											alt="User"
+										/>
+										<span className="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-400 border-2 border-[#071311]" />
+									</div>
+
+									<div className="min-w-0">
+										<h2 className="font-bold text-white truncate">
+											{user?.display_name}
+										</h2>
+										<p className="text-sm text-slate-500 truncate">
+											{user?.email}
+										</p>
+									</div>
+								</div>
+
+								<div className="flex flex-wrap justify-center md:justify-end gap-2">
+									<button
+										onClick={() =>
+											handleApprove(
+												user?.email,
+												user?.uid,
+												user?._id,
+												user?.display_name
+											)
+										}
+										className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-400/20 text-emerald-300 hover:bg-emerald-500 hover:text-[#071311] font-semibold transition-all"
+									>
+										<MdPersonAdd />
+										Approve
+									</button>
+
+									<button
+										onClick={() =>
+											handleReplace(
+												user?.email,
+												user?.uid,
+												user?._id
+											)
+										}
+										className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-400/20 text-cyan-300 hover:bg-cyan-500 hover:text-[#071311] font-semibold transition-all"
+									>
+										<MdSwapHoriz />
+										Replace
+									</button>
+
+									<button
+										onClick={() => handleReject(user._id)}
+										className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 border border-red-400/20 text-red-300 hover:bg-red-500 hover:text-white font-semibold transition-all"
+									>
+										<MdDeleteOutline />
+										Reject
+									</button>
+								</div>
 							</div>
 						</div>
-					</div>)
-			}
-		</div >
+					)) : (
+						<div className="py-20 text-center rounded-3xl border border-dashed border-white/10 bg-white/[0.02]">
+							<p className="text-slate-500">No pending user requests.</p>
+						</div>
+					)}
+				</div>
+			</div>
+		</div>
 	);
 };
 
