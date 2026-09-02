@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { FiArrowDownCircle, FiArrowUpCircle, FiUsers, FiCreditCard } from 'react-icons/fi';
 import Swal from 'sweetalert2';
+import useAdmin from '../Hooks/useAdmin';
 
 const API = 'https://bismillah-enterprise-server.onrender.com';
 
@@ -33,6 +34,7 @@ export default function DailyTransactions() {
     const location = useLocation();
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isAdmin, isAdminLoading] = useAdmin();
 
     const load = async () => {
         try {
@@ -77,7 +79,7 @@ export default function DailyTransactions() {
             <h1 className="text-3xl md:text-4xl font-black text-white mt-1">Daily Transactions</h1>
             <p className="text-slate-500 mt-2 mb-7">Manage revenue, expenses, dues and daily cash flow.</p>
 
-            <div className="grid grid-cols-2 xl:grid-cols-5 gap-3 mb-6">
+            <div className={`${!isAdmin ? 'hidden': 'grid'} grid-cols-2 xl:grid-cols-5 gap-3 mb-6`}>
                 {[
                     ['Total Sell', totalSell, 'text-orange-300'],
                     ['Revenue', revenue, 'text-emerald-300'],
