@@ -312,7 +312,7 @@ const Home = () => {
 			<section className="
 				max-w-7xl
 				mx-auto
-				relative
+				hidden sm:block relative
 				overflow-hidden
 				rounded-[30px]
 				sm:rounded-[38px]
@@ -913,72 +913,7 @@ const Home = () => {
 			{
 				!loadedUser?.status ?
 
-					<div className="
-						max-w-7xl
-						mx-auto
-						mt-6 sm:mt-8
-						rounded-[28px]
-						border border-amber-400/10
-						bg-[#111a17]/70
-						backdrop-blur-xl
-						p-6 sm:p-8
-					">
-
-						<div className="flex flex-col sm:flex-row sm:items-center gap-5">
-
-							<div className="
-								w-14 h-14
-								shrink-0
-								rounded-2xl
-								bg-amber-400/10
-								border border-amber-400/15
-								flex items-center justify-center
-							">
-
-								<FaUserClock className="text-amber-400 text-xl" />
-
-							</div>
-
-							<div className="flex-1">
-
-								<h3 className="text-xl font-black">
-									Account approval required
-								</h3>
-
-								<p className="text-sm text-slate-500 mt-1 leading-6">
-									Your account is waiting for administrator
-									approval before accessing enterprise features.
-								</p>
-
-							</div>
-
-							<Link
-								to="/user_request"
-								state={{ pathname: location.pathname }}
-							>
-
-								<button className="
-									w-full sm:w-auto
-									px-5
-									py-3
-									rounded-xl
-									bg-gradient-to-r
-									from-amber-400
-									to-orange-400
-									text-[#17100a]
-									font-black
-									text-sm
-									hover:-translate-y-1
-									transition-all duration-300
-								">
-									Request Access
-								</button>
-
-							</Link>
-
-						</div>
-
-					</div>
+					''
 
 					:
 

@@ -83,7 +83,7 @@ const ClientCorner = () => {
         )?.length || 0;
 
     return (
-        <div className="min-h-full py-5 sm:py-7">
+        <div className="min-h-full py-5 sm:py-7 overflow-scroll">
 
             {/* Header */}
             <div className="flex items-center justify-between gap-4 mb-6">
@@ -182,7 +182,7 @@ const ClientCorner = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-7">
 
                 <Link
-                    to={location.pathname.includes('admin') ? '/admin/new_client' : '/new_client'}
+                    to={location.pathname.includes('admin') ? '/admin/new_client' : location.pathname.includes('daily_transactions') ? '/daily_transactions/create_new_client' : '/new_client'}
                     state={{ pathname: location.pathname }}
                     className="group flex items-center justify-center gap-2 rounded-xl
                     border border-emerald-400/20
@@ -200,7 +200,7 @@ const ClientCorner = () => {
                 <Link
                     to={
                         location.pathname.includes('admin')
-                            ? '/admin/new_client_new_voucher'
+                            ? '/admin/new_client_new_voucher' : location.pathname.includes('daily_transactions') ? '/daily_transactions/create_new_client_with_voucher'
                             : '/new_client_new_voucher'
                     }
                     state={{ pathname: location.pathname }}
@@ -302,7 +302,7 @@ const ClientCorner = () => {
                                     <Link
                                         to={
                                             location.pathname.includes('admin')
-                                                ? `/admin/client_details/${client._id}`
+                                                ? `/admin/client_details/${client._id}` : location.pathname.includes('daily_transactions') ? `/daily_transactions/client_details/${client._id}` 
                                                 : `/client_details/${client._id}`
                                         }
                                         state={{ pathname: location.pathname }}

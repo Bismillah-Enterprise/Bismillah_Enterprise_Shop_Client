@@ -204,13 +204,53 @@ th {
 }
 
 
-.scrollbar-hide {
+* {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
-.scrollbar-hide::-webkit-scrollbar {
+*::-webkit-scrollbar {
   display: none;
+}
+
+select.modern-select, 
+select.modern-select::picker(select) {
+  appearance: base-select;
+}
+
+/* Style the closed select button state */
+select.modern-select {
+  padding: 10px 15px;
+  cursor: pointer;
+}
+
+/* Style the actual dropdown wrapper (the picker) */
+select.modern-select::picker(select) {
+  /* background-color: #1e1b4b; */
+   background-color: black;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 5px;
+}
+
+/* Style individual option tags */
+select.modern-select option {
+  padding: 10px;
+  color: #ffffff;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+/* Style option when hovered or focused */
+select.modern-select option:hover {
+  background-color: #10231f;
+  cursor: pointer;
+}
+
+/* Style the currently chosen option */
+select.modern-select option:checked {
+  background-color: #6366f1;
+  font-weight: bold;
 }
 
 .custom-date {

@@ -6,37 +6,22 @@ import { FiHome } from 'react-icons/fi';
 
 const AdminMain = () => {
 	const { setIsMenu } = useContext(AuthContext);
-	const [loading, setLoading] = useState(false);
 	const [mobileNav, setMobileNav] = useState(false);
 
-
 	useEffect(() => {
-
 		const handleResize = () => {
-
-			const width = window.innerWidth;
-			if (width >= 1024) {
-
-				setMobileNav(false);
-
-			} else {
-
-				setMobileNav(true);
-
-			}
-
+			setMobileNav(window.innerWidth < 1024);
 		};
 
 		handleResize();
 
-		window.addEventListener("resize", handleResize);
+		window.addEventListener('resize', handleResize);
 
-		return () => window.removeEventListener("resize", handleResize);
-
+		return () => window.removeEventListener('resize', handleResize);
 	}, []);
 
 	return (
-		<div className="relative h-screen w-full overflow-hidden text-white">
+		<div className="overflow-scroll relative h-[calc(100vh-20px)] w-full overflow-hidden text-white">
 			{/* Ambient background */}
 			<div className="pointer-events-none fixed inset-0 overflow-hidden">
 				<div className="absolute -left-40 -top-40 h-[450px] w-[450px] rounded-full bg-emerald-500/[0.035] blur-[130px]" />
@@ -54,15 +39,14 @@ const AdminMain = () => {
 					className="
 				min-w-0
 				flex-1
-				h-full
+				h-[calc(100vh-20px)]
 				overflow-y-auto
-				px-3
-				pb-24
+				pb-5
 				pt-3
 				sm:px-5
 				sm:pt-20
 				lg:px-6
-				lg:pb-16
+				lg:pb-5
 				lg:pt-6
 			"
 				>
@@ -93,7 +77,7 @@ const AdminMain = () => {
 					{/* CONTENT CARD */}
 					<div className="
 				flex
-				h-[calc(100%-0px)]
+				h-[calc(100%-50px)]
 				min-h-0
 				w-full
 				flex-col
@@ -114,7 +98,7 @@ const AdminMain = () => {
 					sm:p-5
 					lg:p-6
 				">
-							<div className="flex min-h-0 flex-1 w-full flex-col overflow-scroll scrollbar-hide">
+							<div className="flex min-h-0 flex-1 w-full flex-col">
 								<Outlet />
 							</div>
 						</div>

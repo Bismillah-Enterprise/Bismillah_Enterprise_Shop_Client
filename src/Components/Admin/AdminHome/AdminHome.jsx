@@ -60,7 +60,7 @@ const AdminHome = () => {
 	];
 
 	return (
-		<div className="relative min-h-[calc(100vh-110px)] w-full overflow-hidden py-6 sm:py-8">
+		<div className="overflow-scroll relative min-h-[calc(100vh-110px)] w-full overflow-scroll scrollbar-hide py-6 sm:py-8">
 			{/* Ambient Background */}
 			<div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 animate-pulse rounded-full bg-emerald-500/[0.045] blur-[110px]" />
 

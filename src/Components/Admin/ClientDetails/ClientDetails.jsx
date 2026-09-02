@@ -81,13 +81,13 @@ const ClientDetails = () => {
         ).length || 0;
 
     return (
-        <div className="min-h-full py-5 sm:py-7">
+        <div className="min-h-full py-5 sm:py-7 overflow-scroll">
 
             {/* Header */}
             <div className="flex items-center gap-4 mb-6">
 
                 <Link
-                    to={location.pathname.includes('admin') ? '/admin/client_corner' : '/client_corner'}
+                    to={location.pathname.includes('admin') ? '/admin/client_corner': location.pathname.includes('daily_transactions') ? '/daily_transactions/client_corner' : '/client_corner'}
                     className="hidden md:flex group items-center gap-2 px-4 py-2 rounded-xl
                     border border-white/10 bg-white/[0.03]
                     text-slate-300 hover:text-emerald-300
@@ -290,7 +290,7 @@ const ClientDetails = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-5">
 
                 <Link
-                    to={location.pathname.includes('admin') ? `/admin/new_voucher/${client._id}` : `/new_voucher/${client._id}`}
+                    to={location.pathname.includes('admin') ? `/admin/new_voucher/${client._id}` : location.pathname.includes('daily_transactions') ? `/daily_transactions/create_new_voucher/${client._id}` : `/new_voucher/${client._id}`}
                     state={{ pathname: location.pathname }}
                     className="flex items-center justify-center gap-2
                     rounded-xl py-3
@@ -306,7 +306,7 @@ const ClientDetails = () => {
                 </Link>
 
                 <Link
-                    to={location.pathname.includes('admin') ? `/admin/client_transections/${client._id}` : `/client_transections/${client._id}`}
+                    to={location.pathname.includes('admin') ? `/admin/client_transections/${client._id}` : location.pathname.includes('daily_transactions') ? `/daily_transactions/client_transactions/${client._id}` : `/client_transections/${client._id}`}
                     state={{ pathname: location.pathname }}
                     className="flex items-center justify-center gap-2
                     rounded-xl py-3
@@ -393,7 +393,7 @@ const ClientDetails = () => {
                                             <Link
                                                 to={
                                                     location.pathname.includes('admin')
-                                                        ? `/admin/voucher/${client._id}/${voucher.voucher_no}`
+                                                        ? `/admin/voucher/${client._id}/${voucher.voucher_no}` : location.pathname.includes('daily_transactions') ? `/daily_transactions/voucher/${client._id}/${voucher.voucher_no}`
                                                         : `/voucher/${client._id}/${voucher.voucher_no}`
                                                 }
                                                 state={{ pathname: location.pathname }}

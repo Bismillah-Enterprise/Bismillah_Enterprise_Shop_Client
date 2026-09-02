@@ -1,6 +1,7 @@
 import React from 'react';
 import {
-	createBrowserRouter
+	createBrowserRouter,
+	Navigate
 } from "react-router-dom";
 import Main from '../Main/Main';
 import Home from '../Home/Home';
@@ -44,6 +45,10 @@ import AirTicketNewVoucher from '../Admin/AirTicketNewVoucher/AirTicketNewVouche
 import AirTicketVoucher from '../Admin/AirTicketVoucher/AirTicketVoucher';
 import DailyTransactions from '../DailyTransactions/DailyTransactions';
 import ViewDailyTransactions from '../Admin/ViewDailyTransactions/ViewDailyTransactions';
+
+import DueManagement from '../DailyTransactions/DueManagement';
+import DailyRevenue from '../DailyTransactions/DailyRevenue';
+import DailyExpense from '../DailyTransactions/DailyExpense';
 
 const router = createBrowserRouter([
 	{
@@ -91,6 +96,70 @@ const router = createBrowserRouter([
 			{
 				path: '/daily_transactions',
 				element: <StaffRoute><DailyTransactions></DailyTransactions></StaffRoute>,
+				children: [
+					{
+						index: true,
+						element: <Navigate to="/daily_transactions/revenue" replace />
+					},
+					{
+						path: '/daily_transactions/revenue',
+						element: <StaffRoute><DailyRevenue></DailyRevenue></StaffRoute>
+					},
+					{
+						path: '/daily_transactions/expense',
+						element: <StaffRoute><DailyExpense></DailyExpense></StaffRoute>
+					},
+					{
+						path: '/daily_transactions/due_management',
+						element: <StaffRoute><DueManagement></DueManagement></StaffRoute>
+					},
+					{
+						path: '/daily_transactions/client_corner',
+						element: <StaffRoute><ClientCorner></ClientCorner></StaffRoute>,
+						loader: () => fetch('https://bismillah-enterprise-server.onrender.com/client_corner'),
+					},
+					{
+						path: '/daily_transactions/create_new_client',
+						element: <StaffRoute><CreateNewClient></CreateNewClient></StaffRoute>
+					},
+					{
+						path: '/daily_transactions/create_new_client_with_voucher',
+						element: <StaffRoute><CreateNewClientWithVoucher></CreateNewClientWithVoucher></StaffRoute>
+					},
+					{
+						path: '/daily_transactions/create_new_voucher/:id',
+						element: <StaffRoute><NewVoucher></NewVoucher></StaffRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+					},
+					{
+						path: '/daily_transactions/client_details/:id',
+						element: <StaffRoute><ClientDetails></ClientDetails></StaffRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+					},
+					{
+						path: '/daily_transactions/client_transactions/:id',
+						element: <StaffRoute><ClientTransections></ClientTransections></StaffRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+					},
+					{
+						path: '/daily_transactions/voucher/:id/:voucher_no',
+						element: <StaffRoute><Voucher></Voucher></StaffRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+
+					},
+					{
+						path: '/daily_transactions/voucher/:id/:voucher_no',
+						element: <StaffRoute><Voucher></Voucher></StaffRoute>,
+						loader: ({ params }) => fetch(`https://bismillah-enterprise-server.onrender.com/client_details/${params.id}`),
+
+					},
+					{
+						path: '/daily_transactions/view_daily_transactions',
+						element: <AdminRoute><ViewDailyTransactions></ViewDailyTransactions></AdminRoute>,
+						loader: () => fetch(`https://bismillah-enterprise-server.onrender.com/daily_transactions`)
+
+					},
+				]
 			},
 			{
 				path: '/new_client_new_voucher',

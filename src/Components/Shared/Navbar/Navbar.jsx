@@ -7,6 +7,7 @@ import Swal from 'sweetalert2';
 
 const Navbar = () => {
 	const { user, googleSignIn, logOut, loading, setLoading } = useContext(AuthContext);
+	const [loginLoading, setLoginLoading] = useState(false)
 	const [modal, setModal] = useState(false);
 	const [isCodeMatched, setIsCodeMatched] = useState(true);
 	const inputRef = useRef(null);
@@ -52,7 +53,7 @@ const Navbar = () => {
 		fetchColorPlate(serial);
 		const colorTimer = setInterval(() => {
 			serial += 1;
-			if (serial > 5) {
+			if (serial > 3) {
 				serial = 1;
 			}
 			setColorSerial(serial);
@@ -96,11 +97,12 @@ const Navbar = () => {
 		})
 	}
 	const handleLogin = () => {
-		setLoading(true)
+	setLoginLoading(true)
 		const typedShopCode = inputRef.current?.value;
 		fetch(`https://bismillah-enterprise-server.onrender.com/shop_code`)
 			.then(res => res.json())
 			.then(theShopCode => {
+				console.log(theShopCode)
 				if (typedShopCode === theShopCode?.shop_code) {
 					inputRef.current.value = '';
 					setModal(!modal);
@@ -157,18 +159,18 @@ const Navbar = () => {
 												timer: 1000
 											});
 										}
-										setLoading(false);
+										setLoginLoading(false);
 										setModal(!modal);
 									})
 							}
-							setLoading(false);
+							setLoginLoading(false);
 							setModal(!modal);
 						})
 				}
 				else {
 					inputRef.current.value = '';
 					setIsCodeMatched(false);
-					setLoading(false);
+					setLoginLoading(false);
 				}
 			})
 	}
@@ -314,7 +316,7 @@ const Navbar = () => {
 								boxShadow: `0 10px 35px ${clockColor}25`
 							}}
 						>
-							Continue
+							{loginLoading ? 'Loading . . .' : 'Continue'}
 						</button>
 
 					</div>

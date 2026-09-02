@@ -1,616 +1,118 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { MdAdd, MdArrowBack, MdDeleteOutline, MdPrint } from 'react-icons/md';
 import { NumericFormat } from 'react-number-format';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
-import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 import AirTicketVoucherHeading from '../../Shared/AirTicketVoucherHeading/AirTicketVoucherHeading';
 
-const AirTicketNewClientWithNewVoucher = () => {
+const API = 'https://bismillah-enterprise-server.onrender.com';
+const money = v => Number.isFinite(Number(v)) ? Number(Number(v).toFixed(2)) : 0;
+const emptyService = () => ({ service_name: '', destination: '', flight_date: '', ticket_price: '', ticket_agent_price: '' });
+
+export default function AirTicketNewClientWithNewVoucher() {
     const location = useLocation();
     const navigate = useNavigate();
-    const from = location.state?.pathname;
-    const [clientName, setClientName] = useState('');
-    const [clientAddress, setClientAddress] = useState('');
-    const [clientNumber, setClientNumber] = useState('');
-    const [clientDateOfBirth, setClientDateOfBirth] = useState('');
-    const [clientPassportNo, setClientPassportNo] = useState('');
-    const [clientDateOfExpiry, setClientDateOfExpiry] = useState('');
-    const [value, setValue] = useState('');
+    const from = location.state?.pathname || '/air_ticket_client_corner';
+    const [voucherSl, setVoucherSl] = useState(0);
+    const [loading, setLoading] = useState(false);
     const [numberAlert, setNumberAlert] = useState(false);
+    const [client, setClient] = useState({ name: '', address: '', mobile_no: '', date_of_birth: '', passport_no: '', date_of_expiry: '' });
+    const [services, setServices] = useState([emptyService()]);
+    const [discount, setDiscount] = useState('');
+    const [paid, setPaid] = useState('');
+    const printRef = React.useRef();
 
-    const [destination, setDestination] = useState('');
-    const [flightDate, setFlightDate] = useState('');
-    const [ticketPrice, setTicketPrice] = useState();
-    const [discount, setDiscount] = useState();
-    const [paid, setPaid] = useState();
-    const [due, setDue] = useState(0);
-    const [status, setStatus] = useState('Unpaid');
-    const handlePrint = () => {
-        const content = voucherPrintRef.current.innerHTML;
-
-        // Create a hidden iframe
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
-
-        document.body.appendChild(iframe);
-
-        const doc = iframe.contentWindow.document;
-
-        // Optional: You can load Tailwind CSS from CDN inside iframe
-        doc.open();
-        doc.write(`
-             <html>
-               <head>
-                 <title>Print</title>
-                 <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-                 <style>
-            @page { size: A4 landscape; }
-            body { font-family: sans-serif; color: black; display: flex; justify-content: end; width: 100% }
-            .voucher-wrapper {
-            width: 48%;
-            height: 100%;
-            box-sizing: border-box;
-            page-break-inside: avoid;
-            }
-          </style>
-        </head>
-        <body>
-            <div class="voucher-wrapper">
-                ${content}
-            </div>
-        </body>
-             </html>
-           `);
-        doc.close();
-
-        // Wait until iframe is ready then print
-        iframe.onload = () => {
-            iframe.contentWindow.focus();
-            iframe.contentWindow.print();
-
-            // Optional: Cleanup after printing
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 1000);
-        };
-    };
-    const handleClientInfoChange = (name) => {
-        if (name = 'clientName') {
-            setClientName(clientNameRef.current.value);
-        }
-        if (name = 'clientAddress') {
-            setClientAddress(addressRef.current.value);
-        }
-        if (name = 'clientNumber') {
-            setClientNumber(phoneNoRef.current.value);
-        }
-        if (name = 'dateOfBirth') {
-            setClientDateOfBirth(dateOfBirthRef.current.value);
-        }
-        if (name = 'passportNo') {
-            setClientPassportNo(passportNoRef.current.value);
-        }
-        if (name = 'dateOfExpiry') {
-            setClientDateOfExpiry(dateOfExpiryRef.current.value);
-        }
-    }
-    const handleCreateNewClient = () => {
-        if (String(ticket_price_ref.current.value) === '0' || String(ticket_price_ref.current.value) === '') {
-            Swal.fire({
-                position: 'center',
-                icon: 'warning',
-                title: 'Ticket Price Is Not Allowed As 0',
-                showConfirmButton: false,
-                timer: 2000,
-            })
-            return;
-        }
-        const clientName = clientNameRef.current.value;
-        const address = addressRef.current.value;
-        const phoneNo = phoneNoRef.current.value;
-        const dateOfBirth = dateOfBirthRef.current.value;
-        const passportNo = passportNoRef.current.value;
-        const dateOfExpiry = dateOfExpiryRef.current.value;
-        const newSlNo = String(voucherSl + 1);
-        const discountAmount = parseFloat(discount_amount_ref.current.value || '0');
-        const ticketPrice = parseFloat(ticket_price_ref.current.value || '0');
-        const dueAmount = parseFloat(due);
-        const pn = `0${phoneNo}`
-        if (pn.length < 11 || pn.length > 11 || value.charAt(0) !== '1') {
-            setNumberAlert(true);
-            return;
-        }
-        const voucher = {
-            date: `${currentDate}, ${Time}`,
-            voucher_no: newSlNo,
-            destination: destination,
-            flight_date: flightDate,
-            ticket_price: ticketPrice,
-            paid_amount: parseFloat(paid_amount_ref.current.value) || 0,
-            due_amount: dueAmount,
-            payment_status: status,
-            discount: discountAmount
-        }
-        const paymentDetails = {
-            date: `${currentDate}, ${Time}`,
-            reference_voucher: voucherSl + 1,
-            paid_amount: paid,
-            transection_amount: paid,
-            due_amount: dueAmount,
-            payment_status: status,
-            voucher_no: `${voucherSl + 1}`,
-            discount: discountAmount
-        }
-        console.log(voucher, paymentDetails)
-        const newClient = {
-            name: clientName,
-            mobile_no: pn,
-            date_of_birth: dateOfBirth,
-            passport_no: passportNo,
-            date_of_expiry: dateOfExpiry,
-            address,
-            vouchers: [voucher],
-            transections: [paymentDetails]
-        }
-        // ----------------------------------------------------------------------------
-        // --------------------------------------------------------------------------------------
-        Swal.fire({
-            title: "Are you sure?",
-            text: `You Are Creating a New Client`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, I am Sure"
-        }).then((result) => {
-            if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_new_client`, {
-                    method: 'POST',
-                    headers: {
-                        'content-type': 'application/json'
-                    },
-                    body: JSON.stringify(newClient)
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        clientNameRef.current.value = ''
-                        addressRef.current.value = '';
-                        phoneNoRef.current.value = '';
-                        fetch(`https://bismillah-enterprise-server.onrender.com/voucher_sl`, {
-                            method: 'POST',
-                            headers: { 'content-type': 'application/json' },
-                            body: JSON.stringify({ new_sl_no: parseInt(newSlNo) })
-                        })
-                            .then(slres => slres.json())
-                            .then(slData => {
-                                if (slData.message === 'new sl set successfully') {
-                                    navigate(location?.state?.pathname);
-                                    Swal.fire({
-                                        position: "center",
-                                        icon: "success",
-                                        title: "Voucher Added Successfully",
-                                        showConfirmButton: false,
-                                        timer: 1000
-                                    })
-                                }
-                            })
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "New Client Added Successfully With New Voucher",
-                            showConfirmButton: false,
-                            timer: 1000
-                        }).then(() => {
-                            setNumberAlert(false);
-                            navigate(location?.state?.pathname);
-                        })
-                    });
-            }
-        })
-    }
-    const clientNameRef = useRef();
-    const addressRef = useRef();
-    const phoneNoRef = useRef();
-    const dateOfBirthRef = useRef();
-    const passportNoRef = useRef();
-    const dateOfExpiryRef = useRef();
-
-    const destination_ref = useRef();
-    const flight_date_ref = useRef();
-    const ticket_price_ref = useRef();
-
-    // -------------------------------------------------------
-    const [voucherSl, setVoucherSl] = useState();
     useEffect(() => {
-        fetch('https://bismillah-enterprise-server.onrender.com/voucher_sl')
-            .then(res => res.json())
-            .then(data => {
-                setVoucherSl(data.sl_no)
-            })
-    }, [])
+        fetch(`${API}/voucher_sl`).then(r => r.json()).then(d => setVoucherSl(Number(d?.sl_no || 0))).catch(console.error);
+    }, []);
+
     const now = new Date();
-    const Time = now.toLocaleTimeString('en-BD', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-    });
-    const currentDate = now.toLocaleDateString('en-BD', {
-        day: 'numeric',
-        year: 'numeric',
-        month: 'long',
-    });
-    // const [products, setProducts] = useState([
-    //     { destination: '', flight_date: '', ticket_price: 0 },
-    // ]);
+    const time = now.toLocaleTimeString('en-BD', { hour: '2-digit', minute: '2-digit', hour12: true });
+    const currentDate = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 
-    const discount_amount_ref = useRef();
-    const paid_amount_ref = useRef();
-    const status_ref = useRef();
-    const voucherPrintRef = useRef();
+    const totals = useMemo(() => {
+        const ticket = services.reduce((s, x) => s + money(x.ticket_price), 0);
+        const agent = services.reduce((s, x) => s + money(x.ticket_agent_price), 0);
+        const disc = money(discount);
+        const paidAmount = money(paid);
+        const revenue = money(Math.max(0, ticket - agent - disc));
+        const due = money(Math.max(0, ticket - disc - paidAmount));
+        return { ticket, agent, disc, paidAmount, revenue, due, status: due > 0 ? 'Unpaid' : 'Paid' };
+    }, [services, discount, paid]);
 
-
-    const handleDiscountPaidChange = () => {
-        const discountVal = parseFloat((discount_amount_ref.current.value) || 0);
-        const ticketPriceVal = parseFloat((ticket_price_ref.current.value) || 0);
-        const paidVal = parseFloat(paid_amount_ref.current.value || 0);
-        const calculatedDue = ticketPriceVal - discountVal - paidVal;
-        setTicketPrice(ticketPriceVal);
-        setStatus(calculatedDue > 0 ? 'Unpaid' : 'Paid')
-        setDiscount(discountVal);
-        setPaid(paidVal);
-        setDue(calculatedDue > 0 ? parseFloat(calculatedDue.toFixed(2)) : 0);
+    const updateService = (index, key, value) => setServices(prev => prev.map((x, i) => i === index ? { ...x, [key]: value } : x));
+    const addService = () => setServices(prev => [...prev, emptyService()]);
+    const deleteService = index => {
+        if (services.length === 1) return;
+        setServices(prev => prev.filter((_, i) => i !== index));
     };
 
-    // --------------------------------------------------------
+    const create = async () => {
+        const name = client.name.trim();
+        const phone = client.mobile_no.trim().startsWith('0') ? client.mobile_no.trim() : `0${client.mobile_no.trim()}`;
+        if (!name) return Swal.fire('Client Name Required', 'Enter client name.', 'warning');
+        if (phone.length !== 11 || phone.charAt(1) !== '1') { setNumberAlert(true); return; }
+        if (services.some(s => !s.destination.trim() || money(s.ticket_price) <= 0 || money(s.ticket_agent_price) < 0)) return Swal.fire('Incomplete Service', 'Every service needs destination, ticket price and valid agent price.', 'warning');
+        if (totals.agent > totals.ticket) return Swal.fire('Invalid Agent Price', 'Agent price cannot be greater than total ticket price.', 'warning');
+        if (totals.disc < 0 || totals.disc > totals.ticket) return Swal.fire('Invalid Discount', 'Discount cannot exceed ticket price.', 'warning');
+        if (totals.paidAmount < 0 || totals.paidAmount > totals.ticket - totals.disc) return Swal.fire('Invalid Payment', 'Paid amount cannot exceed the amount after discount.', 'warning');
 
+        const newSlNo = String(voucherSl + 1);
+        const voucher = {
+            date: `${currentDate}, ${time}`,
+            transaction_date: currentDate,
+            voucher_no: newSlNo,
+            services: services.map(s => ({ ...s, ticket_price: money(s.ticket_price), ticket_agent_price: money(s.ticket_agent_price) })),
+            ticket_price: totals.ticket,
+            ticket_agent_price: totals.agent,
+            paid_amount: totals.paidAmount,
+            due_amount: totals.due,
+            payment_status: totals.status,
+            discount: totals.disc,
+        };
+        const newClient = {
+            name, mobile_no: phone, address: client.address.trim(), date_of_birth: client.date_of_birth,
+            passport_no: client.passport_no, date_of_expiry: client.date_of_expiry,
+            vouchers: [voucher], transections: totals.paidAmount > 0 ? [{ date: voucher.date, reference_voucher: newSlNo, paid_amount: totals.paidAmount, transection_amount: totals.paidAmount, due_amount: totals.due, payment_status: totals.status }] : []
+        };
 
-    return (
-        <div className="relative min-h-full text-slate-200">
-            <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-                <div className="absolute -left-40 top-10 h-96 w-96 rounded-full bg-emerald-500/[0.06] blur-[120px]" />
-                <div className="absolute -right-40 top-1/3 h-96 w-96 rounded-full bg-cyan-500/[0.05] blur-[130px]" />
-                <div className="absolute bottom-0 left-1/3 h-96 w-96 rounded-full bg-violet-500/[0.04] blur-[140px]" />
+        const confirm = await Swal.fire({ title: 'Create Client + Voucher?', text: `Voucher #${newSlNo} will update Daily Transactions.`, icon: 'question', showCancelButton: true, confirmButtonColor: '#10b981', background: '#071311', color: '#ecfdf5' });
+        if (!confirm.isConfirmed) return;
+        try {
+            setLoading(true);
+            const r = await fetch(`${API}/air_ticket_new_client`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(newClient) });
+            const result = await r.json();
+            if (!r.ok || !result?.success) throw new Error(result?.error || 'Client creation failed');
+            await fetch(`${API}/voucher_sl`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ new_sl_no: Number(newSlNo) }) });
+            await Swal.fire({ icon: 'success', title: 'Created Successfully', showConfirmButton: false, timer: 1100 });
+            navigate(from);
+        } catch (e) { Swal.fire('Creation Failed', e.message, 'error'); }
+        finally { setLoading(false); }
+    };
+
+    const print = () => {
+        const iframe = document.createElement('iframe'); iframe.style.cssText = 'position:fixed;width:0;height:0;border:0'; document.body.appendChild(iframe);
+        const doc = iframe.contentWindow.document; doc.open(); doc.write(`<html><head><title>Air Ticket Voucher</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Arial;color:#000}.voucher{width:48%;margin-left:auto}table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:6px;font-size:10px;text-align:center}</style></head><body>${printRef.current.innerHTML}</body></html>`); doc.close(); iframe.onload = () => { iframe.contentWindow.print(); setTimeout(() => iframe.remove(), 500); };
+    };
+
+    return <div className="min-h-full px-4 py-6 text-slate-200">
+        <div className="max-w-7xl mx-auto">
+            <div className="flex items-center gap-3 mb-6"><Link to={from} className="rounded-xl border border-white/10 px-4 py-2"><MdArrowBack className="inline" /> Back</Link><div><h1 className="text-2xl font-black text-white">New Air Ticket Client + Voucher</h1><p className="text-xs text-slate-500">Voucher #{voucherSl + 1}</p></div></div>
+            <div className="grid lg:grid-cols-2 gap-5">
+                <section className="rounded-3xl border border-white/10 bg-white/[0.025] p-6 space-y-4">
+                    <h2 className="text-lg font-bold text-white">Client Details</h2>
+                    {['name', 'address', 'mobile_no', 'date_of_birth', 'passport_no', 'date_of_expiry'].map(key => <input key={key} value={client[key]} onChange={e => { setClient(c => ({ ...c, [key]: e.target.value })); if (key === 'mobile_no') setNumberAlert(false); }} placeholder={key.replaceAll('_', ' ')} className="h-12 w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 text-white" />)}
+                    {numberAlert && <p className="text-sm text-red-300">Enter a valid Bangladesh mobile number.</p>}
+                </section>
+                <section className="rounded-3xl border border-white/10 bg-white/[0.025] p-6">
+                    <div className="flex justify-between items-center mb-4"><div><p className="text-xs uppercase tracking-[0.25em] text-violet-400">Services</p><h2 className="text-lg font-bold text-white">Air Ticket Voucher</h2></div><button onClick={addService} className="inline-flex items-center gap-2 rounded-xl bg-violet-500/15 px-4 py-2 font-bold text-violet-300"><MdAdd /> Add Service</button></div>
+                    <div className="space-y-4">{services.map((s, i) => <div key={i} className="rounded-2xl border border-white/10 p-4"><div className="flex justify-between mb-3"><b>Service {i + 1}</b><button onClick={() => deleteService(i)} className="text-red-300" disabled={services.length === 1}><MdDeleteOutline /></button></div><div className="grid md:grid-cols-2 gap-3"><input value={s.service_name} onChange={e => updateService(i, 'service_name', e.target.value)} placeholder="Service name (optional)" className="h-11 rounded-xl bg-white/[0.04] border border-white/10 px-3 text-white" /><input value={s.destination} onChange={e => updateService(i, 'destination', e.target.value)} placeholder="Destination" className="h-11 rounded-xl bg-white/[0.04] border border-white/10 px-3 text-white" /><input type="date" value={s.flight_date} onChange={e => updateService(i, 'flight_date', e.target.value)} className="h-11 rounded-xl bg-white/[0.04] border border-white/10 px-3 text-white" /><NumericFormat value={s.ticket_price} onValueChange={v => updateService(i, 'ticket_price', v.value)} allowNegative={false} placeholder="Ticket Price" className="h-11 rounded-xl bg-white/[0.04] border border-white/10 px-3 text-white" /><NumericFormat value={s.ticket_agent_price} onValueChange={v => updateService(i, 'ticket_agent_price', v.value)} allowNegative={false} placeholder="Ticket Agent Price" className="h-11 rounded-xl bg-white/[0.04] border border-white/10 px-3 text-white" /></div></div>)}</div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-5"><div className="p-3 rounded-xl bg-white/[0.03]">Ticket<br /><b>৳ {totals.ticket.toFixed(2)}</b></div><div className="p-3 rounded-xl bg-violet-500/10">Agent<br /><b>৳ {totals.agent.toFixed(2)}</b></div><div className="p-3 rounded-xl bg-pink-500/10"><input value={discount} onChange={e => setDiscount(e.target.value)} placeholder="Discount" className="w-full bg-transparent outline-none" />৳ {totals.disc.toFixed(2)}</div><div className="p-3 rounded-xl bg-amber-500/10">Due<br /><b>৳ {totals.due.toFixed(2)}</b></div></div>
+                    <NumericFormat value={paid} onValueChange={v => setPaid(v.value)} allowNegative={false} placeholder="Paid Amount" className="mt-3 h-12 w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white" />
+                    <div className="mt-4 flex gap-3"><button onClick={create} disabled={loading} className="flex-1 h-12 rounded-xl bg-emerald-500 text-[#071311] font-black">{loading ? 'Saving...' : 'Create Voucher'}</button><button onClick={print} className="h-12 px-5 rounded-xl bg-cyan-500/10 text-cyan-300"><MdPrint /></button></div>
+                </section>
             </div>
-            <div>
-                <div className='flex items-center justify-start'>
-                    <Link to={from}>
-                        <button className="hidden md:block text-slate-200 cursor-pointer rounded-xl border border-emerald-400/15 bg-gradient-to-r from-emerald-400/10 to-cyan-400/[0.04] shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)] shadow-emerald-400/10 px-5 py-1 text-md lg:text-lg font-semibold">
-                            Back
-                        </button>
-                    </Link>
-                </div>
-                <h2 className="text-2xl text-emerald-300 font-semibold text-center">Create A New Client With A New Voucher</h2>
-                <div className='h-fit min-h-[320px] flex lg:justify-center duration-300'>
-                    <div className="text-slate-200 shadow-lg shadow-emerald-400/10 flex flex-col items-center justify-center mt-10 w-fit rounded-2xl px-10 py-5">
-                        <h1 className='text-lg lg:text-2xl font-semibold'>Enter Client Informations</h1>
-                        <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                            <div className='text-slate-200 flex flex-col items-start w-full gap-2'>
-                                <p>Client Name</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-emerald-400/10  w-full'>
-                                    <input onChange={() => { handleClientInfoChange('clientName') }} ref={clientNameRef} type="text" className='outline-none w-full' placeholder='Enter Client Name' />
-                                </div>
-                            </div>
-                            <div className='text-slate-200 flex flex-col items-start w-full gap-2'>
-                                <p>Date of Birth</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-emerald-400/10  w-full'>
-                                    <input onChange={() => { handleClientInfoChange('dateOfBirth') }} ref={dateOfBirthRef} type="text" className='outline-none w-full' placeholder='Enter Client Date of Birth' />
-                                </div>
-                            </div>
-                            <div className='text-slate-200 flex flex-col items-start w-full gap-2'>
-                                <p>Passport No</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-emerald-400/10  w-full'>
-                                    <input onChange={() => { handleClientInfoChange('passportNo') }} ref={passportNoRef} type="text" className='outline-none w-full' placeholder='Enter Client Passport No' />
-                                </div>
-                            </div>
-                            <div className='text-slate-200 flex flex-col items-start w-full gap-2'>
-                                <p>Date of Expiry</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-emerald-400/10  w-full'>
-                                    <input onChange={() => { handleClientInfoChange('dateOfExpiry') }} ref={dateOfExpiryRef} type="text" className='outline-none w-full' placeholder='Passport Date of Expiry' />
-                                </div>
-                            </div>
-                            <div className='text-slate-200 flex flex-col items-start w-full gap-2'>
-                                <p>Phone Number</p>
-                                <div className={`${numberAlert ? 'border-red-500' : ''} px-3 border-2 rounded-xl h-8 shadow-2xl shadow-emerald-400/10  w-full`}>
-                                    <NumericFormat
-                                        getInputRef={phoneNoRef}
-                                        onChange={() => { handleClientInfoChange('clientNumber') }}
-                                        className="outline-none w-full h-full"
-                                        placeholder="Enter Phone Number"
-                                        format="0##########"
-                                        allowEmptyFormatting={false}
-                                        mask="_"
-                                        onValueChange={(values) => setValue(values.value)}
-                                        isAllowed={(values) => {
-                                            return values.value.length <= 11;
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                            <div className='text-slate-200 flex flex-col items-start w-full gap-2'>
-                                <p>Address</p>
-                                <div className='px-3 border-2 rounded-xl h-8 shadow-2xl shadow-emerald-400/10  w-full'>
-                                    <input onChange={() => { handleClientInfoChange('clientAddress') }} ref={addressRef} type="text" className='outline-none w-full' placeholder='Enter Client Address' />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                {/* ------------------------------ */}
-                <div className='print:hidden mt-8'>
-                    <div>
-                        <div className='flex items-center justify-center nunito'>
-                            <h1 className="nunito text-2xl text-center font-bold px-5 text-emerald-300">
-                                Voucher - {voucherSl + 1}
-                            </h1>
-                        </div>
-                    </div>
-                    <div className="flex items-center sm:justify-center mt-5 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-xs lg:text-lg">
-                        <table className="text-slate-200 min-w-[380px] sm:min-w-[100%]">
-                            <thead>
-                                <tr className="text-emerald-300">
-                                    <th className="border p-2">Destination</th>
-                                    <th className="border p-2">Flight Date</th>
-                                    <th className="border p-2">Ticket Price</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td className="border p-2">
-                                        <input
-                                            type="text"
-                                            onChange={(e) => { setDestination(e.target.value) }}
-                                            getInputRef={destination_ref}
-                                            className="w-full p-1 outline-none"
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <input
-                                            type="text"
-                                            onChange={(e) => { setFlightDate(e.target.value) }}
-                                            getInputRef={flight_date_ref}
-                                            className="w-full p-1 outline-none"
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={ticketPrice}
-                                            getInputRef={ticket_price_ref}
-                                            onChange={handleDiscountPaidChange}
-                                            className="outline-none w-full h-full text-center"
-                                            placeholder="Enter Price"
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr className="text-right font-semibold">
-                                    <td className="p-2 border"></td>
-                                    <td className="p-2 border">Discount</td>
-                                    <td className="p-2 border text-right">
-                                        <NumericFormat
-                                            value={discount}
-                                            getInputRef={discount_amount_ref}
-                                            onChange={handleDiscountPaidChange}
-                                            className='outline-none w-full h-full text-center'
-                                            placeholder='Enter discount'
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                </tr>
-                                <tr className="text-right font-semibold">
-                                    <td className="p-2 border"></td>
-                                    <td className="p-2 border">Paid Amount</td>
-                                    <td className="p-2 border text-right">
-                                        <NumericFormat
-                                            value={paid}
-                                            getInputRef={paid_amount_ref}
-                                            onChange={handleDiscountPaidChange}
-                                            className='outline-none w-full h-full text-center'
-                                            placeholder='Enter amount'
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                </tr>
-
-                                <tr className="text-right font-semibold">
-                                    <td ref={status_ref} className="p-2 border text-center">{status}</td>
-                                    <td className="p-2 border">Due Amount</td>
-                                    <td className="p-2 border text-right">
-                                        {due}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className='flex items-center justify-center gap-5 mt-5'>
-                        {/* <button onClick={addProduct} className="text-slate-200 cursor-pointer rounded-xl border border-emerald-400/15 bg-gradient-to-r from-emerald-400/10 to-cyan-400/[0.04] shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)] shadow-emerald-400/10 px-5 py-1 rounded-md text-md lg:text-lg font-semibold">
-                        + Add Product
-                    </button> */}
-                        <button onClick={handleCreateNewClient} className="text-slate-200 cursor-pointer rounded-xl border border-emerald-400/15 bg-gradient-to-r from-emerald-400/10 to-cyan-400/[0.04] shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)] shadow-emerald-400/10 px-5 py-1 text-md lg:text-lg font-semibold">
-                            Create Voucher
-                        </button>
-                        <button onClick={handlePrint} className="text-slate-200 cursor-pointer rounded-xl border border-emerald-400/15 bg-gradient-to-r from-emerald-400/10 to-cyan-400/[0.04] shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:shadow-[0_12px_35px_rgba(16,185,129,0.16)] shadow-emerald-400/10 px-5 py-1 text-md lg:text-lg font-semibold">
-                            Print
-                        </button>
-                    </div>
-                </div>
-                <div
-                    ref={voucherPrintRef}
-                    className="nunito w-[550px] hidden"
-                >
-                    <AirTicketVoucherHeading />
-
-                    <div className="flex items-center justify-center">
-
-                        <div className="text-sm font-semibold grid grid-cols-2 text-black w-full">
-
-                            <div>
-                                <h1>Name: {clientName}</h1>
-                                <h1>Mobile No: 0{clientNumber}</h1>
-                                <h1>Date of Birth: {clientDateOfBirth}</h1>
-                                <h1>Address: {clientAddress}</h1>
-                            </div>
-
-                            <div className="flex justify-end">
-
-                                <div>
-                                    <h1>Date: {currentDate}</h1>
-                                    <h1>Passport No: {clientPassportNo}</h1>
-                                    <h1>Date of Expiry: {clientDateOfExpiry}</h1>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div className="flex items-center justify-center nunito">
-
-                        <h1 className="nunito text-xl text-center font-bold px-5 text-black">
-                            Voucher - {voucherSl + 1}
-                        </h1>
-
-                    </div>
-
-                    <div className="flex items-center justify-center mt-1 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-md">
-
-                        <div className="absolute w-full flex items-center justify-center">
-
-                            <div>
-                                <h1 className="text-7xl font-bold opacity-20">
-                                    {status}
-                                </h1>
-                            </div>
-
-                        </div>
-
-                        <table className="text-black w-full border-collapse">
-
-                            <thead>
-
-                                <tr className="text-black">
-
-                                    <th className="border border-black p-2">
-                                        Destination
-                                    </th>
-
-                                    <th className="border border-black p-2">
-                                        Flight Date
-                                    </th>
-
-                                    <th className="border border-black p-2">
-                                        Ticket Price
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-
-                            <tbody>
-
-                                <tr>
-
-                                    <td className="border border-black p-2 text-center">
-                                        {destination}
-                                    </td>
-
-                                    <td className="border border-black p-2 text-center">
-                                        {flightDate}
-                                    </td>
-
-                                    <td className="border border-black p-2 text-center">
-                                        {ticketPrice}
-                                    </td>
-
-                                </tr>
-
-                                <tr className="text-right font-semibold">
-
-                                    <td className="p-2 border border-black" />
-
-                                    <td className="p-2 border border-black">
-                                        Discount
-                                    </td>
-
-                                    <td className="p-2 border border-black text-center">
-                                        {discount}
-                                    </td>
-
-                                </tr>
-
-                                <tr className="text-right font-semibold">
-
-                                    <td className="p-2 border border-black" />
-
-                                    <td className="p-2 border border-black">
-                                        Paid Amount
-                                    </td>
-
-                                    <td className="p-2 border border-black text-center">
-                                        {paid}
-                                    </td>
-
-                                </tr>
-
-                                <tr className="text-right font-semibold">
-
-                                    <td
-                                        ref={status_ref}
-                                        className="p-2 border border-black text-center"
-                                    >
-                                        {status}
-                                    </td>
-
-                                    <td className="p-2 border border-black">
-                                        Due Amount
-                                    </td>
-
-                                    <td className="p-2 border border-black text-center">
-                                        {due}
-                                    </td>
-
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                    <div className="flex items-center justify-between mt-20 text-xs absolute bottom-0 w-1/2">
-
-                        <div className="border-t-2 border-black pt-1 w-fit px-5 ml-4">
-                            <h1>Buyer Sign</h1>
-                        </div>
-
-                        <div className="border-t-2 border-black pt-1 w-fit px-5 mr-8">
-                            <h1>Seller Sign</h1>
-                        </div>
-
-                    </div>
-
-                </div>
-                {/* ------------------------------ */}
-            </div>
+            <div ref={printRef} className="hidden"><div className="voucher"><AirTicketVoucherHeading /><p>Name: {client.name}</p><p>Mobile: {client.mobile_no}</p><p>Address: {client.address}</p><h3>Voucher - {voucherSl + 1}</h3><table><thead><tr><th>Service</th><th>Destination</th><th>Flight Date</th><th>Ticket Price</th></tr></thead><tbody>{services.map((s, i) => <tr key={i}><td>{s.service_name || 'Air Ticket'}</td><td>{s.destination}</td><td>{s.flight_date}</td><td>{money(s.ticket_price).toFixed(2)}</td></tr>)}</tbody></table><p>Total Ticket Price: {totals.ticket.toFixed(2)}</p><p>Discount: {totals.disc.toFixed(2)}</p><p>Paid: {totals.paidAmount.toFixed(2)}</p><p>Due: {totals.due.toFixed(2)}</p></div></div>
         </div>
-    );
-};
-
-export default AirTicketNewClientWithNewVoucher;
+    </div>;
+}

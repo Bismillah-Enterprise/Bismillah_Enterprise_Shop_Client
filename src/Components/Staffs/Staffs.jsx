@@ -748,11 +748,11 @@ const Staffs = () => {
 		return e !== null && x !== null && x > e ? x - e : 0;
 	};
 
-	const todayWorkedMinutes = shiftMinutes(today_enter1_time, today_exit1_time) + shiftMinutes(today_enter2_time, today_exit2_time);
+	const todayWorkedMinutes = shiftMinutes(today_enter1_time, today_exit1_time || Time) + shiftMinutes(today_enter2_time, today_exit2_time || Time);
 	const todayWorkedHours = Math.floor(todayWorkedMinutes / 60);
 	const todayWorkedRemainder = todayWorkedMinutes % 60;
 	const todayEarnedUI = Number(((todayWorkedMinutes / 60) * (hour_rate || 0)).toFixed(2));
-	const dailyTargetMinutes = 8 * 60;
+	const dailyTargetMinutes = 12 * 60;
 	const progress = Math.min(100, Math.round((todayWorkedMinutes / dailyTargetMinutes) * 100));
 	const locationReady = Number(distance) <= Number(currentLocation?.shop_range || Infinity) && Number(accuracy) <= 100;
 	const actionButton = (label, icon, disabled, onClick, tone = 'emerald') => {
@@ -795,7 +795,7 @@ const Staffs = () => {
 				</div>
 
 				{/* Profile / live status */}
-				<section className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-2xl sm:p-7">
+				<section className="hidden sm:relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-2xl shadow-black/20 backdrop-blur-2xl sm:p-7">
 					<div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-emerald-400/10 blur-3xl" />
 					<div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 						<div>
@@ -818,18 +818,18 @@ const Staffs = () => {
 					<div className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl backdrop-blur-xl">
 						<div className="mb-4 flex items-center justify-between gap-3">
 							<div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Attendance Security</p><h2 className="mt-1 text-lg font-bold text-slate-100">Your Location From Shop</h2></div>
-							<div className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${locationReady ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300' : 'border-amber-400/25 bg-amber-400/10 text-amber-300'}`}><span className={`h-2 w-2 rounded-full ${locationReady ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />{locationReady ? 'Location Verified' : 'Location Restricted'}</div>
+							<div className={`hidden sm:flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${locationReady ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300' : 'border-amber-400/25 bg-amber-400/10 text-amber-300'}`}><span className={`h-2 w-2 rounded-full ${locationReady ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />{locationReady ? 'Location Verified' : 'Location Restricted'}</div>
 						</div>
-						<div className="grid gap-3 sm:grid-cols-2">
-							<div className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.04] p-4"><div className="flex items-center gap-2 text-emerald-300"><MdLocationOn size={20} /><span className="text-xs uppercase tracking-wider text-slate-500">Accuracy</span></div><p className="mt-2 text-2xl font-bold">{accuracy || '--'} <span className="text-sm font-medium text-slate-500">m</span></p></div>
-							<div className="rounded-2xl border border-cyan-400/10 bg-cyan-400/[0.04] p-4"><div className="flex items-center gap-2 text-cyan-300"><MdDirectionsWalk size={20} /><span className="text-xs uppercase tracking-wider text-slate-500">Distance</span></div><p className="mt-2 text-2xl font-bold">{distance || '--'} <span className="text-sm font-medium text-slate-500">m</span></p></div>
+						<div className="grid gap-3 grid-cols-2">
+							<div className="rounded-2xl border border-emerald-400/10 bg-emerald-400/[0.04] p-4"><div className="flex items-center gap-2 text-emerald-300"><MdLocationOn size={20} /><span className="text-xs uppercase tracking-wider text-slate-500">Accuracy</span></div><p className="mt-2 sm:text-2xl font-bold">{accuracy || '--'} <span className="text-sm font-medium text-slate-500">m</span></p></div>
+							<div className="rounded-2xl border border-cyan-400/10 bg-cyan-400/[0.04] p-4"><div className="flex items-center gap-2 text-cyan-300"><MdDirectionsWalk size={20} /><span className="text-xs uppercase tracking-wider text-slate-500">Distance</span></div><p className="mt-2 sm:text-2xl font-bold">{distance || '--'} <span className="text-sm font-medium text-slate-500">m</span></p></div>
 						</div>
 					</div>
 					<div className="flex min-h-[190px] items-center justify-center rounded-3xl border border-violet-400/10 bg-violet-400/[0.035] px-5 shadow-xl backdrop-blur-xl"><Clock /></div>
 				</section>
 
 				{/* Today's overview */}
-				<section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+				<section className="hidden sm:grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
 					{[
 						['Worked Today', `${todayWorkedHours}h ${todayWorkedRemainder}m`, <MdAccessTime />, 'emerald'],
 						['Today Earned', `৳ ${todayEarnedUI.toFixed(2)}`, <MdPayments />, 'cyan'],
@@ -840,7 +840,7 @@ const Staffs = () => {
 
 				{/* Progress */}
 				<section className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 shadow-xl backdrop-blur-xl">
-					<div className="mb-3 flex items-center justify-between"><div><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Daily Progress</p><p className="mt-1 font-semibold text-slate-200">{progress}% of 8-hour target</p></div><span className="text-sm font-bold text-emerald-300">{todayWorkedHours}h {todayWorkedRemainder}m</span></div>
+					<div className="mb-3 flex items-center justify-between"><div><p className="text-xs uppercase tracking-[0.18em] text-slate-500">Daily Progress</p><p className="mt-1 font-semibold text-slate-200">{progress}% of 12-hour target</p></div><span className="text-sm font-bold text-emerald-300">{todayWorkedHours}h {todayWorkedRemainder}m</span></div>
 					<div className="h-2.5 overflow-hidden rounded-full bg-white/5"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-violet-400 transition-all duration-700" style={{ width: `${progress}%` }} /></div>
 				</section>
 

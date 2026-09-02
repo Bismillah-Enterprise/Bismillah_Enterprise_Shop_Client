@@ -1,9 +1,33 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { MdArrowBack, MdPersonAdd, MdDeleteOutline, MdAdd, MdPrint, MdSave } from 'react-icons/md';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import {
+    MdAdd,
+    MdArrowBack,
+    MdDeleteOutline,
+    MdPersonAdd,
+    MdPrint,
+    MdSave,
+} from 'react-icons/md';
 import { NumericFormat } from 'react-number-format';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
+
+const API = 'https://bismillah-enterprise-server.onrender.com';
+
+const CATEGORIES = [
+    'Computer',
+    'Stationary',
+    'Photocopy',
+    'Others',
+];
+
+const emptyProduct = () => ({
+    product_name: '',
+    quantity: '',
+    rate: '',
+    total: 0,
+    category: '',
+});
 
 const CreateNewClientWithVoucher = () => {
     const location = useLocation();
@@ -19,29 +43,26 @@ const CreateNewClientWithVoucher = () => {
     const onBehalfRef = useRef();
     const addressRef = useRef();
     const phoneNoRef = useRef();
-
-    const discount_amount_ref = useRef();
-    const paid_amount_ref = useRef();
+    const discountAmountRef = useRef();
+    const paidAmountRef = useRef();
     const voucherPrintRef = useRef();
 
-    const [products, setProducts] = useState([
-        { product_name: '', quantity: '', rate: '', total: 0 },
-    ]);
-
+    const [products, setProducts] = useState([emptyProduct()]);
     const [discount, setDiscount] = useState(0);
     const [paid, setPaid] = useState(0);
     const [due, setDue] = useState(0);
     const [status, setStatus] = useState('Unpaid');
 
     useEffect(() => {
-        fetch('https://bismillah-enterprise-server.onrender.com/voucher_sl')
+        fetch(`${API}/voucher_sl`)
             .then((res) => res.json())
-            .then((data) => setVoucherSl(data.sl_no || 0));
+            .then((data) => setVoucherSl(Number(data?.sl_no) || 0))
+            .catch(() => { });
     }, []);
 
     const now = new Date();
 
-    const Time = now.toLocaleTimeString('en-BD', {
+    const time = now.toLocaleTimeString('en-BD', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: true,
@@ -53,47 +74,43 @@ const CreateNewClientWithVoucher = () => {
         month: 'long',
     });
 
-    const totalBill = products.reduce((sum, item) => sum + item.total, 0);
+    const totalBill = useMemo(
+        () => products.reduce((sum, item) => sum + Number(item.total || 0), 0),
+        [products]
+    );
 
     const calculatePayment = (discountValue, paidValue) => {
-        const calculatedDue = Math.max(
+        const nextDue = Math.max(
             0,
-            totalBill - discountValue - paidValue
+            totalBill - Number(discountValue || 0) - Number(paidValue || 0)
         );
 
-        setDiscount(discountValue);
-        setPaid(paidValue);
-        setDue(parseFloat(calculatedDue.toFixed(2)));
-        setStatus(calculatedDue > 0 ? 'Unpaid' : 'Paid');
+        setDiscount(Number(discountValue || 0));
+        setPaid(Number(paidValue || 0));
+        setDue(Number(nextDue.toFixed(2)));
+        setStatus(nextDue > 0 ? 'Unpaid' : 'Paid');
     };
 
     const handlePaymentChange = () => {
-        const discountValue = parseFloat(
-            discount_amount_ref.current?.value || 0
+        calculatePayment(
+            Number(discountAmountRef.current?.value || 0),
+            Number(paidAmountRef.current?.value || 0)
         );
-
-        const paidValue = parseFloat(
-            paid_amount_ref.current?.value || 0
-        );
-
-        calculatePayment(discountValue, paidValue);
     };
 
     const handleChange = (index, field, value) => {
         setProducts((prev) => {
             const updated = [...prev];
-
-            updated[index] = {
+            const row = {
                 ...updated[index],
                 [field]: value,
             };
 
-            const quantity = parseFloat(updated[index].quantity || 0);
-            const rate = parseFloat(updated[index].rate || 0);
+            const quantity = Number(row.quantity || 0);
+            const rate = Number(row.rate || 0);
 
-            updated[index].total = parseFloat(
-                (quantity * rate).toFixed(2)
-            );
+            row.total = Number((quantity * rate).toFixed(2));
+            updated[index] = row;
 
             return updated;
         });
@@ -101,16 +118,7 @@ const CreateNewClientWithVoucher = () => {
 
     const addProduct = () => {
         if (products.length >= 9) return;
-
-        setProducts((prev) => [
-            ...prev,
-            {
-                product_name: '',
-                quantity: '',
-                rate: '',
-                total: 0,
-            },
-        ]);
+        setProducts((prev) => [...prev, emptyProduct()]);
     };
 
     const handleDeleteRow = (index) => {
@@ -135,23 +143,17 @@ const CreateNewClientWithVoucher = () => {
     };
 
     const handlePrint = () => {
-        const content = voucherPrintRef.current.innerHTML;
-
+        const content = voucherPrintRef.current?.innerHTML || '';
         const iframe = document.createElement('iframe');
 
-        iframe.style.position = 'fixed';
-        iframe.style.right = '0';
-        iframe.style.bottom = '0';
-        iframe.style.width = '0';
-        iframe.style.height = '0';
-        iframe.style.border = '0';
+        iframe.style.cssText =
+            'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
 
         document.body.appendChild(iframe);
 
         const doc = iframe.contentWindow.document;
 
         doc.open();
-
         doc.write(`
             <html>
                 <head>
@@ -161,57 +163,43 @@ const CreateNewClientWithVoucher = () => {
                         rel="stylesheet"
                     />
                     <style>
-                        @page {
-                            size: A4 landscape;
-                            margin: 10mm;
-                        }
-
+                        @page { size: A4 landscape; margin: 10mm; }
                         body {
                             font-family: sans-serif;
                             color: black;
                             display: flex;
                             justify-content: flex-end;
-                            width: 100%;
                         }
-
                         .voucher-wrapper {
                             width: 48%;
                             box-sizing: border-box;
-                            page-break-inside: avoid;
                         }
                     </style>
                 </head>
-
                 <body>
-                    <div class="voucher-wrapper">
-                        ${content}
-                    </div>
+                    <div class="voucher-wrapper">${content}</div>
                 </body>
             </html>
         `);
-
         doc.close();
 
         iframe.onload = () => {
             iframe.contentWindow.focus();
             iframe.contentWindow.print();
-
-            setTimeout(() => {
-                document.body.removeChild(iframe);
-            }, 1000);
+            setTimeout(() => iframe.remove(), 1000);
         };
     };
 
-    const handleCreateNewClient = () => {
-        const clientName = clientNameRef.current.value.trim();
-        const onBehalf = onBehalfRef.current.value.trim();
-        const address = addressRef.current.value.trim();
-        const phoneNo = phoneNoRef.current.value;
+    const handleCreateNewClient = async () => {
+        const clientName = clientNameRef.current?.value.trim();
+        const onBehalf = onBehalfRef.current?.value.trim();
+        const address = addressRef.current?.value.trim();
+        const phoneNo = phoneNoRef.current?.value || '';
 
-        const pn = `0${phoneNo}`;
+        const phone = `0${phoneNo}`;
 
         if (!clientName || !onBehalf || !address) {
-            Swal.fire({
+            return Swal.fire({
                 title: 'Incomplete Information',
                 text: 'Please fill in all client information.',
                 icon: 'warning',
@@ -219,53 +207,60 @@ const CreateNewClientWithVoucher = () => {
                 color: '#ecfdf5',
                 confirmButtonColor: '#10b981',
             });
-            return;
         }
 
-        if (pn.length !== 11 || value.charAt(0) !== '1') {
+        if (phone.length !== 11 || value.charAt(0) !== '1') {
             setNumberAlert(true);
             return;
         }
 
+        const incomplete = products.some(
+            (item) =>
+                !item.product_name ||
+                !item.quantity ||
+                !item.rate ||
+                !item.category
+        );
+
+        if (incomplete) {
+            return Swal.fire({
+                title: 'Incomplete Voucher',
+                text: 'Please complete product, quantity, rate and category for every row.',
+                icon: 'warning',
+                background: '#0b1a17',
+                color: '#ecfdf5',
+                confirmButtonColor: '#10b981',
+            });
+        }
+
         const newSlNo = voucherSl + 1;
-        const discountAmount = parseFloat(
-            discount_amount_ref.current?.value || 0
+        const discountAmount = Number(
+            discountAmountRef.current?.value || 0
         );
 
         const voucher = {
-            date: `${currentDate}, ${Time}`,
+            date: `${currentDate}, ${time}`,
             voucher_no: String(newSlNo),
             products,
-            total: parseFloat(totalBill.toFixed(2)),
-            paid_amount: paid,
-            due_amount: due,
+            total: Number(totalBill.toFixed(2)),
+            paid_amount: Number(paid.toFixed(2)),
+            due_amount: Number(due.toFixed(2)),
             payment_status: status,
-            discount: discountAmount,
-        };
-
-        const paymentDetails = {
-            date: `${currentDate}, ${Time}`,
-            reference_voucher: newSlNo,
-            paid_amount: paid,
-            transection_amount: paid,
-            due_amount: due,
-            payment_status: status,
-            voucher_no: String(newSlNo),
-            discount: discountAmount,
+            discount: Number(discountAmount.toFixed(2)),
         };
 
         const newClient = {
             name: clientName,
             on_behalf: onBehalf,
-            mobile_no: pn,
+            mobile_no: phone,
             address,
-            vouchers: [voucher],
-            transections: paid > 0 ? [paymentDetails] : [],
+            vouchers: [],
+            transections: [],
         };
 
-        Swal.fire({
+        const confirm = await Swal.fire({
             title: 'Create Client + Voucher?',
-            text: 'Both client and voucher information will be saved.',
+            text: `Voucher #${newSlNo} will be created and added to Daily Transactions.`,
             icon: 'question',
             background: '#0b1a17',
             color: '#ecfdf5',
@@ -273,143 +268,146 @@ const CreateNewClientWithVoucher = () => {
             confirmButtonColor: '#10b981',
             cancelButtonColor: '#334155',
             confirmButtonText: 'Create',
-        }).then((result) => {
-            if (!result.isConfirmed) return;
+        });
 
+        if (!confirm.isConfirmed) return;
+
+        try {
             setLoading(true);
 
-            fetch('https://bismillah-enterprise-server.onrender.com/new_client', {
+            const clientResponse = await fetch(`${API}/new_client`, {
                 method: 'POST',
-                headers: {
-                    'content-type': 'application/json',
-                },
+                headers: { 'content-type': 'application/json' },
                 body: JSON.stringify(newClient),
-            })
-                .then((res) => res.json())
-                .then(() =>
-                    fetch('https://bismillah-enterprise-server.onrender.com/voucher_sl', {
-                        method: 'POST',
-                        headers: {
-                            'content-type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            new_sl_no: newSlNo,
-                        }),
-                    })
-                )
-                .then(() => {
-                    Swal.fire({
-                        position: 'center',
-                        icon: 'success',
-                        title: 'Client & Voucher Created',
-                        background: '#0b1a17',
-                        color: '#ecfdf5',
-                        showConfirmButton: false,
-                        timer: 1200,
-                    }).then(() => {
-                        navigate(from || '/client_corner');
-                    });
-                })
-                .catch(() => {
-                    Swal.fire({
-                        title: 'Something went wrong',
-                        text: 'Unable to create client and voucher.',
-                        icon: 'error',
-                        background: '#0b1a17',
-                        color: '#ecfdf5',
-                        confirmButtonColor: '#10b981',
-                    });
-                })
-                .finally(() => setLoading(false));
-        });
+            });
+
+            const clientResult = await clientResponse.json();
+
+            if (!clientResponse.ok || !clientResult?.insertedId) {
+                throw new Error(
+                    clientResult?.error || 'Client creation failed'
+                );
+            }
+
+            const voucherResponse = await fetch(
+                `${API}/new_voucher/${clientResult.insertedId}`,
+                {
+                    method: 'PUT',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({
+                        ...voucher,
+                        transaction_date: currentDate,
+                    }),
+                }
+            );
+
+            const voucherResult = await voucherResponse.json();
+
+            if (!voucherResponse.ok || !voucherResult?.success) {
+                throw new Error(
+                    voucherResult?.error || 'Daily transaction sync failed'
+                );
+            }
+
+            await fetch(`${API}/voucher_sl`, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({ new_sl_no: newSlNo }),
+            });
+
+            await Swal.fire({
+                position: 'center',
+                icon: 'success',
+                title: 'Client & Voucher Created',
+                showConfirmButton: false,
+                timer: 1200,
+                background: '#0b1a17',
+                color: '#ecfdf5',
+            });
+
+            navigate(from || '/client_corner');
+        } catch (error) {
+            console.error('Create client/voucher error:', error);
+
+            Swal.fire({
+                title: 'Something went wrong',
+                text: error.message,
+                icon: 'error',
+                background: '#0b1a17',
+                color: '#ecfdf5',
+                confirmButtonColor: '#10b981',
+            });
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
-        <div className="min-h-full py-5 sm:py-7">
-
-            {/* Header */}
-            <div className="flex items-center gap-4 mb-7 print:hidden">
-
+        <div className="min-h-full overflow-hidden py-5 text-slate-200 sm:py-7">
+            <div className="mb-7 flex items-center gap-4 print:hidden">
                 <Link
                     to={from || '/client_corner'}
-                    className="hidden md:flex group items-center gap-2 px-4 py-2 rounded-xl
-                    border border-white/10 bg-white/[0.03]
-                    text-slate-300 hover:text-emerald-300
-                    hover:border-emerald-400/30 transition-all"
+                    className="hidden items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2 text-slate-300 transition hover:border-emerald-400/30 hover:text-emerald-300 md:flex"
                 >
-                    <MdArrowBack className="text-xl group-hover:-translate-x-1 transition-transform" />
+                    <MdArrowBack />
                     Back
                 </Link>
 
-                <div className="flex-1 flex items-center justify-center md:justify-start gap-3">
-                    <div className="p-3 rounded-xl bg-emerald-400/10 border border-emerald-400/20">
+                <div className="flex flex-1 items-center justify-center gap-3 md:justify-start">
+                    <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3">
                         <MdPersonAdd className="text-2xl text-emerald-300" />
                     </div>
-
                     <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-white">
+                        <h1 className="text-xl font-bold text-white sm:text-2xl">
                             New Client + Voucher
                         </h1>
-                        <p className="text-xs text-slate-500 mt-1">
+                        <p className="mt-1 text-xs text-slate-500">
                             Create client and first voucher together
                         </p>
                     </div>
                 </div>
             </div>
 
-            {/* Client information */}
-            <div className="max-w-5xl mx-auto rounded-3xl border border-white/[0.08]
-                bg-white/[0.025] backdrop-blur-xl p-5 sm:p-7 print:hidden">
-
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h2 className="font-bold text-white">
-                            Client Information
-                        </h2>
-                        <p className="text-xs text-slate-500 mt-1">
-                            Enter client information before preparing the voucher.
-                        </p>
-                    </div>
+            <div className="mx-auto max-w-5xl rounded-3xl border border-white/[0.08] bg-white/[0.025] p-5 backdrop-blur-xl sm:p-7 print:hidden">
+                <div className="mb-6">
+                    <h2 className="font-bold text-white">Client Information</h2>
+                    <p className="mt-1 text-xs text-slate-500">
+                        Enter client information before preparing the voucher.
+                    </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
+                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     {[
                         ['Client Name', clientNameRef, 'Enter client name'],
                         ['On Behalf', onBehalfRef, 'Enter representative'],
                         ['Address', addressRef, 'Enter address'],
                     ].map(([label, ref, placeholder]) => (
                         <div key={label}>
-                            <label className="block text-xs text-slate-500 mb-2">
+                            <label className="mb-2 block text-xs text-slate-500">
                                 {label}
                             </label>
-
                             <input
                                 ref={ref}
                                 type="text"
                                 placeholder={placeholder}
-                                className="w-full px-4 py-3 rounded-xl
-                                bg-white/[0.035]
-                                border border-white/10
-                                text-slate-200 placeholder:text-slate-700
-                                outline-none focus:border-emerald-400/40"
+                                className="w-full rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-slate-200 outline-none placeholder:text-slate-700 focus:border-emerald-400/40"
                             />
                         </div>
                     ))}
 
                     <div>
-                        <label className="block text-xs text-slate-500 mb-2">
+                        <label className="mb-2 block text-xs text-slate-500">
                             Phone Number
                         </label>
-
-                        <div className={`px-4 py-3 rounded-xl
-                            bg-white/[0.035]
-                            border ${numberAlert ? 'border-red-500' : 'border-white/10'}
-                            focus-within:border-emerald-400/40`}
+                        <div
+                            className={`rounded-xl border bg-white/[0.035] px-4 py-3 ${numberAlert
+                                ? 'border-red-500'
+                                : 'border-white/10'
+                                }`}
                         >
                             <NumericFormat
                                 getInputRef={phoneNoRef}
-                                className="outline-none w-full bg-transparent text-slate-200"
+                                className="w-full bg-transparent text-slate-200 outline-none"
                                 placeholder="01XXXXXXXXX"
                                 format="0##########"
                                 mask="_"
@@ -424,378 +422,302 @@ const CreateNewClientWithVoucher = () => {
                 </div>
             </div>
 
-            {/* Voucher */}
-            <div className="max-w-5xl mx-auto mt-5 print:hidden">
-
-                <div className="rounded-3xl border border-white/[0.08]
-                    bg-white/[0.025] backdrop-blur-xl overflow-hidden">
-
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3
-                        p-5 border-b border-white/[0.06]">
-
-                        <div>
-                            <h2 className="font-bold text-white">
-                                Voucher #{voucherSl + 1}
-                            </h2>
-                            <p className="text-xs text-slate-500 mt-1">
-                                {currentDate} • {Time}
-                            </p>
-                        </div>
-
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold w-fit
-                            ${status === 'Paid'
-                                ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20'
-                                : 'bg-red-400/10 text-red-400 border border-red-400/20'
-                            }`}>
-                            {status}
-                        </span>
+            <div className="mx-auto mt-5 max-w-5xl rounded-3xl border border-white/[0.08] bg-white/[0.025] backdrop-blur-xl print:hidden">
+                <div className="flex flex-col justify-between gap-3 border-b border-white/[0.06] p-5 sm:flex-row sm:items-center">
+                    <div>
+                        <h2 className="font-bold text-white">
+                            Voucher #{voucherSl + 1}
+                        </h2>
+                        <p className="mt-1 text-xs text-slate-500">
+                            {currentDate} • {time}
+                        </p>
                     </div>
 
-                    <div className="overflow-x-auto scrollbar-hide p-5">
-                        <table className="w-full min-w-[700px] text-sm">
+                    <span
+                        className={`w-fit rounded-full border px-3 py-1 text-xs font-semibold ${status === 'Paid'
+                            ? 'border-emerald-400/20 bg-emerald-400/10 text-emerald-400'
+                            : 'border-red-400/20 bg-red-400/10 text-red-400'
+                            }`}
+                    >
+                        {status}
+                    </span>
+                </div>
 
-                            <thead>
-                                <tr className="text-xs text-slate-500 border-b border-white/[0.06]">
-                                    <th className="p-4 w-10"></th>
-                                    <th className="p-4">SL</th>
-                                    <th className="p-4 text-left">Product</th>
-                                    <th className="p-4">Qty</th>
-                                    <th className="p-4">Rate</th>
-                                    <th className="p-4 text-right">Total</th>
+                <div className="overflow-x-auto p-5 scrollbar-hide">
+                    <table className="w-full min-w-[860px] text-sm">
+                        <thead>
+                            <tr className="border-b border-white/[0.06] text-xs text-slate-500">
+                                <th className="p-3">#</th>
+                                <th className="p-3 text-left">Product</th>
+                                <th className="p-3">Category</th>
+                                <th className="p-3">Qty</th>
+                                <th className="p-3">Rate</th>
+                                <th className="p-3 text-right">Total</th>
+                                <th className="p-3" />
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {products.map((item, index) => (
+                                <tr
+                                    key={index}
+                                    className="border-b border-white/[0.04]"
+                                >
+                                    <td className="p-3 text-center text-slate-500">
+                                        {index + 1}
+                                    </td>
+
+                                    <td className="p-3">
+                                        <input
+                                            value={item.product_name}
+                                            onChange={(e) =>
+                                                handleChange(
+                                                    index,
+                                                    'product_name',
+                                                    e.target.value
+                                                )
+                                            }
+                                            placeholder="Product name"
+                                            className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-200 outline-none focus:border-emerald-400/30"
+                                        />
+                                    </td>
+
+                                    <td className="p-3">
+                                        <select
+                                            value={item.category}
+                                            onChange={(e) =>
+                                                handleChange(
+                                                    index,
+                                                    'category',
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="w-36 rounded-lg border border-white/10 bg-[#0b1a17] px-3 py-2 text-slate-200 outline-none focus:border-emerald-400/30"
+                                        >
+                                            <option value="">Select</option>
+                                            {CATEGORIES.map((category) => (
+                                                <option
+                                                    key={category}
+                                                    value={category}
+                                                >
+                                                    {category}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </td>
+
+                                    <td className="p-3">
+                                        <NumericFormat
+                                            value={item.quantity}
+                                            onValueChange={(values) =>
+                                                handleChange(
+                                                    index,
+                                                    'quantity',
+                                                    values.value
+                                                )
+                                            }
+                                            className="w-24 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-200 outline-none"
+                                            allowNegative={false}
+                                            decimalScale={2}
+                                        />
+                                    </td>
+
+                                    <td className="p-3">
+                                        <NumericFormat
+                                            value={item.rate}
+                                            onValueChange={(values) =>
+                                                handleChange(
+                                                    index,
+                                                    'rate',
+                                                    values.floatValue || 0
+                                                )
+                                            }
+                                            className="w-24 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-slate-200 outline-none"
+                                            allowNegative={false}
+                                            decimalScale={2}
+                                        />
+                                    </td>
+
+                                    <td className="p-3 text-right font-semibold text-slate-200">
+                                        {Number(item.total || 0).toFixed(2)}
+                                    </td>
+
+                                    <td className="p-3 text-center">
+                                        <button
+                                            type="button"
+                                            onClick={() => handleDeleteRow(index)}
+                                            className="text-red-400/60 transition hover:text-red-400"
+                                        >
+                                            <MdDeleteOutline className="text-xl" />
+                                        </button>
+                                    </td>
                                 </tr>
-                            </thead>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
 
-                            <tbody>
-                                {products.map((item, index) => (
-                                    <tr key={index} className="border-b border-white/[0.04]">
+                <div className="p-5 sm:p-6">
+                    <div className="ml-auto max-w-md space-y-3">
+                        <div className="flex justify-between text-sm">
+                            <span className="text-slate-500">Total Bill</span>
+                            <span className="font-semibold text-white">
+                                {totalBill.toFixed(2)}
+                            </span>
+                        </div>
 
-                                        <td className="p-3 text-center">
-                                            <button
-                                                onClick={() => handleDeleteRow(index)}
-                                                className="text-red-400/60 hover:text-red-400"
-                                            >
-                                                <MdDeleteOutline className="text-xl" />
-                                            </button>
-                                        </td>
+                        <div className="flex items-center justify-between gap-5">
+                            <span className="text-sm text-slate-500">Discount</span>
+                            <NumericFormat
+                                value={discount}
+                                getInputRef={discountAmountRef}
+                                onChange={handlePaymentChange}
+                                className="w-32 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-right text-slate-200 outline-none"
+                                allowNegative={false}
+                                decimalScale={2}
+                            />
+                        </div>
 
-                                        <td className="p-3 text-center text-slate-500">
-                                            {index + 1}
-                                        </td>
+                        <div className="flex items-center justify-between gap-5">
+                            <span className="text-sm text-slate-500">Paid Amount</span>
+                            <NumericFormat
+                                value={paid}
+                                getInputRef={paidAmountRef}
+                                onChange={handlePaymentChange}
+                                className="w-32 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-right text-slate-200 outline-none"
+                                allowNegative={false}
+                                decimalScale={2}
+                            />
+                        </div>
 
-                                        <td className="p-3">
-                                            <input
-                                                value={item.product_name}
-                                                onChange={(e) =>
-                                                    handleChange(index, 'product_name', e.target.value)
-                                                }
-                                                placeholder="Product name"
-                                                className="w-full px-3 py-2 rounded-lg
-                                                bg-white/[0.03]
-                                                border border-white/10
-                                                text-slate-200 outline-none
-                                                focus:border-emerald-400/30"
-                                            />
-                                        </td>
+                        <div className="h-px bg-white/[0.06]" />
 
-                                        <td className="p-3">
-                                            <NumericFormat
-                                                value={item.quantity}
-                                                onValueChange={(values) =>
-                                                    handleChange(index, 'quantity', values.value)
-                                                }
-                                                className="w-24 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-slate-200 outline-none"
-                                                allowNegative={false}
-                                                decimalScale={2}
-                                            />
-                                        </td>
-
-                                        <td className="p-3">
-                                            <NumericFormat
-                                                value={item.rate}
-                                                onValueChange={(values) =>
-                                                    handleChange(index, 'rate', values.floatValue || 0)
-                                                }
-                                                className="w-24 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-slate-200 outline-none"
-                                                allowNegative={false}
-                                                decimalScale={2}
-                                            />
-                                        </td>
-
-                                        <td className="p-3 text-right font-semibold text-slate-200">
-                                            {item.total.toFixed(2)}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                        <div className="flex justify-between">
+                            <span className="font-semibold text-slate-400">
+                                Due Amount
+                            </span>
+                            <span className="font-bold text-amber-300">
+                                {due.toFixed(2)}
+                            </span>
+                        </div>
                     </div>
 
-                    <div className="p-5 sm:p-6">
+                    <div className="mt-6 flex flex-col justify-end gap-3 sm:flex-row">
+                        <button
+                            onClick={addProduct}
+                            disabled={products.length >= 9}
+                            className="flex items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-slate-300 transition hover:border-emerald-400/30 hover:text-emerald-300 disabled:opacity-40"
+                        >
+                            <MdAdd />
+                            Add Product
+                        </button>
 
-                        <div className="max-w-md ml-auto space-y-3">
+                        <button
+                            onClick={handlePrint}
+                            className="flex items-center justify-center gap-2 rounded-xl border border-cyan-400/20 bg-cyan-400/[0.05] px-4 py-2.5 text-cyan-300 transition hover:bg-cyan-400/10"
+                        >
+                            <MdPrint />
+                            Print
+                        </button>
 
-                            <div className="flex justify-between text-sm">
-                                <span className="text-slate-500">Total Bill</span>
-                                <span className="text-white font-semibold">
-                                    {totalBill.toFixed(2)}
-                                </span>
-                            </div>
-
-                            <div className="flex items-center justify-between gap-5">
-                                <span className="text-slate-500 text-sm">Discount</span>
-
-                                <NumericFormat
-                                    value={discount}
-                                    getInputRef={discount_amount_ref}
-                                    onChange={handlePaymentChange}
-                                    className="w-32 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-slate-200 text-right outline-none"
-                                    allowNegative={false}
-                                    decimalScale={2}
-                                />
-                            </div>
-
-                            <div className="flex items-center justify-between gap-5">
-                                <span className="text-slate-500 text-sm">Paid Amount</span>
-
-                                <NumericFormat
-                                    value={paid}
-                                    getInputRef={paid_amount_ref}
-                                    onChange={handlePaymentChange}
-                                    className="w-32 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 text-slate-200 text-right outline-none"
-                                    allowNegative={false}
-                                    decimalScale={2}
-                                />
-                            </div>
-
-                            <div className="h-px bg-white/[0.06]" />
-
-                            <div className="flex justify-between">
-                                <span className="text-slate-400 font-semibold">
-                                    Due Amount
-                                </span>
-
-                                <span className="text-red-400 font-bold">
-                                    {due.toFixed(2)}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
-
-                            <button
-                                onClick={addProduct}
-                                disabled={products.length >= 9}
-                                className="flex items-center justify-center gap-2
-                                px-4 py-2.5 rounded-xl
-                                border border-white/10
-                                bg-white/[0.03]
-                                text-slate-300
-                                hover:border-emerald-400/30
-                                hover:text-emerald-300
-                                disabled:opacity-40
-                                transition-all"
-                            >
-                                <MdAdd />
-                                Add Product
-                            </button>
-
-                            <button
-                                onClick={handlePrint}
-                                className="flex items-center justify-center gap-2
-                                px-4 py-2.5 rounded-xl
-                                border border-cyan-400/20
-                                bg-cyan-400/[0.05]
-                                text-cyan-300
-                                hover:bg-cyan-400/10
-                                transition-all"
-                            >
-                                <MdPrint />
-                                Print
-                            </button>
-
-                            <button
-                                onClick={handleCreateNewClient}
-                                disabled={loading}
-                                className="flex items-center justify-center gap-2
-                                px-5 py-2.5 rounded-xl
-                                border border-emerald-400/20
-                                bg-emerald-400/10
-                                text-emerald-300
-                                hover:bg-emerald-400/15
-                                disabled:opacity-40
-                                transition-all font-semibold"
-                            >
-                                <MdSave />
-                                {loading ? 'Creating...' : 'Create Client & Voucher'}
-                            </button>
-                        </div>
+                        <button
+                            onClick={handleCreateNewClient}
+                            disabled={loading}
+                            className="flex items-center justify-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-5 py-2.5 font-semibold text-emerald-300 transition hover:bg-emerald-400/15 disabled:opacity-40"
+                        >
+                            <MdSave />
+                            {loading ? 'Creating...' : 'Create Client & Voucher'}
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Print */}
-            <div
-                ref={voucherPrintRef}
-                className="nunito w-[550px] hidden"
-            >
+            <div ref={voucherPrintRef} className="nunito hidden w-[550px]">
                 <VoucherHeading />
 
-                <div className="flex items-center justify-center">
-                    <div className="text-xs font-semibold grid grid-cols-2 text-black w-full">
-
-                        <div>
-                            <h1>Name: {clientNameRef.current?.value}</h1>
-                            <h1>Address: {addressRef.current?.value}</h1>
-                        </div>
-
-                        <div className="flex justify-end">
-                            <div>
-                                <h1>Date: {currentDate}</h1>
-                                <h1>Mobile No: 0{phoneNoRef.current?.value}</h1>
-                            </div>
-                        </div>
-
+                <div className="grid grid-cols-2 text-xs font-semibold text-black">
+                    <div>
+                        <h1>Name: {clientNameRef.current?.value}</h1>
+                        <h1>Address: {addressRef.current?.value}</h1>
+                    </div>
+                    <div className="text-right">
+                        <h1>Date: {currentDate}</h1>
+                        <h1>Mobile No: 0{phoneNoRef.current?.value}</h1>
                     </div>
                 </div>
 
-                <h1 className="text-md text-center font-bold text-black mt-2">
+                <h1 className="mt-2 text-center text-md font-bold text-black">
                     Voucher - {voucherSl + 1}
                 </h1>
 
-                <table className="text-black w-full text-xs mt-2">
-
+                <table className="mt-2 w-full text-xs text-black">
                     <thead>
                         <tr>
                             <th className="border border-black p-2">SL</th>
                             <th className="border border-black p-2">Product</th>
+                            <th className="border border-black p-2">Category</th>
                             <th className="border border-black p-2">Quantity</th>
                             <th className="border border-black p-2">Rate</th>
                             <th className="border border-black p-2">Total</th>
                         </tr>
                     </thead>
-
                     <tbody>
-
                         {products.map((item, index) => (
                             <tr key={index}>
-
                                 <td className="border border-black p-2 text-center">
                                     {index + 1}
                                 </td>
-
                                 <td className="border border-black p-2">
                                     {item.product_name}
                                 </td>
-
+                                <td className="border border-black p-2 text-center">
+                                    {item.category}
+                                </td>
                                 <td className="border border-black p-2 text-center">
                                     {item.quantity}
                                 </td>
-
                                 <td className="border border-black p-2 text-center">
                                     {item.rate}
                                 </td>
-
                                 <td className="border border-black p-2 text-center">
-                                    {item.total.toFixed(2)}
+                                    {Number(item.total || 0).toFixed(2)}
                                 </td>
-
                             </tr>
                         ))}
-
-                        {Array.from({
-                            length: Math.max(0, 8 - (products?.length || 0))
-                        }).map((_, index) => (
-                            <tr key={`empty-${index}`}>
-
-                                <td className="border border-black p-2 text-center">
-                                    &nbsp;
-                                </td>
-
-                                <td className="border border-black p-2">
-                                    &nbsp;
-                                </td>
-
-                                <td className="border border-black p-2 text-center">
-                                    &nbsp;
-                                </td>
-
-                                <td className="border border-black p-2 text-center">
-                                    &nbsp;
-                                </td>
-
-                                <td className="border border-black p-2 text-center">
-                                    &nbsp;
-                                </td>
-
-                            </tr>
-                        ))}
-
                         <tr>
-                            <td
-                                colSpan="4"
-                                className="border border-black p-2 text-right"
-                            >
+                            <td colSpan="5" className="border border-black p-2 text-right">
                                 Total Bill
                             </td>
-
                             <td className="border border-black p-2 text-center">
                                 {totalBill.toFixed(2)}
                             </td>
                         </tr>
-
                         <tr>
-                            <td
-                                colSpan="4"
-                                className="border border-black p-2 text-right"
-                            >
+                            <td colSpan="5" className="border border-black p-2 text-right">
                                 Discount
                             </td>
-
                             <td className="border border-black p-2 text-center">
                                 {discount.toFixed(2)}
                             </td>
                         </tr>
-
                         <tr>
-                            <td
-                                colSpan="4"
-                                className="border border-black p-2 text-right"
-                            >
+                            <td colSpan="5" className="border border-black p-2 text-right">
                                 Paid
                             </td>
-
                             <td className="border border-black p-2 text-center">
                                 {paid.toFixed(2)}
                             </td>
                         </tr>
-
                         <tr>
-                            <td
-                                colSpan="4"
-                                className="border border-black p-2 text-right"
-                            >
+                            <td colSpan="5" className="border border-black p-2 text-right">
                                 Due
                             </td>
-
                             <td className="border border-black p-2 text-center">
                                 {due.toFixed(2)}
                             </td>
                         </tr>
-
                     </tbody>
-
                 </table>
-                <div className="absolute bottom-0 mt-20 flex w-1/2 items-center justify-between text-xs">
-
-                    <div className="ml-4 w-fit border-t-2 border-black px-5 pt-1">
-                        <h1>Buyer Sign</h1>
-                    </div>
-
-                    <div className="mr-8 w-fit border-t-2 border-black px-5 pt-1">
-                        <h1>Seller Sign</h1>
-                    </div>
-
-                </div>
             </div>
         </div>
     );
@@ -804,140 +726,3 @@ const CreateNewClientWithVoucher = () => {
 export default CreateNewClientWithVoucher;
 
 
-
-/**
-            <div ref={voucherPrintRef} className='nunito w-[550px] hidden'>
-                <VoucherHeading></VoucherHeading>
-                <div className='flex items-center justify-center'>
-                    <div className='text-xs font-semibold grid grid-cols-2 text-black w-full'>
-                        <div className=''>
-                            <h1>Name: {clientName}</h1>
-                            <h1>Address: {clientAddress}</h1>
-                        </div>
-                        <div className='flex justify-end'>
-                            <div>
-                                <h1>Date: {currentDate}</h1>
-                                <h1>Mobile No: 0{clientNumber}</h1>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className='flex items-center justify-center nunito'>
-                    <h1 className="nunito text-md text-center font-bold px-5 text-black">
-                        Voucher - {voucherSl + 1}
-                    </h1>
-                </div>
-                <div className="flex items-center justify-center mt-1 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-md">
-                    <div className='absolute w-full flex items-center justify-center'>
-                        <div className=''>
-                            <h1 className='text-5xl font-bold opacity-20'>{status}</h1>
-                        </div>
-                    </div>
-                    <table className="text-black w-full text-xs">
-                        <thead>
-                            <tr className="text-black">
-                                <th className="border p-2">SL</th>
-                                <th className="border p-2">Product</th>
-                                <th className="border p-2 w-28">Quantity</th>
-                                <th className="border p-2 w-28">Rate</th>
-                                <th className="border p-2 w-28">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {products?.map((item, index) => (
-                                <tr key={index}>
-                                    <td className="p-2 border text-center">{index + 1}</td>
-                                    <td className="border p-2">
-                                        <input
-                                            type="text"
-                                            value={item.product_name}
-                                            onChange={(e) => handleChange(index, 'product_name', e.target.value)}
-                                            className="w-full p-1 "
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={item.quantity}
-                                            onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-                                            className='outline-none w-full h-full text-center'
-                                            placeholder='Enter Qantity'
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                    <td className="border p-2">
-                                        <NumericFormat
-                                            value={item.rate}
-                                            onValueChange={(values) => handleChange(index, 'rate', values.floatValue)}
-                                            className="outline-none w-full h-full text-center"
-                                            placeholder="Enter Rate"
-                                            allowNegative={false}
-                                            decimalScale={2}
-                                            fixedDecimalScale={false}
-                                            thousandSeparator={false}
-                                        />
-                                    </td>
-                                    <td className="border p-2 text-center">{item.total.toFixed(2)}</td>
-                                </tr>
-                            ))}
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
-                                <td className="p-2 border">Total Bill</td>
-                                <td className="p-2 border text-center">{totalBill.toFixed(2)}</td>
-                            </tr>
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
-                                <td className="p-2 border">Discount</td>
-                                <td className="p-2 border text-right">
-                                    <NumericFormat
-                                        value={discount}
-                                        onChange={handleDiscountPaidChange}
-                                        className='outline-none w-full h-full text-center'
-                                        placeholder='Enter discount'
-                                        allowNegative={false}
-                                        decimalScale={2}
-                                        fixedDecimalScale={false}
-                                        thousandSeparator={false}
-                                    />
-                                </td>
-                            </tr>
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
-                                <td className="p-2 border">Paid Amount</td>
-                                <td className="p-2 border text-right">
-                                    <NumericFormat
-                                        value={paid}
-                                        onChange={handleDiscountPaidChange}
-                                        className='outline-none w-full h-full text-center'
-                                        placeholder='Enter amount'
-                                        allowNegative={false}
-                                        decimalScale={2}
-                                        fixedDecimalScale={false}
-                                        thousandSeparator={false}
-                                    />
-                                </td>
-                            </tr>
-
-                            <tr className="text-right font-semibold">
-                                <td colSpan="3" className="p-2 border"></td>
-                                <td className="p-2 border">Due Amount</td>
-                                <td className="p-2 border text-center">
-                                    {due.toFixed(2)}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div className='flex items-center justify-between mt-20 text-xs absolute bottom-0 w-1/2'>
-                    <div className='border-t-2 pt-1 w-fit px-5 ml-4'>
-                        <h1>Buyer Sign</h1>
-                    </div>
-                    <div className='border-t-2 pt-1 w-fit px-5 mr-8'>
-                        <h1>Seller Sign</h1>
-                    </div>
-                </div>
-            </div>
- */

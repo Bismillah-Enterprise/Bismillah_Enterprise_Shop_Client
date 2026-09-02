@@ -125,12 +125,16 @@ const UserRequest = () => {
 	};
 
 	const handleSetNewUser = () => {
+		if (!user) {
+			return;
+		}
 		const user_category = user_category_field.current.value;
 		const name = user_name_field.current.value;
-		const email = user_email_field.current.value;
+		const email = user?.email;
 		const hour_rate = parseFloat(hour_rate_field.current.value) || 0;
-		const uid = user_uid_field.current.value;
-		const id = user_old_id_field.current.value;
+		const uid = user?.uid;
+
+		console.log(user, { user_category, name, email, hour_rate, uid })
 
 		const userAllData = {
 			name,
@@ -191,7 +195,7 @@ const UserRequest = () => {
 					return text ? JSON.parse(text) : null;
 				})
 				.then(() => {
-					return fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${id}`, {
+					return fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${uid}`, {
 						method: 'DELETE'
 					});
 				})
@@ -208,6 +212,9 @@ const UserRequest = () => {
 						background: "#0b1c18",
 						color: "#e2e8f0"
 					});
+					if (location.pathname === '/user_request') {
+						navigate('/');
+					}
 				})
 				.catch(error => {
 					Swal.fire({
@@ -252,7 +259,7 @@ const UserRequest = () => {
 	};
 
 	return (
-		<div className="min-h-full pb-12 text-slate-200">
+		<div className="overflow-scroll min-h-full pb-12 p-5 text-slate-200">
 
 			{/* Ambient accents */}
 			<div className="pointer-events-none fixed -top-32 -left-32 w-80 h-80 bg-emerald-500/10 blur-[120px] rounded-full" />
@@ -282,9 +289,8 @@ const UserRequest = () => {
 						</div>
 
 						<div className="p-6 space-y-5">
-							<input ref={user_email_field} type="hidden" />
-							<input ref={user_uid_field} type="hidden" />
-							<input ref={user_old_id_field} type="hidden" />
+							<input defaultValue={user?.email} ref={user_email_field} type="hidden" />
+							<input defaultValue={user?.uid} ref={user_uid_field} type="hidden" />
 
 							<div>
 								<label className="text-sm text-slate-400">User Name</label>
@@ -434,14 +440,7 @@ const UserRequest = () => {
 
 								<div className="flex flex-wrap justify-center md:justify-end gap-2">
 									<button
-										onClick={() =>
-											handleApprove(
-												user?.email,
-												user?.uid,
-												user?._id,
-												user?.display_name
-											)
-										}
+										onClick={() => setModal(!modal)}
 										className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-400/20 text-emerald-300 hover:bg-emerald-500 hover:text-[#071311] font-semibold transition-all"
 									>
 										<MdPersonAdd />
@@ -450,11 +449,7 @@ const UserRequest = () => {
 
 									<button
 										onClick={() =>
-											handleReplace(
-												user?.email,
-												user?.uid,
-												user?._id
-											)
+											setReplaceModal(true)
 										}
 										className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-400/20 text-cyan-300 hover:bg-cyan-500 hover:text-[#071311] font-semibold transition-all"
 									>

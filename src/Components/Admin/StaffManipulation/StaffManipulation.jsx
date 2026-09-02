@@ -410,52 +410,52 @@ const StaffManipulation = () => {
 										View User
 									</Link>
 
-									{user?.email === 'toyburrahman48@gmail.com' ? (
+									{user?.email === 'toyburrahman48@gmail.com' || 'bismillah786e@gmail.com' ? (
 										staff.user_category === 'admin' ? (
-											<Link
+											<button
 												onClick={() => {
 													handleUserCategory(staff?.uid, 'staff')
 												}}
 												className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-violet-400/20 bg-violet-400/10 px-3.5 py-2 text-xs font-semibold text-violet-300 transition hover:-translate-y-0.5 hover:bg-violet-400/15 sm:text-sm"
 											>
 												Set As Staff
-											</Link>
+											</button>
 										) : (
-											<Link
+											<button
 												onClick={() => {
 													handleUserCategory(staff?.uid, 'admin')
 												}}
 												className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-violet-400/20 bg-violet-400/10 px-3.5 py-2 text-xs font-semibold text-violet-300 transition hover:-translate-y-0.5 hover:bg-violet-400/15 sm:text-sm"
 											>
 												Set As Admin
-											</Link>
+											</button>
 										)
 									) : (
 										''
 									)}
 
 									{staff.status ? (
-										<Link
+										<button
 											onClick={() => {
 												handleUserStatus(staff?.uid, false)
 											}}
 											className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-red-400/20 bg-red-400/10 px-3.5 py-2 text-xs font-semibold text-red-300 transition hover:-translate-y-0.5 hover:bg-red-400/15 sm:text-sm w-24"
 										>
 											Block
-										</Link>
+										</button>
 									) : (
-										<Link
+										<button
 											onClick={() => {
 												handleUserStatus(staff?.uid, true)
 											}}
 											className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3.5 py-2 text-xs font-semibold text-emerald-300 transition hover:-translate-y-0.5 hover:bg-emerald-400/15 sm:text-sm w-24"
 										>
 											Unblock
-										</Link>
+										</button>
 									)}
 
-									{user?.email === 'bismillah786e@gmail.com' ? (
-										<Link
+									{user?.email === 'toyburrahman48@gmail.com' || 'bismillah786e@gmail.com' ? (
+										<button
 											onClick={() => {
 												setStaffId(staff?._id);
 												setModal(true);
@@ -463,7 +463,7 @@ const StaffManipulation = () => {
 											className="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-400/20 bg-amber-400/10 px-3.5 py-2 text-xs font-semibold text-amber-300 transition hover:-translate-y-0.5 hover:bg-amber-400/15 sm:text-sm"
 										>
 											Change Hour Rate
-										</Link>
+										</button>
 									) : (
 										''
 									)}
