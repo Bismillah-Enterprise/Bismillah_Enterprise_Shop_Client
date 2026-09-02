@@ -69,111 +69,25 @@ const Staffs = () => {
 	});
 	const today_only_date_number = parseInt(currentDate.split(' ')[1].split(',')[0]);
 
-	useEffect(() => {
-		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
-			.then(bonusRes => bonusRes.json())
-			.then(bonusData => {
-				if (bonusData.date !== currentDate) {
-					fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
-						method: 'PUT',
-						headers: { 'content-type': 'application/json' },
-						body: JSON.stringify({ entry_type: 'new day', date: currentDate }),
-					}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
-						if (firstEntryData.acknowledged) {
-						}
-					})
-				}
-			})
-	}, [])
 
 	useEffect(() => {
 		setDateCheckLoading(true);
-		const todayFullDate = new Date();
-		const todayOnlyDate = todayFullDate.toLocaleDateString('en-BD', { day: 'numeric' });
-		const todayOnlyDateIntFormat = parseInt(todayOnlyDate);
-
-		const parseTime = (timeStr) => {
-			if (!timeStr) return null;
-			const [time, modifier] = timeStr.split(' ');
-			let [hours, minutes] = time.split(':').map(Number);
-			if (modifier === 'PM' && hours !== 12) hours += 12;
-			if (modifier === 'AM' && hours === 12) hours = 0;
-			return hours * 60 + minutes;
+		const checkTodaySubmission = async () => {
+			try {
+				const res = await fetch(`http://localhost:5000/staff/uid_query/${uid}`);
+				const data = await res.json();
+				const submittedToday = Array.isArray(data?.current_month_details)
+					&& data.current_month_details.some(item => item?.current_date === currentDate);
+				setWorkSubmitButton(!submittedToday && (data?.today_exit1_time || data?.today_exit2_time));
+			} catch (error) {
+				console.error('Attendance date check failed:', error);
+				setWorkSubmitButton(false);
+			} finally {
+				setDateCheckLoading(false);
+			}
 		};
-
-		let totalMinutes = 0;
-
-		const enter1 = parseTime(today_enter1_time);
-		const exit1 = parseTime(today_exit1_time);
-		if (enter1 !== null && exit1 !== null && exit1 > enter1) {
-			totalMinutes += exit1 - enter1;
-		}
-
-		const enter2 = parseTime(today_enter2_time);
-		const exit2 = parseTime(today_exit2_time);
-		if (enter2 !== null && exit2 !== null && exit2 > enter2) {
-			totalMinutes += exit2 - enter2;
-		}
-
-		const today_hours = Math.floor(totalMinutes / 60);
-		const today_minutes = totalMinutes % 60;
-
-		const todayDecimal = totalMinutes / 60;
-		const today_earned = parseFloat((todayDecimal * hour_rate).toFixed(2));
-
-		// Add today’s work to previous total from staff data
-		const previousTotalMinutes = (total_working_hour || 0) * 60 + (total_working_minute || 0);
-		const updatedTotalMinutes = previousTotalMinutes + totalMinutes;
-		const updatedTotalHours = Math.floor(updatedTotalMinutes / 60);
-		const updatedTotalMinutesRemainder = updatedTotalMinutes % 60;
-
-		const previousEarn = parseFloat(staff.total_income || 0);
-		const updatedEarn = parseFloat((previousEarn + today_earned).toFixed(2));
-
-		fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${uid}`)
-			.then(res => res.json())
-			.then(data => {
-				if (data.today_date !== todayOnlyDateIntFormat) {
-					const TodaySummary = {
-						currentDate,
-						currentDayName,
-						today_enter1_time: "",
-						today_exit1_time: "",
-						today_enter2_time: "",
-						today_exit2_time: "",
-						total_hour: 0,
-						total_minute: 0,
-						total_earn: 0,
-						total_working_hour: updatedTotalHours,
-						total_working_minute: updatedTotalMinutesRemainder,
-						total_income: parseFloat(updatedEarn.toFixed(2)),
-						available_balance,
-						additional_movement_hour,
-						additional_movement_minute,
-						today_bonus: 0,
-						total_bonus,
-						today_date: todayOnlyDateIntFormat
-					};
-
-					// Save to database
-					fetch(`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`, {
-						method: 'PUT',
-						headers: {
-							'content-type': 'application/json'
-						},
-						body: JSON.stringify(TodaySummary)
-					})
-						.then(res => res.json())
-						.then(() => {
-							setDateCheckLoading(false);
-						});
-				}
-				else {
-					setDateCheckLoading(false)
-					return;
-				}
-			})
-	}, [user])
+		checkTodaySubmission();
+	}, [user, uid, currentDate]);
 
 	useEffect(() => {
 		if (
@@ -198,7 +112,7 @@ const Staffs = () => {
 			setLocationLoading(false);
 			return;
 		}
-		fetch('https://bismillah-enterprise-server.onrender.com/shop_location')
+		fetch('http://localhost:5000/shop_location')
 			.then(res => res.json())
 			.then(currentLocationData => {
 				setCurrentLocation(currentLocationData);
@@ -264,86 +178,75 @@ const Staffs = () => {
 			confirmButtonColor: "#3085d6",
 			cancelButtonColor: "#d33",
 			confirmButtonText: "Yes, Submit"
-		}).then((result) => {
-			if (result.isConfirmed) {
-				const updatedTime = { name, clickedTime: Time, today_date: today_only_date_number };
-				fetch(`https://bismillah-enterprise-server.onrender.com/staffs_daily_time/${id}`, {
+		}).then(async (result) => {
+			if (!result.isConfirmed) return;
+
+			try {
+				const updatedTime = {
+					name,
+					clickedTime: Time,
+					today_date: today_only_date_number,
+					current_date: currentDate
+				};
+
+				const attendanceRes = await fetch(`http://localhost:5000/staffs_daily_time/${id}`, {
 					method: 'PUT',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(updatedTime),
-				})
-					.then((res) => res.json())
-					.then((data) => {
-						Swal.fire({
+				});
+				const attendanceData = await attendanceRes.json();
+				if (!attendanceRes.ok) throw new Error(attendanceData?.message || attendanceData?.error || 'Attendance update failed.');
+
+				let bonusResult = null;
+				if (name === 'today_enter1_time') {
+					setWorkSubmitButton(false);
+					const bonusRes = await fetch(`http://localhost:5000/staff_bonus`, {
+						method: 'PUT',
+						headers: { 'content-type': 'application/json' },
+						body: JSON.stringify({ entry_type: 'first entry', time: Time, uid, date: currentDate }),
+					});
+					bonusResult = await bonusRes.json();
+					if (!bonusRes.ok) throw new Error(bonusResult?.message || 'Bonus check failed.');
+
+					if (bonusResult?.bonus > 0) {
+						await Swal.fire({
 							position: 'center',
 							icon: 'success',
-							title: 'saved time',
+							title: `You Will Get ৳${bonusResult.bonus} Bonus Today`,
 							showConfirmButton: false,
-							timer: 1000,
+							timer: 1200,
 						});
-						if (name === 'today_enter1_time') {
-							setWorkSubmitButton(false);
-							fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
-								.then(response => response.json())
-								.then(bonusData => {
-									const parseTime = (timeStr) => {
-										if (!timeStr) return null;
-										const [time, modifier] = timeStr.split(' ');
-										let [hours, minutes] = time.split(':').map(Number);
-										if (modifier === 'PM' && hours !== 12) hours += 12;
-										if (modifier === 'AM' && hours === 12) hours = 0;
-										return hours * 60 + minutes;
-									};
-									if (!bonusData.first_entry.time && !bonusData.second_entry.time && parseTime(Time) < bonusData?.end_time) {
-										fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
-											method: 'PUT',
-											headers: { 'content-type': 'application/json' },
-											body: JSON.stringify({ entry_type: 'first entry', time: Time, uid }),
-										}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
-											if (firstEntryData.acknowledged) {
-												Swal.fire({
-													position: 'center',
-													icon: 'success',
-													title: 'You Will Get Bonus Today',
-													showConfirmButton: false,
-													timer: 1000,
-												});
-											}
-										})
-									}
-									if (bonusData.first_entry.time && parseTime(Time) - parseTime(bonusData.first_entry.time) < 11 && !bonusData.second_entry.time) {
-										fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`, {
-											method: 'PUT',
-											headers: { 'content-type': 'application/json' },
-											body: JSON.stringify({ entry_type: 'second entry', time: Time, uid }),
-										}).then(firstEntryRes => firstEntryRes.json()).then(firstEntryData => {
-											if (firstEntryData.acknowledged) {
-												Swal.fire({
-													position: 'center',
-													icon: 'success',
-													title: 'You Will Get Bonus Today',
-													showConfirmButton: false,
-													timer: 1000,
-												});
-											}
-										})
-									}
-								})
-						}
-						else if (name === 'today_exit1_time') {
-							setWorkSubmitButton(true);
-						}
-						else if (name === 'today_enter2_time') {
-							setWorkSubmitButton(false);
-						}
-						else {
-							setWorkSubmitButton(true);
-						}
-						navigate(`/staff/uid_query/${uid}`)
+					}
+				}
+
+				if (name === 'today_exit1_time') setWorkSubmitButton(true);
+				else if (name === 'today_enter2_time') setWorkSubmitButton(false);
+				else if (name === 'today_exit2_time') setWorkSubmitButton(true);
+
+				if (bonusResult?.bonus === 0 && name === 'today_enter1_time') {
+					await Swal.fire({
+						position: 'center',
+						icon: 'success',
+						title: 'Attendance Saved',
+						text: 'No attendance bonus was available for this entry.',
+						showConfirmButton: false,
+						timer: 1200,
 					});
+				} else if (name !== 'today_enter1_time') {
+					await Swal.fire({
+						position: 'center',
+						icon: 'success',
+						title: 'Saved Time',
+						showConfirmButton: false,
+						timer: 900,
+					});
+				}
+
+				navigate(`/staff/uid_query/${uid}`);
+			} catch (error) {
+				Swal.fire('Attendance Failed', error.message, 'error');
 			}
 		});
-
 	};
 
 	const handleAdditionalMovementRequest = (name, uid) => {
@@ -358,7 +261,7 @@ const Staffs = () => {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				const requestData = { name, uid };
-				fetch(`https://bismillah-enterprise-server.onrender.com/additional_movement_request`, {
+				fetch(`http://localhost:5000/additional_movement_request`, {
 					method: 'POST',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(requestData),
@@ -390,7 +293,7 @@ const Staffs = () => {
 		}).then(async (result) => {
 			if (result.isConfirmed) {
 				const updatedTime = { name, clickedTime: Time };
-				await fetch(`https://bismillah-enterprise-server.onrender.com/additional_movements/${id}`, {
+				await fetch(`http://localhost:5000/additional_movements/${id}`, {
 					method: 'PUT',
 					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(updatedTime),
@@ -423,7 +326,7 @@ const Staffs = () => {
 								additional_movement_hour: updatedAdditionalTotalHours,
 								additional_movement_minute: updatedAdditionalTotalMinutesRemainder,
 							};
-							await fetch(`https://bismillah-enterprise-server.onrender.com/additional_movement_submit/${_id}`, {
+							await fetch(`http://localhost:5000/additional_movement_submit/${_id}`, {
 								method: 'PUT',
 								headers: {
 									'content-type': 'application/json'
@@ -433,7 +336,7 @@ const Staffs = () => {
 								.then(res => res.json())
 								.then(async (sentDataToStuffProfile) => {
 									if (sentDataToStuffProfile.acknowledged) {
-										await fetch(`https://bismillah-enterprise-server.onrender.com/additional_request_approve/${uid}`, {
+										await fetch(`http://localhost:5000/additional_request_approve/${uid}`, {
 											method: 'PUT',
 											headers: {
 												'content-type': 'application/json'
@@ -517,30 +420,19 @@ const Staffs = () => {
 				const todayDecimal = totalMinutes / 60;
 				let today_earned = parseFloat((todayDecimal * hour_rate).toFixed(2));
 				let today_bonus = 0;
-				let total_bonus = bonus;
-				await fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
-					.then(bonusres => bonusres.json())
-					.then(bonusdata => {
-						if (bonusdata.first_entry?.uid === uid && !bonusdata.second_entry.time) {
-							today_bonus = 50;
-							total_bonus = bonus + 50;
-							today_earned = today_earned + 50;
-						}
-						else if (bonusdata.first_entry?.uid === uid && bonusdata.second_entry.time) {
-							today_bonus = 30;
-							total_bonus = bonus + 30;
-							today_earned = today_earned + 30;
-						}
-						else if (bonusdata.first_entry.time && bonusdata.second_entry?.uid === uid) {
-							today_bonus = 20;
-							total_bonus = bonus + 20;
-							today_earned = today_earned + 20;
-						}
-						else if (!bonusdata.first_entry.time && !bonusdata.second_entry.time) {
-							today_bonus = 0;
-							total_bonus = 0;
-						}
-					})
+				let total_bonus = Number(bonus || 0);
+				try {
+					const bonusres = await fetch(`http://localhost:5000/staff_bonus`);
+					const bonusdata = await bonusres.json();
+					if (bonusdata?.date === currentDate) {
+						if (bonusdata.first_entry?.uid === uid) today_bonus = 50;
+						else if (bonusdata.second_entry?.uid === uid) today_bonus = 20;
+					}
+					total_bonus = Number(bonus || 0) + today_bonus;
+					today_earned = parseFloat((today_earned + today_bonus).toFixed(2));
+				} catch (error) {
+					console.error('Bonus calculation failed:', error);
+				}
 
 				// Add today’s work to previous total from staff data
 				const previousTotalMinutes = (total_working_hour || 0) * 60 + (total_working_minute || 0);
@@ -569,30 +461,34 @@ const Staffs = () => {
 					today_bonus,
 					total_bonus,
 					total_income: parseFloat(updatedEarn.toFixed(2)),
-					today_date: today_only_date_number
+					today_date: today_only_date_number,
+					current_date: currentDate
 				};
 
 				// Save to database
-				fetch(`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`, {
+				const submitRes = await fetch(`http://localhost:5000/submit_work_time/${_id}`, {
 					method: 'PUT',
-					headers: {
-						'content-type': 'application/json'
-					},
+					headers: { 'content-type': 'application/json' },
 					body: JSON.stringify(TodaySummary)
-				})
-					.then(res => res.json())
-					.then(sentDataToStuffProfile => {
-						if (sentDataToStuffProfile.message === 'Work time submitted successfully') {
-							navigate(`/staff/uid_query/${uid}`)
-							Swal.fire({
-								position: 'center',
-								icon: 'success',
-								title: 'Work Time Submitted Successfully',
-								showConfirmButton: false,
-								timer: 1000,
-							});
-						}
+				});
+				const sentDataToStuffProfile = await submitRes.json();
+
+				if (submitRes.status === 409) {
+					await Swal.fire('Already Submitted', sentDataToStuffProfile?.message || 'Work time for this date has already been submitted.', 'warning');
+					return;
+				}
+				if (!submitRes.ok) throw new Error(sentDataToStuffProfile?.error || sentDataToStuffProfile?.message || 'Work time submission failed.');
+
+				if (sentDataToStuffProfile.message === 'Work time submitted successfully') {
+					navigate(`/staff/uid_query/${uid}`);
+					Swal.fire({
+						position: 'center',
+						icon: 'success',
+						title: 'Work Time Submitted Successfully',
+						showConfirmButton: false,
+						timer: 1000,
 					});
+				}
 			}
 		});
 	};
@@ -638,7 +534,7 @@ const Staffs = () => {
 	}
 	const handleChangeTime = (id) => {
 		if (editEnter1Time) {
-			fetch(`https://bismillah-enterprise-server.onrender.com/change_time/${id}`, {
+			fetch(`http://localhost:5000/change_time/${id}`, {
 				method: 'PUT',
 				headers: {
 					'content-type': 'application/json'
@@ -659,7 +555,7 @@ const Staffs = () => {
 			setIsEnableEdit(false);
 		}
 		if (editExit1Time) {
-			fetch(`https://bismillah-enterprise-server.onrender.com/change_time/${id}`, {
+			fetch(`http://localhost:5000/change_time/${id}`, {
 				method: 'PUT',
 				headers: {
 					'content-type': 'application/json'
@@ -680,7 +576,7 @@ const Staffs = () => {
 			setIsEnableEdit(false);
 		}
 		if (editEnter2Time) {
-			fetch(`https://bismillah-enterprise-server.onrender.com/change_time/${id}`, {
+			fetch(`http://localhost:5000/change_time/${id}`, {
 				method: 'PUT',
 				headers: {
 					'content-type': 'application/json'
@@ -701,7 +597,7 @@ const Staffs = () => {
 			setIsEnableEdit(false);
 		}
 		if (editExit2Time) {
-			fetch(`https://bismillah-enterprise-server.onrender.com/change_time/${id}`, {
+			fetch(`http://localhost:5000/change_time/${id}`, {
 				method: 'PUT',
 				headers: {
 					'content-type': 'application/json'
