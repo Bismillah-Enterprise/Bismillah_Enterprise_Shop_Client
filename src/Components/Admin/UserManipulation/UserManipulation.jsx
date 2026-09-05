@@ -4,7 +4,7 @@ import { AuthContext } from '../../Providers/AuthProvider';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 const alertTheme = {
 	background: '#0b1f1b',

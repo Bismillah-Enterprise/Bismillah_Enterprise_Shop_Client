@@ -26,7 +26,7 @@ const ClientCorner = () => {
             cancelButtonText: 'Cancel',
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/client/${id}`, {
+                fetch(`http://localhost:5000/client/${id}`, {
                     method: 'DELETE',
                 })
                     .then((res) => res.json())
@@ -234,7 +234,7 @@ const ClientCorner = () => {
                     </div>
                 )}
 
-                {allClient?.map((client, index) => {
+                {allClient?.toReversed().map((client, index) => {
                     const unpaid =
                         client?.vouchers?.filter(
                             (voucher) => voucher.payment_status === 'Unpaid'

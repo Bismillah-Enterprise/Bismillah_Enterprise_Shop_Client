@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { FiArrowDownCircle, FiArrowUpCircle, FiUsers, FiCreditCard } from 'react-icons/fi';
+import { FiArrowDownCircle, FiArrowUpCircle, FiUsers, FiCreditCard, FiBriefcase, FiUser } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import useAdmin from '../Hooks/useAdmin';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 const money = v => Number(v || 0).toLocaleString();
 
@@ -60,17 +60,46 @@ export default function DailyTransactions() {
     const others = (data?.others_revenues || []).reduce((s, x) => s + Number(x?.amount || 0), 0);
     const airTicket = Number(data?.air_ticket_revenues || 0);
     const expenses = (data?.expenses || []).reduce((s, x) => s + Number(x?.amount || 0), 0);
+    const givenLoanDue = data?.given_loan_list.reduce((total, loan) => {
+        const loanAmount = Number(loan?.amount || 0);
+
+        const paidAmount = Array.isArray(loan?.payback_transactions)
+            ? loan.payback_transactions.reduce(
+                (sum, payment) => sum + Number(payment?.amount || 0),
+                0
+            )
+            : 0;
+
+        return total + Math.max(0, loanAmount - paidAmount);
+    }, 0);
+
+    const takenLoanDue = data?.taken_loan_list.reduce((total, loan) => {
+        const loanAmount = Number(loan?.amount || 0);
+
+        const paidAmount = Array.isArray(loan?.payback_transactions)
+            ? loan.payback_transactions.reduce(
+                (sum, payment) => sum + Number(payment?.amount || 0),
+                0
+            )
+            : 0;
+
+        return total + Math.max(0, loanAmount - paidAmount);
+    }, 0);
+    const revenue = computer + stationary + photocopy + airTicket + others;
     const discount = discountTotal(data);
-    const revenue = computer + stationary + photocopy + airTicket + others - discount;
     const due = todayDue(data);
-    const cash = revenue - expenses - due;
-    const totalSell = revenue + discount
+    const cash = revenue - expenses - due + takenLoanDue - givenLoanDue;
+    const totalSell = revenue - discount;
 
     const nav = [
         ['Revenue', '/daily_transactions/revenue', FiArrowUpCircle],
         ['Expense', '/daily_transactions/expense', FiArrowDownCircle],
         ['Client Corner', '/daily_transactions/client_corner', FiUsers],
-        ['Due Management', '/daily_transactions/due_management', FiCreditCard]
+        ['Due Management', '/daily_transactions/due_management', FiCreditCard],
+        ['Loan Management', '/daily_transactions/loan_management', FiBriefcase],
+    ];
+    const AdminNav = [
+        ['Admin View', '/daily_transactions/view_daily_transactions', FiUser],
     ];
 
     return <div className="min-h-full px-4 py-6 text-slate-200">
@@ -79,7 +108,7 @@ export default function DailyTransactions() {
             <h1 className="text-3xl md:text-4xl font-black text-white mt-1">Daily Transactions</h1>
             <p className="text-slate-500 mt-2 mb-7">Manage revenue, expenses, dues and daily cash flow.</p>
 
-            <div className={`${!isAdmin ? 'hidden': 'grid'} grid-cols-2 xl:grid-cols-5 gap-3 mb-6`}>
+            <div className={`${isAdmin ? 'grid' : 'hidden'} grid-cols-2 xl:grid-cols-5 gap-3 mb-6`}>
                 {[
                     ['Total Sell', totalSell, 'text-orange-300'],
                     ['Revenue', revenue, 'text-emerald-300'],
@@ -88,7 +117,9 @@ export default function DailyTransactions() {
                     ['Today Due', due, 'text-amber-300'],
                     ['Cash Movement', cash, cash < 0 ? 'text-red-300' : 'text-cyan-300'],
                     ['Air Ticket', airTicket, 'text-violet-300'],
-                    ['Active Dues', (data?.due_list || []).reduce((n, g) => n + (g?.due_data?.length || 0), 0), 'text-violet-300']
+                    ['Active Dues', (data?.due_list || []).reduce((n, g) => n + (g?.due_data?.length || 0), 0), 'text-violet-300'],
+                    ['Taken Lone Due', takenLoanDue, 'text-violet-300'],
+                    ['Given Loan Due', givenLoanDue, 'text-violet-300'],
                 ].map(([label, value, color]) => <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
                     <p className="text-xs uppercase tracking-wider text-slate-500">{label}</p>
                     <p className={`text-xl md:text-2xl font-black mt-1 ${color}`}>
@@ -104,6 +135,14 @@ export default function DailyTransactions() {
                         <Icon size={17} />{label}
                     </Link>;
                 })}
+                {
+                    isAdmin && AdminNav?.map(([label, path, Icon]) => {
+                        const active = location.pathname === path;
+                        return <Link key={path} to={path} className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold ${active ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-400/20' : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'}`}>
+                            <Icon size={17} />{label}
+                        </Link>;
+                    })
+                }
             </div>
 
             <Outlet context={{ data, reload: load }} />

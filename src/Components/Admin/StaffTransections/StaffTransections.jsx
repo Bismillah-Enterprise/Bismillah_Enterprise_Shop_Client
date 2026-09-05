@@ -16,7 +16,7 @@ const StaffTransections = () => {
 	}, [staffs, search]);
 
 	return (
-		<div className="relative min-h-full w-full px-1 py-3 sm:px-2 lg:p-5 text-slate-100">
+		<div className="relative min-h-full w-full px-1 py-3 sm:px-2 lg:p-5 text-slate-100 overflow-scroll">
 			<div className="pointer-events-none fixed -top-40 -left-40 h-[420px] w-[420px] rounded-full bg-emerald-500/10 blur-[130px]" />
 			<div className="pointer-events-none fixed top-1/3 -right-40 h-[420px] w-[420px] rounded-full bg-cyan-500/10 blur-[140px]" />
 

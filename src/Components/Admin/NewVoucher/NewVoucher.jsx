@@ -12,7 +12,7 @@ import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2';
 import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 const CATEGORIES = [
     'Computer',

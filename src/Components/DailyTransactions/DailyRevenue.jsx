@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 import Swal from 'sweetalert2';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 export default function DailyRevenue() {
     const [form, setForm] = useState({ category:'', amount:'', discount:'', paid:'', reference:'', comment:'' });
@@ -44,13 +44,13 @@ export default function DailyRevenue() {
         } finally { setLoading(false); }
     };
 
-    return <div className="rounded-3xl border border-emerald-400/15 bg-white/[0.025] overflow-hidden">
+    return <div className="rounded-3xl border border-emerald-400/15 bg-white/[0.025] overflow-scroll">
         <div className="p-6 border-b border-white/10">
             <p className="text-xs uppercase tracking-[0.25em] text-emerald-400">Revenue Entry</p>
             <h2 className="text-2xl font-bold text-white mt-1">Add Revenue</h2>
         </div>
         <form onSubmit={submit} className="p-6 grid md:grid-cols-2 gap-5">
-            <select value={form.category} onChange={e=>set('category',e.target.value)} className="h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white">
+            <select value={form.category} onChange={e=>set('category',e.target.value)} className="rounded-lg border bg-[#0b1a17] border-white/10 px-3 py-2 text-slate-200 outline-none focus:border-emerald-400/30">
                 <option value="">Select category</option><option value="computer">Computer</option><option value="stationary">Stationary</option><option value="photocopy">Photocopy</option><option value="others">Others</option>
             </select>
             <NumericFormat value={form.amount} onValueChange={v=>set('amount',v.value)} allowNegative={false} placeholder="Sale amount" className="h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white"/>

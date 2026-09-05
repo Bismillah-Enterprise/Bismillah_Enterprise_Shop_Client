@@ -28,7 +28,7 @@ const NoticePanel = () => {
 
         try {
             const response = await fetch(
-                'https://bismillah-enterprise-server.onrender.com/notice_panel',
+                'http://localhost:5000/notice_panel',
                 {
                     method: 'POST',
                     headers: {

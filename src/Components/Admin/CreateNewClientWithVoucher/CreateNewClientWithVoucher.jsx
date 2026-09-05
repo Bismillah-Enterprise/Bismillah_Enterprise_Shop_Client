@@ -12,7 +12,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 const CATEGORIES = [
     'Computer',
@@ -343,7 +343,7 @@ const CreateNewClientWithVoucher = () => {
     };
 
     return (
-        <div className="min-h-full overflow-hidden py-5 text-slate-200 sm:py-7">
+        <div className="min-h-full overflow-scroll py-5 text-slate-200 sm:py-7">
             <div className="mb-7 flex items-center gap-4 print:hidden">
                 <Link
                     to={from || '/client_corner'}

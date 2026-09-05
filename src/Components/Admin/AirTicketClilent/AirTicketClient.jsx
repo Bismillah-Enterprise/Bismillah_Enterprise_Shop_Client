@@ -20,7 +20,7 @@ const AirTicketClient = () => {
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_client/${id}`, {
+                fetch(`http://localhost:5000/air_ticket_client/${id}`, {
                     method: 'DELETE'
                 })
                     .then(res => res.json())
@@ -44,7 +44,7 @@ const AirTicketClient = () => {
     }
     const search_ref = useRef();
     return (
-        <div className="relative min-h-full text-slate-200 pb-10">
+        <div className="relative min-h-full text-slate-200 pb-10 overflow-scroll">
 
             {/* Ambient glow */}
             <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
@@ -119,7 +119,7 @@ const AirTicketClient = () => {
             {/* Client list */}
             <div className="mx-auto max-w-6xl space-y-3">
                 {
-                    allClient?.map((client, index) =>
+                    allClient?.toReversed().map((client, index) =>
                         <div
                             key={client._id}
                             className="group relative overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.025] p-4 md:p-5 backdrop-blur-xl transition-all duration-300 hover:border-emerald-400/20 hover:bg-white/[0.04] hover:shadow-[0_15px_50px_rgba(16,185,129,0.06)]"

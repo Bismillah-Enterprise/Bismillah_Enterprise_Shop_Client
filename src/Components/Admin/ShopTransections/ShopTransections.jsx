@@ -102,7 +102,7 @@ const ShopTransections = () => {
 			if (result.isConfirmed) {
 
 				fetch(
-					`https://bismillah-enterprise-server.onrender.com/shop_transections`,
+					`http://localhost:5000/shop_transections`,
 					{
 						method: 'PUT',
 						headers: {
@@ -191,7 +191,7 @@ const ShopTransections = () => {
 			if (result.isConfirmed) {
 
 				fetch(
-					`https://bismillah-enterprise-server.onrender.com/shop_transections`,
+					`http://localhost:5000/shop_transections`,
 					{
 						method: 'PUT',
 						headers: {
@@ -256,7 +256,7 @@ const ShopTransections = () => {
 				};
 
 				fetch(
-					`https://bismillah-enterprise-server.onrender.com/shop_transections_closing_month`,
+					`http://localhost:5000/shop_transections_closing_month`,
 					{
 						method: 'POST',
 						headers: {
@@ -314,7 +314,7 @@ const ShopTransections = () => {
 				};
 
 				fetch(
-					`https://bismillah-enterprise-server.onrender.com/start_new_month`,
+					`http://localhost:5000/start_new_month`,
 					{
 						method: 'PUT',
 						headers: {

@@ -4,7 +4,7 @@ import { NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 const ProductsManipulation = () => {
     const loadedProducts = useLoaderData();
@@ -191,7 +191,7 @@ const ProductsManipulation = () => {
     };
 
     return (
-        <div className="min-h-full py-5 sm:py-7 text-white">
+        <div className="min-h-full py-5 sm:py-7 text-white overflow-scroll">
             {/* Header */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-7">
                 <div className="flex items-center gap-3">

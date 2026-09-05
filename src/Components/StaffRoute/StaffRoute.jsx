@@ -28,7 +28,7 @@ const StaffRoute = ({ children }) => {
 
 
 				const response = await fetch(
-					`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${user.uid}`
+					`http://localhost:5000/staff/uid_query/${user.uid}`
 				);
 
 				const gotData = await response.json();

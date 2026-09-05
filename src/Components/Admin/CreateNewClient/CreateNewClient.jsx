@@ -66,7 +66,7 @@ const CreateNewClient = () => {
             if (!result.isConfirmed) return;
 
             setLoading(true);
-            fetch(`https://bismillah-enterprise-server.onrender.com/new_client`, {
+            fetch(`http://localhost:5000/new_client`, {
                 method: 'POST',
                 headers: {
                     'content-type': 'application/json',
@@ -103,7 +103,7 @@ const CreateNewClient = () => {
     };
 
     return (
-        <div className="min-h-full py-5 sm:py-8">
+        <div className="min-h-full py-5 sm:py-8 overflow-scroll">
 
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">

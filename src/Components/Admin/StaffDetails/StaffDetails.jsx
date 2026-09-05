@@ -100,7 +100,7 @@ const StaffDetails = () => {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				fetch(
-					`https://bismillah-enterprise-server.onrender.com/transection_details/${id}`,
+					`http://localhost:5000/transection_details/${id}`,
 					{
 						method: 'PUT',
 						headers: {
@@ -171,7 +171,7 @@ const StaffDetails = () => {
 				};
 
 				fetch(
-					`https://bismillah-enterprise-server.onrender.com/closing_month/${_id}`,
+					`http://localhost:5000/closing_month/${_id}`,
 					{
 						method: 'PUT',
 						headers: {

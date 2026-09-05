@@ -16,7 +16,7 @@ import {
 import Swal from 'sweetalert2';
 import VoucherHeading from '../../Shared/VoucherHeading/VoucherHeading';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 const CATEGORIES = [
     'Computer',
@@ -433,7 +433,7 @@ const Voucher = () => {
         : matchedVoucher.products || [];
 
     return (
-        <div className="relative min-h-full w-full text-slate-200">
+        <div className="relative min-h-full w-full text-slate-200 overflow-scroll">
             <div className="pointer-events-none fixed inset-0 overflow-hidden">
                 <div className="absolute -left-40 -top-40 h-[420px] w-[420px] rounded-full bg-pink-500/[0.035] blur-[130px]" />
                 <div className="absolute -right-40 top-[25%] h-[450px] w-[450px] rounded-full bg-violet-500/[0.035] blur-[140px]" />

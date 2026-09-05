@@ -22,7 +22,7 @@ const Navbar = () => {
 	const fetchColorPlate = async (serial) => {
 		try {
 			const response = await fetch(
-				`https://bismillah-enterprise-server.onrender.com/colorplate/${serial}`
+				`http://localhost:5000/colorplate/${serial}`
 			);
 
 			if (!response.ok) {
@@ -99,7 +99,7 @@ const Navbar = () => {
 	const handleLogin = () => {
 	setLoginLoading(true)
 		const typedShopCode = inputRef.current?.value;
-		fetch(`https://bismillah-enterprise-server.onrender.com/shop_code`)
+		fetch(`http://localhost:5000/shop_code`)
 			.then(res => res.json())
 			.then(theShopCode => {
 				console.log(theShopCode)
@@ -109,15 +109,15 @@ const Navbar = () => {
 					googleSignIn()
 						.then(userData => {
 							if (userData?.user?.uid) {
-								fetch(`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${userData?.user?.uid}`)
+								fetch(`http://localhost:5000/staff/uid_query/${userData?.user?.uid}`)
 									.then(res => res.json())
 									.then(queryData => {
 										if (queryData?.message === 'UID not found') {
-											fetch(`https://bismillah-enterprise-server.onrender.com/user_request_uid/${userData?.user?.uid}`)
+											fetch(`http://localhost:5000/user_request_uid/${userData?.user?.uid}`)
 												.then(res => res.json())
 												.then(userRequestData => {
 													if (userRequestData?.message === 'UID not found') {
-														fetch(`https://bismillah-enterprise-server.onrender.com/user_request`, {
+														fetch(`http://localhost:5000/user_request`, {
 															method: 'POST',
 															headers: {
 																'content-type': 'application/json'

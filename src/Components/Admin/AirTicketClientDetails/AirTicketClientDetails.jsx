@@ -43,7 +43,7 @@ const AirTicketClientDetails = () => {
                 confirmButtonText: "Yes, I am Sure"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_edit_client_data/${id}`, {
+                    fetch(`http://localhost:5000/air_ticket_edit_client_data/${id}`, {
                         method: 'PATCH',
                         headers: {
                             'content-type': 'application/json'
@@ -74,7 +74,7 @@ const AirTicketClientDetails = () => {
     const passportNoRef = useRef();
     const dateOfExpiryRef = useRef();
     return (
-        <div className="relative min-h-full pb-10 text-slate-200">
+        <div className="relative min-h-full pb-10 text-slate-200 overflow-scroll">
 
             {/* Ambient background */}
             <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">

@@ -39,7 +39,7 @@ const LocationDetails = () => {
 
 		try {
 			const response = await fetch(
-				'https://bismillah-enterprise-server.onrender.com/shop_location'
+				'http://localhost:5000/shop_location'
 			);
 
 			if (!response.ok) {

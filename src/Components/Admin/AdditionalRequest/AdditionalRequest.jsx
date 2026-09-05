@@ -3,7 +3,7 @@ import { FiCheck, FiClock, FiInbox, FiX } from 'react-icons/fi';
 import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 const alertTheme = {
 	background: '#0b1f1b',

@@ -17,7 +17,7 @@ const StaffManipulation = () => {
 	const location = useLocation();
 
 	useEffect(() => {
-		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
+		fetch(`http://localhost:5000/staff_bonus`)
 			.then(res => res.json())
 			.then(data => {
 				const formatTime = (totalMinutes) => {
@@ -50,7 +50,7 @@ const StaffManipulation = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`https://bismillah-enterprise-server.onrender.com/set_user_category/${uid}`, {
+				fetch(`http://localhost:5000/set_user_category/${uid}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -86,7 +86,7 @@ const StaffManipulation = () => {
 			confirmButtonText: "Yes, I am Sure"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`https://bismillah-enterprise-server.onrender.com/set_user_status/${uid}`, {
+				fetch(`http://localhost:5000/set_user_status/${uid}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -116,7 +116,7 @@ const StaffManipulation = () => {
 	const handleHourRate = () => {
 		const newHourRate = parseFloat(hour_rate_ref.current.value);
 
-		fetch(`https://bismillah-enterprise-server.onrender.com/hour_rate/${staffId}`, {
+		fetch(`http://localhost:5000/hour_rate/${staffId}`, {
 			method: 'PUT',
 			headers: {
 				'content-type': 'application/json'
@@ -158,7 +158,7 @@ const StaffManipulation = () => {
 
 		console.log(bonusStartTime, bonusEndTime);
 
-		fetch(`https://bismillah-enterprise-server.onrender.com/set_bonus_time`, {
+		fetch(`http://localhost:5000/set_bonus_time`, {
 			method: 'PATCH',
 			headers: {
 				'content-type': 'application/json'
@@ -191,7 +191,7 @@ const StaffManipulation = () => {
 	const bonusTimeEndRef = useRef();
 
 	return (
-		<div className="min-h-full w-full bg-[#061512] text-slate-200 px-4 py-5 sm:px-6 lg:px-8">
+		<div className="min-h-full w-full bg-[#061512] text-slate-200 px-4 py-5 sm:px-6 lg:px-8 overflow-scroll">
 
 			{/* Background glow */}
 			<div className="pointer-events-none fixed inset-0 overflow-hidden">

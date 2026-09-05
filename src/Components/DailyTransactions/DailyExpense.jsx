@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 import Swal from 'sweetalert2';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+const API = 'http://localhost:5000';
 
 export default function DailyExpense() {
     const [amount, setAmount] = useState('');
@@ -29,7 +29,7 @@ export default function DailyExpense() {
         finally { setLoading(false); }
     };
 
-    return <div className="rounded-3xl border border-red-400/15 bg-white/[0.025] overflow-hidden">
+    return <div className="rounded-3xl border border-red-400/15 bg-white/[0.025] overflow-scroll">
         <div className="p-6 border-b border-white/10"><p className="text-xs uppercase tracking-[0.25em] text-red-400">Expense Entry</p><h2 className="text-2xl font-bold text-white mt-1">Add Expense</h2></div>
         <form onSubmit={submit} className="p-6 grid md:grid-cols-2 gap-5">
             <NumericFormat value={amount} onValueChange={v => setAmount(v.value)} allowNegative={false} placeholder="Expense amount" className="h-12 rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white" />

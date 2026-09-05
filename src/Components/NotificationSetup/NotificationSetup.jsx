@@ -15,7 +15,7 @@ const NotificationSetup = () => {
                             console.log("Token:", currentToken);
 
                             // Send this token to your backend to store
-                            fetch('https://bismillah-enterprise-server.onrender.com/store_token', {
+                            fetch('http://localhost:5000/store_token', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ token: currentToken }),

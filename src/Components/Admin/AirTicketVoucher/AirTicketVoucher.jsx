@@ -5,7 +5,8 @@ import { Link, useLoaderData, useLocation, useNavigate, useParams } from 'react-
 import Swal from 'sweetalert2';
 import AirTicketVoucherHeading from '../../Shared/AirTicketVoucherHeading/AirTicketVoucherHeading';
 
-const API = 'https://bismillah-enterprise-server.onrender.com';
+
+const API = 'http://localhost:5000';
 const money = value => Number.isFinite(Number(value)) ? Number(Number(value).toFixed(2)) : 0;
 const dateOnly = value => {
     if (!value) return '';
@@ -37,7 +38,7 @@ export default function AirTicketVoucher() {
     const [saving, setSaving] = useState(false);
     const paymentRef = useRef();
     const discountRef = useRef();
-    const printRef = useRef();
+    const voucherPrintRef = useRef();
 
     const totals = useMemo(() => {
         const ticket = services.reduce((s, x) => s + money(x.ticket_price), 0);
@@ -88,7 +89,77 @@ export default function AirTicketVoucher() {
         } catch (e) { Swal.fire('Payment Failed', e.message, 'error'); } finally { setSaving(false); }
     };
 
-    const print = () => { const iframe = document.createElement('iframe'); iframe.style.cssText = 'position:fixed;width:0;height:0;border:0'; document.body.appendChild(iframe); const doc = iframe.contentWindow.document; doc.open(); doc.write(`<html><head><title>Air Ticket Voucher</title><style>@page{size:A4 landscape;margin:10mm}body{font-family:Arial;color:#000}.voucher{width:48%;margin-left:auto}table{width:100%;border-collapse:collapse}th,td{border:1px solid #000;padding:6px;text-align:center;font-size:10px}</style></head><body>${printRef.current.innerHTML}</body></html>`); doc.close(); iframe.onload = () => { iframe.contentWindow.print(); setTimeout(() => iframe.remove(), 500) } };
+    const handlePrint = () => {
+        const content = voucherPrintRef.current.innerHTML;
+
+        const iframe = document.createElement('iframe');
+
+        iframe.style.position = 'fixed';
+        iframe.style.right = '0';
+        iframe.style.bottom = '0';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = '0';
+
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentWindow.document;
+
+        doc.open();
+
+        doc.write(`
+        <html>
+            <head>
+                <title>Air Ticket Voucher - ${voucher_no}</title>
+
+                <link
+                    href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+                    rel="stylesheet"
+                >
+
+                <style>
+                    @page {
+                        size: A4 landscape;
+                    }
+
+                    body {
+                        font-family: sans-serif;
+                        color: black;
+                        display: flex;
+                        justify-content: end;
+                        width: 100%;
+                    }
+
+                    .voucher-wrapper {
+                        width: 48%;
+                        height: 100%;
+                        box-sizing: border-box;
+                        page-break-inside: avoid;
+                    }
+                </style>
+            </head>
+
+            <body>
+
+                <div class="voucher-wrapper">
+                    ${content}
+                </div>
+
+            </body>
+        </html>
+    `);
+
+        doc.close();
+
+        iframe.onload = () => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+
+            setTimeout(() => {
+                document.body.removeChild(iframe);
+            }, 1000);
+        };
+    };
 
     if (!matchedVoucher) return <div className="p-10 text-center text-red-300">Voucher not found.</div>;
     const shown = isEdit ? services : normalizeServices(matchedVoucher);
@@ -97,11 +168,168 @@ export default function AirTicketVoucher() {
         {modal && <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"><div className="w-full max-w-md rounded-3xl bg-[#071311] border border-white/10 p-6"><div className="flex justify-between"><h2 className="text-xl font-black text-white">Payment</h2><button onClick={() => setModal(false)}><MdOutlineCancel /></button></div><p className="mt-3 text-slate-400">Due: ৳ {due.toFixed(2)}</p><NumericFormat getInputRef={discountRef} allowNegative={false} placeholder="Additional discount" className="mt-4 h-12 w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white" /><NumericFormat getInputRef={paymentRef} allowNegative={false} placeholder="Payment amount" className="mt-3 h-12 w-full rounded-xl bg-white/[0.04] border border-white/10 px-4 text-white" /><button disabled={saving} onClick={takePayment} className="mt-4 h-12 w-full rounded-xl bg-emerald-500 text-[#071311] font-black">{saving ? 'Processing...' : 'Confirm Payment'}</button></div></div>}
         <div className="flex items-center justify-between mb-6"><Link to={location.pathname.includes('admin') ? `/admin/air_ticket_client_details/${client._id}` : `/air_ticket_client_details/${client._id}`} className="rounded-xl border border-white/10 px-4 py-2">← Back</Link><div className="text-right"><p className="text-xs uppercase tracking-[0.25em] text-violet-400">Air Ticket Voucher</p><h1 className="text-2xl font-black text-white">#{voucher_no}</h1></div></div>
         <div className="rounded-3xl border border-white/10 bg-white/[0.025] p-5"><div className="flex justify-between mb-5"><div><p className="text-xs text-slate-500">Customer</p><h2 className="text-xl font-bold text-white">{client.name}</h2><p className="text-sm text-slate-400">{matchedVoucher.date}</p></div><span className={due > 0 ? 'text-amber-300' : 'text-emerald-300'}>{due > 0 ? 'Unpaid' : 'Paid'}</span></div>
-            <div className="overflow-x-auto"><table className="w-full min-w-[950px] text-sm"><thead><tr className="border-b border-white/10"><th className="p-3 text-left">Service</th><th className="p-3 text-left">Destination</th><th className="p-3">Flight Date</th><th className="p-3 text-right">Ticket Price</th><th className="p-3 text-right">Ticket Agent Price</th><th className="p-3 text-right">Revenue</th>{isEdit && <th className="p-3" />}</tr></thead><tbody>{shown.map((s, i) => { const rowRevenue = money(s.ticket_price) - money(s.ticket_agent_price); return <tr key={i} className="border-b border-white/5"><td className="p-3">{isEdit ? <input value={s.service_name} onChange={e => update(i, 'service_name', e.target.value)} className="w-full rounded-lg bg-white/[0.04] p-2" /> : (s.service_name || 'Air Ticket')}</td><td className="p-3">{isEdit ? <input value={s.destination} onChange={e => update(i, 'destination', e.target.value)} className="w-full rounded-lg bg-white/[0.04] p-2" /> : s.destination}</td><td className="p-3 text-center">{isEdit ? <input type="date" value={s.flight_date} onChange={e => update(i, 'flight_date', e.target.value)} className="rounded-lg bg-white/[0.04] p-2" /> : s.flight_date}</td><td className="p-3 text-right">{isEdit ? <NumericFormat value={s.ticket_price} onValueChange={v => update(i, 'ticket_price', v.value)} allowNegative={false} className="w-28 rounded-lg bg-white/[0.04] p-2 text-right" /> : money(s.ticket_price).toFixed(2)}</td><td className="p-3 text-right">{isEdit ? <NumericFormat value={s.ticket_agent_price} onValueChange={v => update(i, 'ticket_agent_price', v.value)} allowNegative={false} className="w-28 rounded-lg bg-white/[0.04] p-2 text-right" /> : money(s.ticket_agent_price).toFixed(2)}</td><td className="p-3 text-right text-violet-300">{rowRevenue.toFixed(2)}</td>{isEdit && <td className="p-3"><button disabled={services.length === 1} onClick={() => deleteService(i)} className="text-red-300 disabled:opacity-30"><MdDeleteOutline /></button></td>}</tr> })}</tbody></table></div>
+            <div className="overflow-x-auto"><table className="w-full min-w-[950px] text-sm"><thead><tr className="border-b border-white/10"><th className="p-3 text-left">Service</th><th className="p-3 text-left">Destination</th><th className="p-3">Flight Date</th><th className="p-3 text-right">Ticket Price</th><th className="p-3 text-right">Ticket Agent Price</th><th className="p-3 text-right">Revenue</th>{isEdit && <th className="p-3" />}</tr></thead><tbody>{shown.map((s, i) => { const rowRevenue = money(s.ticket_price) - money(s.ticket_agent_price); return <tr key={i} className="border-b border-white/5"><td className="p-3">{isEdit ? <input value={s.service_name} onChange={e => update(i, 'service_name', e.target.value)} className="w-full rounded-lg bg-white/[0.04] p-2" /> : (s.service_name || 'Air Ticket')}</td><td className="p-3">{isEdit ? <input value={s.destination} onChange={e => update(i, 'destination', e.target.value)} className="w-full rounded-lg bg-white/[0.04] p-2" /> : s.destination}</td><td className="p-3 text-center">{isEdit ? <input type="date" value={s.flight_date} onChange={e => update(i, 'flight_date', e.target.value)} className="relative rounded-lg bg-white/[0.04] p-2" /> : s.flight_date}</td><td className="p-3 text-right">{isEdit ? <NumericFormat value={s.ticket_price} onValueChange={v => update(i, 'ticket_price', v.value)} allowNegative={false} className="w-28 rounded-lg bg-white/[0.04] p-2 text-right" /> : money(s.ticket_price).toFixed(2)}</td><td className="p-3 text-right">{isEdit ? <NumericFormat value={s.ticket_agent_price} onValueChange={v => update(i, 'ticket_agent_price', v.value)} allowNegative={false} className="w-28 rounded-lg bg-white/[0.04] p-2 text-right" /> : money(s.ticket_agent_price).toFixed(2)}</td><td className="p-3 text-right text-violet-300">{rowRevenue.toFixed(2)}</td>{isEdit && <td className="p-3"><button disabled={services.length === 1} onClick={() => deleteService(i)} className="text-red-300 disabled:opacity-30"><MdDeleteOutline /></button></td>}</tr> })}</tbody></table></div>
             {isEdit && <button onClick={addService} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-violet-500/15 px-4 py-2 font-bold text-violet-300"><MdAdd /> Add Service</button>}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-5"><div className="p-4 rounded-xl bg-white/[0.03]">Ticket<br /><b>৳ {totals.ticket.toFixed(2)}</b></div><div className="p-4 rounded-xl bg-violet-500/10">Agent<br /><b>৳ {totals.agent.toFixed(2)}</b></div><div className="p-4 rounded-xl bg-pink-500/10">Discount<br /><b>৳ {money(discount).toFixed(2)}</b></div><div className="p-4 rounded-xl bg-emerald-500/10">Revenue<br /><b>৳ {totals.revenue.toFixed(2)}</b></div><div className="p-4 rounded-xl bg-amber-500/10">Due<br /><b>৳ {due.toFixed(2)}</b></div></div>
-            <div className="flex flex-wrap justify-center gap-3 mt-6">{!isEdit && <button disabled={due <= 0} onClick={() => setModal(true)} className="px-5 py-3 rounded-xl bg-emerald-500/10 text-emerald-300 font-bold disabled:opacity-30">Take A Payment</button>}<button disabled={!canEdit && !isEdit} onClick={isEdit ? saveEdit : startEdit} className="px-5 py-3 rounded-xl bg-violet-500/10 text-violet-300 font-bold disabled:opacity-30">{isEdit ? (saving ? 'Saving...' : 'Save Changes') : (canEdit ? 'Edit Voucher' : 'Voucher Locked')}</button>{isEdit && <button onClick={() => setIsEdit(false)} className="px-5 py-3 rounded-xl bg-white/10">Cancel</button>}{!isEdit && <button onClick={print} className="px-5 py-3 rounded-xl bg-cyan-500/10 text-cyan-300 font-bold"><MdPrint className="inline" /> Print</button>}</div>
+            <div className="flex flex-wrap justify-center gap-3 mt-6">{!isEdit && <button disabled={due <= 0} onClick={() => setModal(true)} className="px-5 py-3 rounded-xl bg-emerald-500/10 text-emerald-300 font-bold disabled:opacity-30">Take A Payment</button>}<button disabled={!canEdit && !isEdit} onClick={isEdit ? saveEdit : startEdit} className="px-5 py-3 rounded-xl bg-violet-500/10 text-violet-300 font-bold disabled:opacity-30">{isEdit ? (saving ? 'Saving...' : 'Save Changes') : (canEdit ? 'Edit Voucher' : 'Voucher Locked')}</button>{isEdit && <button onClick={() => setIsEdit(false)} className="px-5 py-3 rounded-xl bg-white/10">Cancel</button>}{!isEdit && <button onClick={handlePrint} className="px-5 py-3 rounded-xl bg-cyan-500/10 text-cyan-300 font-bold"><MdPrint className="inline" /> Print</button>}</div>
         </div>
-        <div ref={printRef} className="hidden"><div className="voucher"><AirTicketVoucherHeading /><p>Name: {client.name}</p><p>Mobile: {client.mobile_no}</p><p>Address: {client.address}</p><h3>Voucher - {voucher_no}</h3><table><thead><tr><th>Service</th><th>Destination</th><th>Flight Date</th><th>Ticket Price</th></tr></thead><tbody>{normalizeServices(matchedVoucher).map((s, i) => <tr key={i}><td>{s.service_name || 'Air Ticket'}</td><td>{s.destination}</td><td>{s.flight_date}</td><td>{money(s.ticket_price).toFixed(2)}</td></tr>)}</tbody></table><p>Total Ticket Price: {money(matchedVoucher.ticket_price).toFixed(2)}</p><p>Discount: {money(matchedVoucher.discount).toFixed(2)}</p><p>Paid: {money(matchedVoucher.paid_amount).toFixed(2)}</p><p>Due: {money(matchedVoucher.due_amount).toFixed(2)}</p></div></div>
+        <div
+                ref={voucherPrintRef}
+                className="nunito w-[550px] hidden"
+            >
+                <AirTicketVoucherHeading />
+
+                <div className="flex items-center justify-center">
+
+                    <div className="text-sm font-semibold grid grid-cols-2 text-black w-full">
+
+                        <div>
+                            <h1>Name: {client.name}</h1>
+                            <h1>Mobile No: {client.mobile_no}</h1>
+                            <h1>Date of Birth: {client.date_of_birth}</h1>
+                            <h1>Address: {client.address}</h1>
+                        </div>
+
+                        <div className="flex justify-end">
+
+                            <div>
+                                <h1>Date: {matchedVoucher.date}</h1>
+                                <h1>Passport No: {client.passport_no}</h1>
+                                <h1>Date of Expiry: {client.date_of_expiry}</h1>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div className="flex items-center justify-center nunito">
+
+                    <h1 className="nunito text-xl text-center font-bold px-5 text-black">
+                        Voucher - {voucher_no}
+                    </h1>
+
+                </div>
+
+                <div className="flex items-center justify-center mt-1 overflow-x-scroll sm:overflow-x-hidden overflow-y-hidden scrollbar-hide text-md">
+
+                    <div className="absolute w-full flex items-center justify-center">
+
+                        <div>
+                            <h1 className="text-7xl font-bold opacity-20">
+                                {matchedVoucher.payment_status}
+                            </h1>
+                        </div>
+
+                    </div>
+
+                    <table className="text-black w-full border-collapse">
+
+                        <thead>
+
+                            <tr className="text-black">
+
+                                <th className="border border-black p-2">
+                                    Destination
+                                </th>
+
+                                <th className="border border-black p-2">
+                                    Flight Date
+                                </th>
+
+                                <th className="border border-black p-2">
+                                    Ticket Price
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+
+                                <td className="border border-black p-2 text-center">
+                                    {matchedVoucher.destination}
+                                </td>
+
+                                <td className="border border-black p-2 text-center">
+                                    {matchedVoucher.flight_date}
+                                </td>
+
+                                <td className="border border-black p-2 text-center">
+                                    {matchedVoucher.ticket_price}
+                                </td>
+
+                            </tr>
+
+                            <tr className="text-right font-semibold">
+
+                                <td className="p-2 border border-black">
+                                    &nbsp;
+                                </td>
+
+                                <td className="p-2 border border-black">
+                                    Discount
+                                </td>
+
+                                <td className="p-2 border border-black text-center">
+                                    {matchedVoucher.discount}
+                                </td>
+
+                            </tr>
+
+                            <tr className="text-right font-semibold">
+
+                                <td className="p-2 border border-black">
+                                    &nbsp;
+                                </td>
+
+                                <td className="p-2 border border-black">
+                                    Paid Amount
+                                </td>
+
+                                <td className="p-2 border border-black text-center">
+                                    {matchedVoucher.paid_amount}
+                                </td>
+
+                            </tr>
+
+                            <tr className="text-right font-semibold">
+
+                                <td className="p-2 border border-black text-center">
+                                    {matchedVoucher.payment_status}
+                                </td>
+
+                                <td className="p-2 border border-black">
+                                    Due Amount
+                                </td>
+
+                                <td className="p-2 border border-black text-center">
+                                    {matchedVoucher.due_amount}
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div className="flex items-center justify-between mt-20 text-xs absolute bottom-0 w-1/2">
+
+                    <div className="border-t-2 border-black pt-1 w-fit px-5 ml-4">
+                        <h1>Buyer Sign</h1>
+                    </div>
+
+                    <div className="border-t-2 border-black pt-1 w-fit px-5 mr-8">
+                        <h1>Seller Sign</h1>
+                    </div>
+
+                </div>
+
+            </div>
     </div></div>;
 }
