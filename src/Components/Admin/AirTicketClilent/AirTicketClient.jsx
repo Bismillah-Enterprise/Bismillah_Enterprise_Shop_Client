@@ -20,7 +20,7 @@ const AirTicketClient = () => {
             confirmButtonText: "Yes, delete it!"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:5000/air_ticket_client/${id}`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/air_ticket_client/${id}`, {
                     method: 'DELETE'
                 })
                     .then(res => res.json())

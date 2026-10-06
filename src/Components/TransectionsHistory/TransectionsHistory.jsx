@@ -19,7 +19,7 @@ const TransectionsHistory = () => {
 			0
 		) || 0;
 	return (
-		<div className="min-h-full pt-5 pb-12 text-slate-200">
+		<div className="min-h-full pt-5 pb-12 text-slate-200 overflow-scroll">
 
 			<div className="pointer-events-none fixed -top-40 -left-40 w-[450px] h-[450px] rounded-full bg-emerald-500/10 blur-[140px]" />
 			<div className="pointer-events-none fixed top-[30%] -right-40 w-[450px] h-[450px] rounded-full bg-cyan-500/10 blur-[140px]" />

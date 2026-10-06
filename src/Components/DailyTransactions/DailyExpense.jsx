@@ -2,12 +2,18 @@ import React, { useState } from 'react';
 import { NumericFormat } from 'react-number-format';
 import Swal from 'sweetalert2';
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 export default function DailyExpense() {
     const [amount, setAmount] = useState('');
     const [comment, setComment] = useState('');
     const [loading, setLoading] = useState(false);
+    const now = new Date();
+    const Time = now.toLocaleTimeString('en-BD', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
+    });
 
     const submit = async e => {
         e.preventDefault();
@@ -18,7 +24,7 @@ export default function DailyExpense() {
             setLoading(true);
             const res = await fetch(`${API}/daily_transactions/expense`, {
                 method: 'PATCH', headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ amount: value, comment: comment.trim() })
+                body: JSON.stringify({ amount: value, comment: comment.trim(), time: Time })
             });
             const result = await res.json();
             if (!res.ok) throw new Error(result?.error || 'Expense entry failed.');

@@ -100,7 +100,7 @@ const StaffDetails = () => {
 		}).then((result) => {
 			if (result.isConfirmed) {
 				fetch(
-					`http://localhost:5000/transection_details/${id}`,
+					`https://bismillah-enterprise-server.onrender.com/transection_details/${id}`,
 					{
 						method: 'PUT',
 						headers: {
@@ -171,7 +171,7 @@ const StaffDetails = () => {
 				};
 
 				fetch(
-					`http://localhost:5000/closing_month/${_id}`,
+					`https://bismillah-enterprise-server.onrender.com/closing_month/${_id}`,
 					{
 						method: 'PUT',
 						headers: {
@@ -199,7 +199,7 @@ const StaffDetails = () => {
 	};
 
 	return (
-		<div className="min-h-full bg-transparent text-white px-3 py-5 sm:px-5 lg:px-8">
+		<div className="min-h-full bg-transparent text-white px-3 py-5 sm:px-5 lg:px-8 overflow-scroll">
 
 			{/* ================= MODAL ================= */}
 			{modal && (

@@ -39,7 +39,7 @@ const ClientDetails = () => {
                 confirmButtonText: "Yes, I am Sure"
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`http://localhost:5000/edit_client_data/${id}`, {
+                    fetch(`https://bismillah-enterprise-server.onrender.com/edit_client_data/${id}`, {
                         method: 'PATCH',
                         headers: {
                             'content-type': 'application/json'

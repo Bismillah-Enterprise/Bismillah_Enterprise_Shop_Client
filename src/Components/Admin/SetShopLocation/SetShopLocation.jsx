@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { PropagateLoader } from 'react-spinners';
 import { MdLocationOn, MdMyLocation, MdOutlineCancel, MdSave } from 'react-icons/md';
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 const SetShopLocation = () => {
 	const [location, setLocation] = useState({

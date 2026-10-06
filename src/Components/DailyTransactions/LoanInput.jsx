@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import { FiCalendar, FiUser, FiDollarSign, FiSend } from 'react-icons/fi';
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 const todayInput = () => {
     const d = new Date();

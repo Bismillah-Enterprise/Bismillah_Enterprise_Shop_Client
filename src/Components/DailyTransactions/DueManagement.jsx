@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Swal from 'sweetalert2';
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 export default function DueManagement() {
     const [data, setData] = useState(null), [search, setSearch] = useState(''), [selected, setSelected] = useState(null), [payment, setPayment] = useState(''), [loading, setLoading] = useState(true), [paying, setPaying] = useState(false);

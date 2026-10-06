@@ -40,7 +40,7 @@ const Home = () => {
 	const [now, setNow] = useState(new Date());
 
 	useEffect(() => {
-		fetch('http://localhost:5000/notice_panel').then(res => res.json()).then(data => setNotice(data));
+		fetch('https://bismillah-enterprise-server.onrender.com/notice_panel').then(res => res.json()).then(data => setNotice(data));
 	})
 
 	useEffect(() => {
@@ -76,14 +76,14 @@ const Home = () => {
 
 	useEffect(() => {
 
-		fetch(`http://localhost:5000/staff_bonus`)
+		fetch(`https://bismillah-enterprise-server.onrender.com/staff_bonus`)
 			.then(bonusRes => bonusRes.json())
 			.then(bonusData => {
 
 				if (bonusData.date !== currentDate) {
 
 					fetch(
-						`http://localhost:5000/staff_bonus`,
+						`https://bismillah-enterprise-server.onrender.com/staff_bonus`,
 						{
 							method: 'PUT',
 							headers: {
@@ -126,7 +126,7 @@ const Home = () => {
 			parseInt(todayOnlyDate);
 
 		fetch(
-			`http://localhost:5000/staff/uid_query/${user?.uid}`
+			`https://bismillah-enterprise-server.onrender.com/staff/uid_query/${user?.uid}`
 		)
 			.then(res => res.json())
 			.then(data => {
@@ -191,7 +191,7 @@ const Home = () => {
 					};
 
 					fetch(
-						`http://localhost:5000/submit_work_time/${_id}`,
+						`https://bismillah-enterprise-server.onrender.com/submit_work_time/${_id}`,
 						{
 							method: 'PUT',
 							headers: {

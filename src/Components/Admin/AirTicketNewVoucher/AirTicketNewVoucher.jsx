@@ -5,7 +5,7 @@ import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom'
 import Swal from 'sweetalert2';
 import AirTicketVoucherHeading from '../../Shared/AirTicketVoucherHeading/AirTicketVoucherHeading';
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 const money = v => Number.isFinite(Number(v)) ? Number(Number(v).toFixed(2)) : 0;
 const emptyService = () => ({ service_name: '', destination: '', flight_date: '', ticket_price: '', ticket_agent_price: '' });
 

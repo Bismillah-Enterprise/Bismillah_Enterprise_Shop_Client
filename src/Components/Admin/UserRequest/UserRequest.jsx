@@ -19,7 +19,7 @@ const UserRequest = () => {
 	const [selectedUser, setSelectedUser] = useState(null);
 
 	useEffect(() => {
-		fetch(`http://localhost:5000/staffs`)
+		fetch(`https://bismillah-enterprise-server.onrender.com/staffs`)
 			.then(res => res.json())
 			.then(data => setAllStaffs(data));
 	}, [user]);
@@ -86,7 +86,7 @@ const UserRequest = () => {
 			confirmButtonText: "Yes, Replace"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/replace_staff/${old_id}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/replace_staff/${old_id}`, {
 					method: 'PUT',
 					headers: {
 						'content-type': 'application/json'
@@ -102,7 +102,7 @@ const UserRequest = () => {
 						return text ? JSON.parse(text) : null;
 					})
 					.then(() => {
-						fetch(`http://localhost:5000/user_request/${id}`, {
+						fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${id}`, {
 							method: 'DELETE'
 						}).then(() => {
 							setReplaceModal(false);
@@ -179,7 +179,7 @@ const UserRequest = () => {
 		}).then(result => {
 			if (!result.isConfirmed) return;
 
-			fetch('http://localhost:5000/staff', {
+			fetch('https://bismillah-enterprise-server.onrender.com/staff', {
 				method: 'POST',
 				headers: {
 					'content-type': 'application/json'
@@ -195,7 +195,7 @@ const UserRequest = () => {
 					return text ? JSON.parse(text) : null;
 				})
 				.then(() => {
-					return fetch(`http://localhost:5000/user_request/${uid}`, {
+					return fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${uid}`, {
 						method: 'DELETE'
 					});
 				})
@@ -241,7 +241,7 @@ const UserRequest = () => {
 			confirmButtonText: "Reject"
 		}).then((result) => {
 			if (result.isConfirmed) {
-				fetch(`http://localhost:5000/user_request/${id}`, {
+				fetch(`https://bismillah-enterprise-server.onrender.com/user_request/${id}`, {
 					method: 'DELETE'
 				})
 					.then(res => res.json())

@@ -23,7 +23,7 @@ const useAdmin = () => {
             try {
 
                 const response = await fetch(
-                    `http://localhost:5000/staff/uid_query/${user.uid}`
+                    `https://bismillah-enterprise-server.onrender.com/staff/uid_query/${user.uid}`
                 );
 
                 const gotData = await response.json();

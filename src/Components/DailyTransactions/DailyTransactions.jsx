@@ -3,8 +3,9 @@ import { Link, Outlet, useLocation } from 'react-router-dom';
 import { FiArrowDownCircle, FiArrowUpCircle, FiUsers, FiCreditCard, FiBriefcase, FiUser } from 'react-icons/fi';
 import Swal from 'sweetalert2';
 import useAdmin from '../Hooks/useAdmin';
+import { MdOutlineCancel } from 'react-icons/md';
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 const money = v => Number(v || 0).toLocaleString();
 
@@ -35,6 +36,30 @@ export default function DailyTransactions() {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAdmin, isAdminLoading] = useAdmin();
+    const [details, setDetails] = useState(null);
+
+    const asList = (value) => {
+        if (Array.isArray(value)) {
+            return value;
+        }
+
+        if (
+            value &&
+            Array.isArray(value.amounts)
+        ) {
+            return value.amounts.map(
+                (amount, index) => ({
+                    amount,
+
+                    comment:
+                        value.descriptions?.[index] ||
+                        '—'
+                })
+            );
+        }
+
+        return [];
+    };
 
     const load = async () => {
         try {
@@ -55,6 +80,7 @@ export default function DailyTransactions() {
     if (loading) return <div className="min-h-[60vh] flex items-center justify-center text-slate-400">Loading transactions...</div>;
 
     const computer = Number(data?.computer_revenues || 0);
+    const airTicketSell = Number(data?.air_ticket_sell || 0);
     const stationary = Number(data?.stationary_revenues || 0);
     const photocopy = Number(data?.photocopy_revenues || 0);
     const others = (data?.others_revenues || []).reduce((s, x) => s + Number(x?.amount || 0), 0);
@@ -89,7 +115,7 @@ export default function DailyTransactions() {
     const discount = discountTotal(data);
     const due = todayDue(data);
     const cash = revenue - expenses - due + takenLoanDue - givenLoanDue;
-    const totalSell = revenue - discount;
+    const totalSell = revenue - discount + airTicketSell - airTicket;
 
     const nav = [
         ['Revenue', '/daily_transactions/revenue', FiArrowUpCircle],
@@ -108,25 +134,32 @@ export default function DailyTransactions() {
             <h1 className="text-3xl md:text-4xl font-black text-white mt-1">Daily Transactions</h1>
             <p className="text-slate-500 mt-2 mb-7">Manage revenue, expenses, dues and daily cash flow.</p>
 
-            <div className={`${isAdmin ? 'grid' : 'hidden'} grid-cols-2 xl:grid-cols-5 gap-3 mb-6`}>
+            <p className="text-base uppercase tracking-[0.3em] text-emerald-400 mb-3">{data.date}</p>
+
+
+            <div className={`grid grid-cols-2 xl:grid-cols-5 gap-3 mb-6`}>
                 {[
-                    ['Total Sell', totalSell, 'text-orange-300'],
-                    ['Revenue', revenue, 'text-emerald-300'],
-                    ['Discount', discount, 'text-pink-300'],
+                    ['Computer', computer, 'text-orange-300'],
+                    ['Stationary', stationary, 'text-emerald-300'],
+                    ['Photocopy', photocopy, 'text-cyan-300'],
+                    ['Others', others, 'text-amber-300'],
                     ['Expense', expenses, 'text-red-300'],
-                    ['Today Due', due, 'text-amber-300'],
-                    ['Cash Movement', cash, cash < 0 ? 'text-red-300' : 'text-cyan-300'],
-                    ['Air Ticket', airTicket, 'text-violet-300'],
-                    ['Active Dues', (data?.due_list || []).reduce((n, g) => n + (g?.due_data?.length || 0), 0), 'text-violet-300'],
-                    ['Taken Lone Due', takenLoanDue, 'text-violet-300'],
-                    ['Given Loan Due', givenLoanDue, 'text-violet-300'],
-                ].map(([label, value, color]) => <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
+                ].map(([label, value, color]) => <div key={label} onClick={() => {
+                    if (label === "Expense") {
+                        setDetails({title: label, details: data?.expenses});
+                    } else if (label === "Others") {
+                        setDetails({title: label, details: data?.others_revenues});
+                    }
+                }} className={`rounded-2xl border border-white/10 bg-white/[0.025] p-4 ${label === "Expense" ? 'cursor-pointer' : label === "Others" ? 'cursor-pointer' : 'cursor-default'}`}>
                     <p className="text-xs uppercase tracking-wider text-slate-500">{label}</p>
                     <p className={`text-xl md:text-2xl font-black mt-1 ${color}`}>
                         {label === 'Active Dues' ? value : `৳ ${money(value)}`}
                     </p>
                 </div>)}
             </div>
+
+            <p className="text-sm tracking-[0.1em] text-emerald-400 mb-3">Last Revenue Transaction: <span className="text-white/80 mt-2 mb-7 ">{data.last_revenue_transaction?.amount} Taka at {data.last_revenue_transaction?.time} in {data.last_revenue_transaction?.category}</span></p>
+            <p className="text-sm tracking-[0.1em] text-red-400 mb-5">Last Expense Transaction: <span className="text-white/80 mt-2 mb-7 ">{data.last_expense_transaction?.amount} Taka for {data.last_expense_transaction?.comment} at {data.last_expense_transaction?.time}</span></p>
 
             <div className="flex flex-wrap gap-2 p-1 rounded-2xl bg-white/[0.025] border border-white/10 mb-7">
                 {nav.map(([label, path, Icon]) => {
@@ -147,6 +180,86 @@ export default function DailyTransactions() {
 
             <Outlet context={{ data, reload: load }} />
         </div>
+
+
+        {details && (
+            <div
+                className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
+                onClick={() =>
+                    setDetails(null)
+                }
+            >
+
+                <div
+                    onClick={(e) =>
+                        e.stopPropagation()
+                    }
+                    className="bg-[#0b1b18] rounded-3xl p-6 w-full max-w-xl max-h-[300px] overflow-scroll"
+                >
+
+                    <div className="flex justify-between border-b pb-3">
+
+                        <h2 className="font-bold text-white">
+                            {
+                                details?.title
+                            }
+                        </h2>
+
+
+                        <button
+                            onClick={() =>
+                                setDetails(
+                                    null
+                                )
+                            }
+                        >
+                            <MdOutlineCancel />
+                        </button>
+
+                    </div>
+
+
+                    {
+                        details?.details?.map(
+                            (
+                                x,
+                                i
+                            ) => (
+                                <div
+                                    key={i}
+                                    className="flex justify-between gap-4 py-3 border-b border-white/5"
+                                >
+
+                                    <span>
+                                        {
+                                            x.comment ||
+                                            x.reference ||
+                                            '—'
+                                        }
+                                    </span>
+
+
+                                    <b>
+                                        ৳{' '}
+                                        {
+                                            money(
+                                                x.amount
+                                            )
+                                        }
+                                    </b>
+
+                                </div>
+                            )
+                        )
+                    }
+
+                </div>
+
+            </div>
+        )}
+
+
+
     </div>;
 }
 

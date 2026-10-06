@@ -22,7 +22,7 @@ import {
 } from 'react-router-dom';
 
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 
 /* =========================================================
@@ -2302,7 +2302,7 @@ export default function ViewDailyTransactions() {
                             onClick={(e) =>
                                 e.stopPropagation()
                             }
-                            className="bg-[#0b1b18] rounded-3xl p-6 w-full max-w-xl"
+                            className="bg-[#0b1b18] rounded-3xl p-6 w-full max-w-xl max-h-[300px] overflow-scroll"
                         >
 
                             <div className="flex justify-between">

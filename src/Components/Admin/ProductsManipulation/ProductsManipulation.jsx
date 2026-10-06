@@ -4,7 +4,7 @@ import { NumericFormat } from 'react-number-format';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 const ProductsManipulation = () => {
     const loadedProducts = useLoaderData();

@@ -26,7 +26,7 @@ const ClientCorner = () => {
             cancelButtonText: 'Cancel',
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`http://localhost:5000/client/${id}`, {
+                fetch(`https://bismillah-enterprise-server.onrender.com/client/${id}`, {
                     method: 'DELETE',
                 })
                     .then((res) => res.json())

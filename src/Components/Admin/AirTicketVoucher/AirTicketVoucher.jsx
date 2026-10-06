@@ -6,7 +6,7 @@ import Swal from 'sweetalert2';
 import AirTicketVoucherHeading from '../../Shared/AirTicketVoucherHeading/AirTicketVoucherHeading';
 
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 const money = value => Number.isFinite(Number(value)) ? Number(Number(value).toFixed(2)) : 0;
 const dateOnly = value => {
     if (!value) return '';

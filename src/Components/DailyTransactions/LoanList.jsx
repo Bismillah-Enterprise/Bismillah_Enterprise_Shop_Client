@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Swal from 'sweetalert2';
 import { FiCheckCircle, FiClock, FiDollarSign, FiX } from 'react-icons/fi';
 
-const API = 'http://localhost:5000';
+const API = 'https://bismillah-enterprise-server.onrender.com';
 
 const money = value => Number(value || 0).toLocaleString('en-BD', { maximumFractionDigits: 2 });
 const number = value => Number(value) || 0;

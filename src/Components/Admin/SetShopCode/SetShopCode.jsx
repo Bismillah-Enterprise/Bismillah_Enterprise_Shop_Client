@@ -34,7 +34,7 @@ const SetShopCode = () => {
 
 		try {
 			const response = await fetch(
-				'http://localhost:5000/shop_code',
+				'https://bismillah-enterprise-server.onrender.com/shop_code',
 				{
 					method: 'POST',
 					headers: {
